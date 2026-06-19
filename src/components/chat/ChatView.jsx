@@ -1,9 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Sparkle, Rain, Bag } from "../Icons.jsx";
 import MessageBubble from "./MessageBubble.jsx";
 import Composer from "./Composer.jsx";
 import LookContextPanel from "./LookContextPanel.jsx";
 import { seedMessages, lookContext } from "../../data/seed.js";
+import { pickAlternative, cardToWardrobeItem } from "../../lib/look.js";
 
 function Chip({ icon: Icon, children }) {
   return (
@@ -14,30 +15,115 @@ function Chip({ icon: Icon, children }) {
   );
 }
 
-export default function ChatView() {
+function TypingBubble() {
+  return (
+    <div className="animate-fade-up">
+      <div className="mr-auto inline-flex items-center gap-3 rounded-xl3 rounded-tl-lg bg-paper px-5 py-4 shadow-soft ring-1 ring-line">
+        <span className="label text-accent">helloModa AI</span>
+        <span className="flex items-center gap-1">
+          <Dot delay="0ms" />
+          <Dot delay="180ms" />
+          <Dot delay="360ms" />
+        </span>
+        <span className="text-[13px] text-muted">styling your look…</span>
+      </div>
+    </div>
+  );
+}
+
+function Dot({ delay }) {
+  return (
+    <span
+      className="h-1.5 w-1.5 rounded-full bg-faint"
+      style={{ animation: "hm-blink 1.2s ease-in-out infinite", animationDelay: delay }}
+    />
+  );
+}
+
+export default function ChatView({ wardrobe = [], onWardrobeAdd, onWardrobeRemove }) {
   const [messages, setMessages] = useState(seedMessages);
+  const [thinking, setThinking] = useState(false);
+  const [look, setLook] = useState([]);
   const scrollRef = useRef(null);
+  const timers = useRef([]);
+
+  // Saved = present in wardrobe under its derived id.
+  const savedIds = useMemo(() => {
+    const ids = new Set();
+    wardrobe.forEach((it) => {
+      if (typeof it.id === "string" && it.id.startsWith("saved-")) {
+        ids.add(it.id.slice("saved-".length));
+      }
+    });
+    return ids;
+  }, [wardrobe]);
+
+  const lookIds = useMemo(() => new Set(look.map((c) => c.id)), [look]);
 
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages]);
+  }, [messages, thinking]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   function handleSend(text) {
-    const userMsg = { id: `u-${Date.now()}`, role: "user", text };
-    const aiMsg = {
-      id: `a-${Date.now()}`,
-      role: "ai",
-      title: "A refined direction",
-      hero: ["#e4e2f0", "#d7d4e9"],
-      text: "Noted. I'll keep your tailoring-forward, soft-neutral signature and weigh that against tonight's gallery dinner and the light rain. Here's a refined direction.",
-      cards: [
-        { id: `r-${Date.now()}-1`, name: "Ivory sheer knit", role: "Top layer", source: "shop", icon: "shirt", price: "$118" },
-        { id: `r-${Date.now()}-2`, name: "Satin micro bag", role: "Accent", source: "closet", icon: "bag", price: "In closet" },
-        { id: `r-${Date.now()}-3`, name: "Sculptural flats", role: "Footing", source: "closet", icon: "shoe", price: "In closet" },
-      ],
-    };
-    setMessages((prev) => [...prev, userMsg, aiMsg]);
+    if (thinking) return;
+    const stamp = Date.now();
+    setMessages((prev) => [...prev, { id: `u-${stamp}`, role: "user", text }]);
+    setThinking(true);
+
+    const delay = 1400 + Math.random() * 1100;
+    const t = setTimeout(() => {
+      const aiMsg = {
+        id: `a-${stamp}`,
+        role: "ai",
+        title: "A refined direction",
+        hero: true,
+        text: "Noted. I'll keep your tailoring-forward, soft-neutral signature and weigh that against tonight's gallery dinner and the light rain. Here's a refined direction.",
+        cards: [
+          { id: `r-${stamp}-1`, brand: "COS", name: "Sheer rib knit", type: "top", price: 159.99, retailer: "Zalando", source: "shop" },
+          { id: `r-${stamp}-2`, brand: "By Far", name: "Satin micro bag", type: "bag", price: null, retailer: "Closet", source: "closet" },
+          { id: `r-${stamp}-3`, brand: "The Row", name: "Sculptural flats", type: "shoe", price: null, retailer: "Closet", source: "closet" },
+        ],
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+      setThinking(false);
+    }, delay);
+    timers.current.push(t);
+  }
+
+  // Re-roll a single suggestion in place.
+  function handleSwap(messageId, cardId) {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id !== messageId
+          ? m
+          : { ...m, cards: m.cards.map((c) => (c.id === cardId ? pickAlternative(c) : c)) }
+      )
+    );
+  }
+
+  // Heart → toggle the piece in the wardrobe favorites.
+  function handleToggleSave(card) {
+    if (savedIds.has(card.id)) {
+      onWardrobeRemove?.(`saved-${card.id}`);
+    } else {
+      onWardrobeAdd?.(cardToWardrobeItem(card));
+    }
+  }
+
+  // + → toggle the piece in the assembled look.
+  function handleToggleLook(card) {
+    setLook((prev) =>
+      prev.some((c) => c.id === card.id)
+        ? prev.filter((c) => c.id !== card.id)
+        : [...prev, card]
+    );
+  }
+
+  function removeFromLook(id) {
+    setLook((prev) => prev.filter((c) => c.id !== id));
   }
 
   return (
@@ -62,7 +148,6 @@ export default function ChatView() {
 
         {/* Messages */}
         <div ref={scrollRef} className="scroll-area min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-          {/* Context chips */}
           <div className="mb-6 flex flex-wrap gap-2.5">
             <Chip icon={Bag}>Occasion: {lookContext.occasion}</Chip>
             <Chip icon={Rain}>{lookContext.weather}</Chip>
@@ -71,15 +156,31 @@ export default function ChatView() {
 
           <div className="space-y-5">
             {messages.map((m) => (
-              <MessageBubble key={m.id} message={m} />
+              <MessageBubble
+                key={m.id}
+                message={m}
+                onSwap={handleSwap}
+                onToggleSave={handleToggleSave}
+                onToggleLook={handleToggleLook}
+                savedIds={savedIds}
+                lookIds={lookIds}
+              />
             ))}
+            {thinking && <TypingBubble />}
           </div>
         </div>
 
-        <Composer onSend={handleSend} />
+        <Composer onSend={handleSend} disabled={thinking} />
       </section>
 
-      <LookContextPanel />
+      <LookContextPanel look={look} onRemove={removeFromLook} />
+
+      <style>{`
+        @keyframes hm-blink {
+          0%, 100% { opacity: 0.25; transform: translateY(0); }
+          50% { opacity: 1; transform: translateY(-1px); }
+        }
+      `}</style>
     </div>
   );
 }

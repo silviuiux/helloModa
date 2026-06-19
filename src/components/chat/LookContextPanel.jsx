@@ -1,4 +1,5 @@
-import { Sliders, Sparkle, Plus, Dress } from "../Icons.jsx";
+import { Sliders, Sparkle, Plus } from "../Icons.jsx";
+import GarmentArt from "../GarmentArt.jsx";
 import { lookContext } from "../../data/seed.js";
 
 function Row({ label, value }) {
@@ -10,7 +11,30 @@ function Row({ label, value }) {
   );
 }
 
-export default function LookContextPanel() {
+function LookPiece({ piece, onRemove }) {
+  return (
+    <div className="group relative overflow-hidden rounded-xl border border-line">
+      <div className="aspect-square">
+        <GarmentArt type={piece.type} />
+      </div>
+      <button
+        onClick={() => onRemove(piece.id)}
+        aria-label={`Remove ${piece.name}`}
+        className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-paper text-ink opacity-0 shadow-soft transition-opacity group-hover:opacity-100"
+      >
+        <span className="text-[15px] leading-none">×</span>
+      </button>
+      <div className="bg-paper px-2 py-1.5">
+        <p className="truncate text-[10.5px] font-medium text-ink">{piece.brand}</p>
+        <p className="truncate text-[10px] text-muted">{piece.name}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function LookContextPanel({ look = [], onRemove }) {
+  const empty = look.length === 0;
+
   return (
     <aside className="hidden w-[300px] shrink-0 flex-col border-l border-line bg-lav-50 px-5 py-6 xl:flex scroll-area overflow-y-auto">
       <div className="flex items-center justify-between">
@@ -23,13 +47,31 @@ export default function LookContextPanel() {
         </button>
       </div>
 
-      {/* Preview canvas */}
-      <div className="mt-5 grid aspect-square place-items-center rounded-xl2 border border-dashed border-lav-300 bg-lav-100/60 text-center">
-        <div className="text-accent/60">
-          <Dress size={40} />
-          <p className="mt-2 text-[12.5px] text-muted">Outfit preview canvas</p>
+      {/* Preview: empty state or the assembled pieces */}
+      {empty ? (
+        <div className="relative mt-5 aspect-square overflow-hidden rounded-xl2 ring-1 ring-line">
+          <GarmentArt type="look" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-paper/95 to-transparent px-3 pb-2.5 pt-10 text-center">
+            <p className="text-[12.5px] text-muted">
+              Tap <span className="font-medium text-ink">+</span> on a suggestion to build a look
+            </p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-5">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="label text-muted">Your look</span>
+            <span className="label text-accent">
+              {look.length} {look.length === 1 ? "piece" : "pieces"}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {look.map((piece) => (
+              <LookPiece key={piece.id} piece={piece} onRemove={onRemove} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Context rows */}
       <div className="mt-5 space-y-2.5">

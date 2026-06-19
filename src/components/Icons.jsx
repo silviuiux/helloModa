@@ -125,6 +125,13 @@ export const Check = (p) => (
   </Svg>
 );
 
+export const Refresh = (p) => (
+  <Svg {...p}>
+    <path d="M5 8.5h5v-5" />
+    <path d="M5 8.5 7.6 6A7 7 0 1 1 5.6 14" />
+  </Svg>
+);
+
 export const Sun = (p) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="4" />

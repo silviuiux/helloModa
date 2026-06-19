@@ -59,7 +59,11 @@ export default function App() {
         <main className="relative flex min-w-0 flex-1 flex-col bg-canvas">
           <MobileBar view={view} setView={setView} />
           {view === "chat" ? (
-            <ChatView wardrobeCount={wardrobe.length} />
+            <ChatView
+              wardrobe={wardrobe}
+              onWardrobeAdd={addWardrobeItem}
+              onWardrobeRemove={removeItem}
+            />
           ) : (
             <WardrobeView
               items={wardrobe}

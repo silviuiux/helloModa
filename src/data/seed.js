@@ -28,9 +28,9 @@ export const seedMessages = [
     hero: ["#e4e2f0", "#d7d4e9"],
     text: "Start with the trousers as the anchor. I'd soften them with an ivory sheer knit, sculptural flats, and a cropped rain shell so the look stays gallery-ready without feeling corporate.",
     cards: [
-      { id: "c1", name: "Ivory sheer knit", role: "Top layer", source: "shop", icon: "shirt", price: "$118" },
-      { id: "c2", name: "Satin micro bag", role: "Accent", source: "closet", icon: "bag", price: "In closet" },
-      { id: "c3", name: "Cropped rain shell", role: "Weather", source: "shop", icon: "hanger", price: "$96" },
+      { id: "c1", brand: "COS", name: "Sheer rib knit", type: "top", price: 159.99, retailer: "Zalando", source: "shop" },
+      { id: "c2", brand: "By Far", name: "Satin micro bag", type: "bag", price: null, retailer: "Closet", source: "closet" },
+      { id: "c3", brand: "Rains", name: "Cropped shell", type: "outerwear", price: 169.99, retailer: "Zalando", source: "shop" },
     ],
     followup:
       "Before I finalize, should I prioritize comfort, drama, or weather protection?",
@@ -69,3 +69,47 @@ export const wardrobeCategories = [
   "Bags",
   "Accessories",
 ];
+
+// Alternatives the stylist can re-roll to when you tap "swap" on a card.
+export const catalog = {
+  top: [
+    { brand: "COS", name: "Sheer rib knit", type: "top", price: 159.99, retailer: "Zalando", source: "shop" },
+    { brand: "Arket", name: "Merino crewneck", type: "top", price: 139.99, retailer: "Zalando", source: "shop" },
+    { brand: "& Other Stories", name: "Satin shell top", type: "top", price: 129.99, retailer: "About You", source: "shop" },
+    { brand: "Mango", name: "Linen blouse", type: "top", price: 99.99, retailer: "Zalando", source: "shop" },
+    { brand: "Uniqlo", name: "White cotton shirt", type: "top", price: null, retailer: "Closet", source: "closet" },
+  ],
+  bottoms: [
+    { brand: "Toteme", name: "Wide-leg trousers", type: "bottoms", price: null, retailer: "Closet", source: "closet" },
+    { brand: "Arket", name: "Pleated midi skirt", type: "bottoms", price: 119.99, retailer: "Zalando", source: "shop" },
+    { brand: "Weekday", name: "Tailored shorts", type: "bottoms", price: 89.99, retailer: "Zalando", source: "shop" },
+    { brand: "Levi's", name: "Straight denim", type: "bottoms", price: 169.99, retailer: "About You", source: "shop" },
+  ],
+  dress: [
+    { brand: "Reformation", name: "Silk slip dress", type: "dress", price: 289.99, retailer: "Zalando", source: "shop" },
+    { brand: "Ganni", name: "Printed midi dress", type: "dress", price: 219.99, retailer: "Zalando", source: "shop" },
+    { brand: "Mango", name: "Knit column dress", type: "dress", price: 149.99, retailer: "About You", source: "shop" },
+  ],
+  outerwear: [
+    { brand: "Rains", name: "Cropped shell", type: "outerwear", price: 169.99, retailer: "Zalando", source: "shop" },
+    { brand: "Theory", name: "Charcoal blazer", type: "outerwear", price: 329.99, retailer: "About You", source: "shop" },
+    { brand: "Max Mara", name: "Camel wool coat", type: "outerwear", price: null, retailer: "Closet", source: "closet" },
+    { brand: "COS", name: "Belted trench", type: "outerwear", price: 249.99, retailer: "Zalando", source: "shop" },
+  ],
+  shoe: [
+    { brand: "The Row", name: "Sculptural flats", type: "shoe", price: null, retailer: "Closet", source: "closet" },
+    { brand: "Vagabond", name: "Leather ankle boots", type: "shoe", price: 179.99, retailer: "Zalando", source: "shop" },
+    { brand: "Aeyde", name: "Square-toe mules", type: "shoe", price: 199.99, retailer: "About You", source: "shop" },
+    { brand: "Veja", name: "Minimal sneakers", type: "shoe", price: 139.99, retailer: "Zalando", source: "shop" },
+  ],
+  bag: [
+    { brand: "By Far", name: "Satin micro bag", type: "bag", price: null, retailer: "Closet", source: "closet" },
+    { brand: "Wandler", name: "Structured tote", type: "bag", price: 259.99, retailer: "Zalando", source: "shop" },
+    { brand: "Polène", name: "Crescent shoulder bag", type: "bag", price: 229.99, retailer: "About You", source: "shop" },
+  ],
+  accessory: [
+    { brand: "Mejuri", name: "Gold hoop earrings", type: "accessory", price: 119.99, retailer: "Zalando", source: "shop" },
+    { brand: "Daniel W.", name: "Slim watch", type: "accessory", price: 149.99, retailer: "About You", source: "shop" },
+    { brand: "Mango", name: "Silk neck scarf", type: "accessory", price: 49.99, retailer: "Zalando", source: "shop" },
+  ],
+};
