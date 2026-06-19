@@ -33,8 +33,8 @@ function CircleBtn({ icon: Icon, label, onClick, filled, title }) {
       aria-label={label}
       title={title || label}
       aria-pressed={filled}
-      className={`grid h-9 w-9 place-items-center rounded-full shadow-soft transition-transform hover:scale-105 active:scale-95 ${
-        filled ? "bg-accent text-paper" : "bg-paper text-ink"
+      className={`grid h-9 w-9 place-items-center rounded-full transition-transform hover:scale-105 active:scale-95 ${
+        filled ? "bg-accent text-white shadow-soft" : "glass-circle text-ink"
       }`}
     >
       <Icon size={17} />

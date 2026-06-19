@@ -15,14 +15,14 @@ export default function Composer({ onSend, disabled = false }) {
   }
 
   return (
-    <div className="border-t border-line bg-canvas px-6 py-4 sm:px-8">
+    <div className="border-t border-white/40 px-6 py-4 sm:px-8">
       <div className="mb-3 flex flex-wrap gap-2">
         {composerPrompts.map((p) => (
           <button
             key={p}
             onClick={() => !disabled && onSend?.(p)}
             disabled={disabled}
-            className="rounded-full border border-line bg-lav-50 px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:border-accent/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="glass-soft rounded-full px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:text-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
             {p}
           </button>
@@ -30,7 +30,7 @@ export default function Composer({ onSend, disabled = false }) {
       </div>
       <form onSubmit={submit} className="flex items-center gap-3">
         <div
-          className={`flex flex-1 items-center rounded-full border border-line bg-paper px-5 shadow-soft transition-opacity focus-within:border-accent/50 ${
+          className={`glass flex flex-1 items-center rounded-full px-5 transition-opacity focus-within:border-accent/60 ${
             disabled ? "opacity-60" : ""
           }`}
         >
@@ -50,7 +50,7 @@ export default function Composer({ onSend, disabled = false }) {
           type="submit"
           aria-label="Send"
           disabled={disabled}
-          className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-paper transition-transform duration-200 hover:scale-[1.04] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent text-white shadow-soft transition-all duration-200 hover:bg-accent-deep hover:scale-[1.04] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ArrowRight size={20} />
         </button>

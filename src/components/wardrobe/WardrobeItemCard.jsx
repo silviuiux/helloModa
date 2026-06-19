@@ -15,7 +15,7 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove }) {
   const tone = dark ? "text-white/90" : "text-ink/70";
 
   return (
-    <div className="group overflow-hidden rounded-xl2 border border-line bg-paper shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-panel">
+    <div className="group glass overflow-hidden rounded-xl2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
       {/* Swatch */}
       <div
         className="relative grid aspect-[4/5] place-items-center"
@@ -30,7 +30,7 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove }) {
           aria-label={item.fav ? "Remove from favorites" : "Add to favorites"}
           className={`absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full backdrop-blur-sm transition-colors ${
             item.fav
-              ? "bg-accent text-paper"
+              ? "bg-accent text-white"
               : "bg-black/15 text-white/85 hover:bg-black/30"
           }`}
         >

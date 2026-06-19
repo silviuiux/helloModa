@@ -8,7 +8,7 @@ import { pickAlternative, cardToWardrobeItem } from "../../lib/look.js";
 
 function Chip({ icon: Icon, children }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-lav-100 px-3.5 py-1.5 text-[12.5px] text-muted">
+    <span className="glass-soft inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12.5px] text-muted">
       {Icon && <Icon size={14} />}
       {children}
     </span>
@@ -18,8 +18,8 @@ function Chip({ icon: Icon, children }) {
 function TypingBubble() {
   return (
     <div className="animate-fade-up">
-      <div className="mr-auto inline-flex items-center gap-3 rounded-xl3 rounded-tl-lg bg-paper px-5 py-4 shadow-soft ring-1 ring-line">
-        <span className="label text-accent">helloModa AI</span>
+      <div className="glass mr-auto inline-flex items-center gap-3 rounded-xl3 rounded-tl-lg px-5 py-4">
+        <span className="label text-accent-deep">helloModa AI</span>
         <span className="flex items-center gap-1">
           <Dot delay="0ms" />
           <Dot delay="180ms" />
@@ -140,7 +140,7 @@ export default function ChatView({ wardrobe = [], onWardrobeAdd, onWardrobeRemov
               AI stylist · remembers wardrobe, fit notes, and taste boundaries
             </p>
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent-tint px-3.5 py-2 text-[12.5px] font-medium text-accent">
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent-tint px-3.5 py-2 text-[12.5px] font-medium text-accent-deep">
             <Sparkle size={14} />
             Context on
           </span>

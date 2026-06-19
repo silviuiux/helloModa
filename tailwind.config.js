@@ -4,30 +4,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Near-white canvas + paper surfaces
-        canvas: "#fbfbfd",
+        // Light lavender-gray field + paper surfaces
+        canvas: "#efedf4",
         paper: "#ffffff",
-        // Lavender-grey surface scale (tints, pills, placeholders)
+        // Lavender surface scale (tints, pills, placeholders)
         lav: {
-          50: "#f6f5fb",
-          100: "#eeedf6",
-          200: "#e4e2f0",
-          300: "#d7d4e9",
-          400: "#bcb7da",
-          500: "#9b95c6",
+          50: "#f6f4fb",
+          100: "#efedf4",
+          200: "#e6e2f1",
+          300: "#d8d2ec",
+          400: "#c3b8e6",
+          500: "#a789f4",
         },
-        // Charcoal ink for actions / active states
-        ink: "#272631",
-        muted: "#807e8c",
-        faint: "#b4b2c0",
-        // Periwinkle accent — used sparingly
+        // Purple-tinted ink for text
+        ink: "#2b2840",
+        muted: "#7c7990",
+        faint: "#aaa6bd",
+        // Purple accent — primary actions + CTAs
         accent: {
-          DEFAULT: "#6f69ac",
-          soft: "#cecae8",
-          tint: "#edebf7",
+          DEFAULT: "#a789f4",
+          deep: "#8c6ae2",
+          soft: "#cdbef7",
+          tint: "#ece6fb",
         },
-        line: "#ececf1",
-        hair: "#f2f1f7",
+        line: "#e7e3f1",
+        hair: "#f0edf7",
       },
       fontFamily: {
         display: ['Fraunces', 'Iowan Old Style', 'Georgia', 'serif'],
@@ -42,9 +43,10 @@ export default {
         xl3: "28px",
       },
       boxShadow: {
-        panel: "0 1px 2px rgba(39,38,49,0.04), 0 18px 40px -24px rgba(39,38,49,0.22)",
-        soft: "0 1px 2px rgba(39,38,49,0.04), 0 10px 24px -18px rgba(39,38,49,0.20)",
-        lift: "0 2px 4px rgba(39,38,49,0.05), 0 24px 50px -26px rgba(39,38,49,0.28)",
+        panel: "0 1px 2px rgba(43,40,64,0.04), 0 18px 44px -22px rgba(43,40,64,0.26)",
+        soft: "0 1px 2px rgba(43,40,64,0.04), 0 10px 26px -16px rgba(43,40,64,0.22)",
+        lift: "0 2px 4px rgba(43,40,64,0.05), 0 30px 60px -26px rgba(43,40,64,0.34)",
+        glass: "0 14px 44px -18px rgba(43,40,64,0.30), inset 0 1px 0 rgba(255,255,255,0.7)",
       },
       keyframes: {
         "fade-up": {

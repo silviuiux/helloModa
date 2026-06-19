@@ -28,7 +28,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Header */}
-      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line px-6 py-5 sm:px-8">
+      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-white/40 px-6 py-5 sm:px-8">
         <div>
           <h1 className="font-display text-[26px] font-medium leading-tight text-ink">
             Wardrobe
@@ -39,7 +39,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
           </p>
         </div>
         <div className="flex items-center gap-2.5">
-          <div className="flex h-11 items-center gap-2 rounded-full border border-line bg-paper px-4">
+          <div className="glass-soft flex h-11 items-center gap-2 rounded-full px-4">
             <Search size={16} className="text-faint" />
             <input
               value={query}
@@ -50,7 +50,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="flex h-11 items-center gap-1.5 rounded-full bg-ink px-4 text-[14px] font-medium text-paper transition-transform hover:scale-[1.03]"
+            className="flex h-11 items-center gap-1.5 rounded-full bg-accent px-4 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.03]"
           >
             <Plus size={17} />
             Add item
@@ -59,15 +59,15 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
       </header>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-line px-6 py-3.5 sm:px-8">
+      <div className="flex flex-wrap items-center gap-2 border-b border-white/40 px-6 py-3.5 sm:px-8">
         {wardrobeCategories.map((c) => (
           <button
             key={c}
             onClick={() => setCategory(c)}
             className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
               category === c
-                ? "bg-ink text-paper"
-                : "border border-line bg-paper text-muted hover:border-accent/40 hover:text-ink"
+                ? "bg-accent text-white shadow-soft"
+                : "glass-soft text-muted hover:text-accent-deep"
             }`}
           >
             {c}
@@ -78,8 +78,8 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
           onClick={() => setFavOnly((v) => !v)}
           className={`ml-auto rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
             favOnly
-              ? "bg-accent text-paper"
-              : "border border-line bg-paper text-muted hover:text-ink"
+              ? "bg-accent text-white shadow-soft"
+              : "glass-soft text-muted hover:text-accent-deep"
           }`}
         >
           Favorites only
@@ -94,7 +94,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
             <p className="mt-3 text-[15px]">Nothing here yet.</p>
             <button
               onClick={() => setModalOpen(true)}
-              className="mt-3 text-[14px] font-medium text-accent hover:underline"
+              className="mt-3 text-[14px] font-medium text-accent-deep hover:underline"
             >
               Add your first piece
             </button>
@@ -104,10 +104,10 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
             {/* Upload tile */}
             <button
               onClick={() => setModalOpen(true)}
-              className="group grid aspect-[4/5] place-items-center rounded-xl2 border border-dashed border-lav-300 bg-lav-50 text-muted transition-colors hover:border-accent/50 hover:bg-lav-100 hover:text-ink"
+              className="group grid aspect-[4/5] place-items-center rounded-xl2 border border-dashed border-accent-soft bg-white/30 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/50 hover:text-accent-deep"
             >
               <span className="text-center">
-                <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-paper ring-1 ring-line transition-transform group-hover:scale-105">
+                <span className="glass-circle mx-auto grid h-12 w-12 place-items-center rounded-full transition-transform group-hover:scale-105">
                   <Plus size={22} />
                 </span>
                 <span className="mt-2.5 block text-[13px] font-medium">Add piece</span>

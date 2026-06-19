@@ -7,8 +7,8 @@ function NavItem({ active, icon: Icon, label, count, onClick }) {
       onClick={onClick}
       className={`group flex w-full items-center gap-3 rounded-xl2 px-4 py-3 text-left text-[15px] transition-colors duration-200 ${
         active
-          ? "bg-ink text-paper"
-          : "text-muted hover:bg-lav-100 hover:text-ink"
+          ? "bg-accent text-white shadow-soft"
+          : "text-muted hover:bg-white/50 hover:text-ink"
       }`}
     >
       <Icon size={19} />
@@ -16,7 +16,7 @@ function NavItem({ active, icon: Icon, label, count, onClick }) {
       {count != null && (
         <span
           className={`ml-auto rounded-full px-2 py-0.5 text-[11px] font-medium ${
-            active ? "bg-paper/15 text-paper" : "bg-lav-200 text-muted"
+            active ? "bg-white/25 text-white" : "bg-white/60 text-muted"
           }`}
         >
           {count}
@@ -28,18 +28,18 @@ function NavItem({ active, icon: Icon, label, count, onClick }) {
 
 export default function Sidebar({ view, setView, wardrobeCount }) {
   return (
-    <aside className="hidden w-[270px] shrink-0 flex-col border-r border-line bg-lav-50 px-5 pb-5 pt-6 md:flex">
+    <aside className="glass-panel hidden w-[270px] shrink-0 flex-col border-r border-white/40 px-5 pb-5 pt-6 md:flex">
       {/* Brand */}
       <div className="flex items-center gap-3 px-1">
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-lav-300 text-ink">
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-accent text-white shadow-soft">
           <Sparkle size={17} />
         </span>
         <span className="label text-muted">helloModa</span>
       </div>
 
       {/* Style memory card */}
-      <div className="mt-6 rounded-xl2 bg-paper p-5 text-center shadow-soft ring-1 ring-line">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-lav-100 text-accent">
+      <div className="glass mt-6 rounded-xl2 p-5 text-center">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-tint text-accent-deep">
           <Dress size={24} />
         </span>
         <h2 className="mt-3 font-display text-[19px] font-medium text-ink">
@@ -68,8 +68,8 @@ export default function Sidebar({ view, setView, wardrobeCount }) {
       </nav>
 
       {/* Today's intent */}
-      <div className="mt-auto rounded-xl2 border border-dashed border-lav-300 bg-lav-100/60 p-4">
-        <p className="label text-accent">Today&rsquo;s intent</p>
+      <div className="mt-auto rounded-xl2 border border-dashed border-accent-soft bg-white/40 p-4">
+        <p className="label text-accent-deep">Today&rsquo;s intent</p>
         <p className="mt-2 text-[13px] leading-relaxed text-muted">
           {styleMemory.intent}
         </p>

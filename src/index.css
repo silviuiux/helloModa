@@ -14,22 +14,50 @@ body,
 
 body {
   margin: 0;
-  background: #ecebf2;
+  background: #e7e3f1;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* ---- Glass / visionOS HUD surfaces ---- */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 14px 44px -18px rgba(43, 40, 64, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.glass-soft {
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+.glass-panel {
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+.glass-circle {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 16px -6px rgba(43, 40, 64, 0.4);
 }
 
 /* Thin, cool scrollbars inside panels */
 .scroll-area {
   scrollbar-width: thin;
-  scrollbar-color: #d7d4e9 transparent;
+  scrollbar-color: #d8d2ec transparent;
 }
 .scroll-area::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 .scroll-area::-webkit-scrollbar-thumb {
-  background: #dddae9;
+  background: #ddd6ef;
   border-radius: 999px;
 }
 .scroll-area::-webkit-scrollbar-track {

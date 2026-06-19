@@ -41,10 +41,10 @@ export default function AddItemModal({ open, onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" onClick={onClose} />
       <form
         onSubmit={submit}
-        className="animate-fade-up relative w-full max-w-md rounded-xl3 bg-canvas p-6 shadow-lift ring-1 ring-line"
+        className="glass animate-fade-up relative w-full max-w-md rounded-xl3 p-6"
       >
         <h3 className="font-display text-[22px] font-medium text-ink">Add wardrobe item</h3>
         <p className="mt-1 text-[13px] text-muted">
@@ -112,7 +112,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
           </button>
           <button
             type="submit"
-            className="flex items-center gap-1.5 rounded-xl2 bg-ink px-4 py-2.5 text-[14px] font-medium text-paper transition-transform hover:scale-[1.02]"
+            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
           >
             <Plus size={16} />
             Add item
@@ -123,10 +123,10 @@ export default function AddItemModal({ open, onClose, onAdd }) {
       <style>{`
         .input{
           width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:#fffdf9; border:1px solid #e6dccd; color:#2a241f;
+          background:rgba(255,255,255,0.7); border:1px solid #e7e3f1; color:#2b2840;
           font-size:14px; outline:none;
         }
-        .input:focus{ border-color:#6f69ac; }
+        .input:focus{ border-color:#a789f4; box-shadow:0 0 0 3px rgba(167,137,244,0.18); }
       `}</style>
     </div>
   );

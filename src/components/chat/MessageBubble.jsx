@@ -15,8 +15,8 @@ export default function MessageBubble({
   if (isUser) {
     return (
       <div className="animate-fade-up">
-        <div className="ml-auto max-w-[78%] rounded-xl3 rounded-tr-lg bg-lav-100 px-5 py-4">
-          <p className="label mb-1.5 text-muted/80">You</p>
+        <div className="ml-auto max-w-[78%] rounded-xl3 rounded-tr-lg border border-accent-soft/50 bg-accent-tint/70 px-5 py-4 backdrop-blur-md">
+          <p className="label mb-1.5 text-accent-deep/80">You</p>
           <p className="text-[15.5px] leading-relaxed text-ink">{message.text}</p>
         </div>
       </div>
@@ -27,7 +27,7 @@ export default function MessageBubble({
 
   return (
     <div className="animate-fade-up">
-      <div className="mr-auto max-w-[92%] overflow-hidden rounded-xl3 rounded-tl-lg bg-paper shadow-soft ring-1 ring-line">
+      <div className="glass mr-auto max-w-[92%] overflow-hidden rounded-xl3 rounded-tl-lg">
         {/* Editorial hero */}
         {hero && (
           <div className="relative h-48">
@@ -42,7 +42,7 @@ export default function MessageBubble({
         )}
 
         <div className="px-5 py-4">
-          <p className="label mb-2 text-accent">helloModa AI</p>
+          <p className="label mb-2 text-accent-deep">helloModa AI</p>
           <p className="text-[15.5px] leading-relaxed text-ink">{message.text}</p>
           <RecommendationCards
             cards={message.cards}
@@ -53,7 +53,7 @@ export default function MessageBubble({
             lookIds={lookIds}
           />
           {message.followup && (
-            <div className="mt-4 rounded-xl2 bg-lav-100 px-4 py-3">
+            <div className="mt-4 rounded-xl2 border border-accent-soft/40 bg-accent-tint/60 px-4 py-3">
               <p className="text-[13.5px] leading-relaxed text-muted">
                 {message.followup}
               </p>
@@ -61,7 +61,7 @@ export default function MessageBubble({
           )}
 
           {/* Response toolbar */}
-          <div className="mt-4 flex items-center gap-1 border-t border-line pt-3 text-faint">
+          <div className="mt-4 flex items-center gap-1 border-t border-white/50 pt-3 text-faint">
             <ToolbarBtn icon={Heart} label="Love" />
             <ToolbarBtn icon={Bookmark} label="Save look" />
             <ToolbarBtn icon={Dots} label="More" />
@@ -74,7 +74,7 @@ export default function MessageBubble({
 
 function ToolbarBtn({ icon: Icon, label }) {
   return (
-    <button className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[12px] transition-colors hover:bg-lav-100 hover:text-ink">
+    <button className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[12px] transition-colors hover:bg-white/60 hover:text-accent-deep">
       <Icon size={15} />
       <span>{label}</span>
     </button>

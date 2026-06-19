@@ -7,9 +7,9 @@ import { wardrobeItems as seedWardrobe } from "./data/seed.js";
 
 function MobileBar({ view, setView }) {
   return (
-    <div className="flex items-center gap-2 border-b border-line bg-lav-50 px-4 py-2.5 md:hidden">
+    <div className="glass-soft flex items-center gap-2 border-b border-white/40 px-4 py-2.5 md:hidden">
       <span className="mr-auto flex items-center gap-2 text-ink">
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-lav-300 text-ink">
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-white">
           <Sparkle size={14} />
         </span>
         <span className="label text-muted">helloModa</span>
@@ -17,7 +17,7 @@ function MobileBar({ view, setView }) {
       <button
         onClick={() => setView("chat")}
         className={`grid h-9 w-9 place-items-center rounded-full ${
-          view === "chat" ? "bg-ink text-paper" : "text-muted"
+          view === "chat" ? "bg-accent text-white" : "text-muted"
         }`}
         aria-label="Chat"
       >
@@ -26,7 +26,7 @@ function MobileBar({ view, setView }) {
       <button
         onClick={() => setView("wardrobe")}
         className={`grid h-9 w-9 place-items-center rounded-full ${
-          view === "wardrobe" ? "bg-ink text-paper" : "text-muted"
+          view === "wardrobe" ? "bg-accent text-white" : "text-muted"
         }`}
         aria-label="Wardrobe"
       >
@@ -53,10 +53,17 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#ecebf2] p-3 sm:p-5 lg:p-7 font-sans text-ink">
-      <div className="mx-auto flex h-[calc(100vh-1.5rem)] sm:h-[calc(100vh-2.5rem)] lg:h-[calc(100vh-3.5rem)] max-w-[1480px] overflow-hidden rounded-xl3 bg-canvas shadow-lift ring-1 ring-line">
+    <div className="relative min-h-screen w-full overflow-hidden p-3 font-sans text-ink sm:p-5 lg:p-7"
+      style={{ background: "radial-gradient(120% 95% at 18% 6%, #f4f2fa 0%, #e9e5f3 48%, #e0dbef 100%)" }}>
+      {/* ambient HUD orbs */}
+      <div className="pointer-events-none absolute -left-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-50 blur-3xl"
+        style={{ background: "radial-gradient(circle, #c3b0f7, transparent 70%)" }} />
+      <div className="pointer-events-none absolute -bottom-32 -right-24 h-[30rem] w-[30rem] rounded-full opacity-45 blur-3xl"
+        style={{ background: "radial-gradient(circle, #b69bf2, transparent 70%)" }} />
+
+      <div className="glass relative mx-auto flex h-[calc(100vh-1.5rem)] max-w-[1480px] overflow-hidden rounded-xl3 sm:h-[calc(100vh-2.5rem)] lg:h-[calc(100vh-3.5rem)]">
         <Sidebar view={view} setView={setView} wardrobeCount={wardrobe.length} />
-        <main className="relative flex min-w-0 flex-1 flex-col bg-canvas">
+        <main className="relative flex min-w-0 flex-1 flex-col">
           <MobileBar view={view} setView={setView} />
           {view === "chat" ? (
             <ChatView
