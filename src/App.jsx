@@ -54,12 +54,12 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden p-3 font-sans text-ink sm:p-5 lg:p-7"
-      style={{ background: "radial-gradient(120% 95% at 18% 6%, #f4f2fa 0%, #e9e5f3 48%, #e0dbef 100%)" }}>
+      style={{ background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)" }}>
       {/* ambient HUD orbs */}
-      <div className="pointer-events-none absolute -left-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-50 blur-3xl"
-        style={{ background: "radial-gradient(circle, #c3b0f7, transparent 70%)" }} />
-      <div className="pointer-events-none absolute -bottom-32 -right-24 h-[30rem] w-[30rem] rounded-full opacity-45 blur-3xl"
-        style={{ background: "radial-gradient(circle, #b69bf2, transparent 70%)" }} />
+      <div className="pointer-events-none absolute -left-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-[0.34] blur-3xl"
+        style={{ background: "radial-gradient(circle, #cdbef7, transparent 70%)" }} />
+      <div className="pointer-events-none absolute -bottom-32 -right-24 h-[30rem] w-[30rem] rounded-full opacity-[0.34] blur-3xl"
+        style={{ background: "radial-gradient(circle, #bba8f2, transparent 70%)" }} />
 
       <div className="glass relative mx-auto flex h-[calc(100vh-1.5rem)] max-w-[1480px] overflow-hidden rounded-xl3 sm:h-[calc(100vh-2.5rem)] lg:h-[calc(100vh-3.5rem)]">
         <Sidebar view={view} setView={setView} wardrobeCount={wardrobe.length} />

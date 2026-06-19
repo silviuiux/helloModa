@@ -16,10 +16,10 @@ export default {
           400: "#c3b8e6",
           500: "#a789f4",
         },
-        // Purple-tinted ink for text
-        ink: "#2b2840",
-        muted: "#7c7990",
-        faint: "#aaa6bd",
+        // Purple-tinted ink for text (softened)
+        ink: "#34304a",
+        muted: "#8c89a0",
+        faint: "#b2afc0",
         // Purple accent — primary actions + CTAs
         accent: {
           DEFAULT: "#a789f4",

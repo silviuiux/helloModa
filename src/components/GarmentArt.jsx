@@ -3,14 +3,14 @@
 // background and a stylized flat-lay silhouette so cards feel "shot", not empty.
 
 const GRADIENTS = {
-  top: ["#eef0f8", "#e2e6f4"],
-  bottoms: ["#f0eef6", "#e5e0f0"],
-  dress: ["#f3eef4", "#ebe1ee"],
-  outerwear: ["#eef1f3", "#dfe6ea"],
-  shoe: ["#f3efe8", "#e9e1d4"],
-  bag: ["#f1eef2", "#e6dfea"],
-  accessory: ["#f4f0e8", "#efe5d4"],
-  look: ["#edecf7", "#e0def0"],
+  top: ["#f2f1f7", "#e4e1ee"],
+  bottoms: ["#f3f1f7", "#e6e1f0"],
+  dress: ["#f4f3f8", "#e7e4f0"],
+  outerwear: ["#f1f2f6", "#e2e4ee"],
+  shoe: ["#f5f2ed", "#ebe4da"],
+  bag: ["#f3f1f7", "#e7e1ee"],
+  accessory: ["#f6f2ea", "#efe6d8"],
+  look: ["#f4f3f8", "#ded8ec"],
 };
 
 // Each path is drawn in a 120 x 160 viewBox, centered around x=60.
@@ -107,15 +107,15 @@ export default function GarmentArt({ type = "top", className = "" }) {
       >
         <g
           style={{
-            fill: "rgba(39,38,49,0.26)",
+            fill: "rgba(70,66,96,0.14)",
           }}
         >
           {SHAPES[key]}
         </g>
         <style>{`
-          svg .stroke{ fill:none; stroke:rgba(39,38,49,0.38); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+          svg .stroke{ fill:none; stroke:rgba(70,66,96,0.22); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
           svg .nofill{ fill:none; }
-          svg .dot{ fill:rgba(39,38,49,0.4); }
+          svg .dot{ fill:rgba(70,66,96,0.24); }
         `}</style>
       </svg>
     </div>

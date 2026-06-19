@@ -2,11 +2,11 @@ import { Sliders, Sparkle, Plus } from "../Icons.jsx";
 import GarmentArt from "../GarmentArt.jsx";
 import { lookContext } from "../../data/seed.js";
 
-function Row({ label, value }) {
+function Readout({ label, value }) {
   return (
-    <div className="glass-soft flex items-center justify-between rounded-xl2 px-4 py-3">
-      <span className="text-[13.5px] text-muted">{label}</span>
-      <span className="text-[13.5px] font-medium text-ink">{value}</span>
+    <div>
+      <p className="label text-faint">{label}</p>
+      <p className="mt-1 text-[13.5px] text-ink">{value}</p>
     </div>
   );
 }
@@ -73,11 +73,12 @@ export default function LookContextPanel({ look = [], onRemove }) {
         </div>
       )}
 
-      {/* Context rows */}
-      <div className="mt-5 space-y-2.5">
-        <Row label="Silhouette" value={lookContext.silhouette} />
-        <Row label="Palette" value={lookContext.palette} />
-        <Row label="Risk" value={lookContext.risk} />
+      {/* Context readouts — quiet mono HUD labels, no chrome */}
+      <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-white/40 pt-5">
+        <Readout label="Silhouette" value={lookContext.silhouette} />
+        <Readout label="Palette" value={lookContext.palette} />
+        <Readout label="Risk" value={lookContext.risk} />
+        <Readout label="Weather" value={lookContext.weather} />
       </div>
 
       {/* Actions */}

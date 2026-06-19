@@ -5,20 +5,20 @@ import { priceParts } from "../../lib/format.js";
 function RetailerTag({ retailer, source }) {
   if (source === "closet") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[13px] text-muted">
-        <Hanger size={15} />
+      <span className="inline-flex items-center gap-1.5 text-[11.5px] text-muted">
+        <Hanger size={13} />
         In your closet
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 text-[14px] font-medium text-ink">
+    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink">
       <span
         className="inline-block h-0 w-0"
         style={{
-          borderTop: "5px solid transparent",
-          borderBottom: "5px solid transparent",
-          borderLeft: "8px solid #ff6900",
+          borderTop: "4px solid transparent",
+          borderBottom: "4px solid transparent",
+          borderLeft: "7px solid #ff6900",
         }}
       />
       {retailer}
@@ -33,11 +33,11 @@ function CircleBtn({ icon: Icon, label, onClick, filled, title }) {
       aria-label={label}
       title={title || label}
       aria-pressed={filled}
-      className={`grid h-9 w-9 place-items-center rounded-full transition-transform hover:scale-105 active:scale-95 ${
+      className={`grid h-8 w-8 place-items-center rounded-full transition-transform hover:scale-105 active:scale-95 ${
         filled ? "bg-accent text-white shadow-soft" : "glass-circle text-ink"
       }`}
     >
-      <Icon size={17} />
+      <Icon size={15} />
     </button>
   );
 }
@@ -45,49 +45,44 @@ function CircleBtn({ icon: Icon, label, onClick, filled, title }) {
 function ProductCard({ card, onSwap, onToggleSave, onToggleLook, saved, inLook }) {
   const price = priceParts(card.price);
   return (
-    <div className="group">
-      {/* Image area */}
-      <div className="relative aspect-[3/4] overflow-hidden rounded-xl2">
-        {/* key forces a soft fade when the product is swapped */}
-        <div key={`${card.brand}-${card.name}`} className="animate-fade-up h-full w-full">
-          <GarmentArt type={card.type} />
-        </div>
-        {/* bottom-left controls */}
-        <div className="absolute bottom-2.5 left-2.5 flex gap-1.5">
-          <CircleBtn icon={Refresh} label="Swap suggestion" onClick={() => onSwap?.(card.id)} />
-          <CircleBtn
-            icon={Heart}
-            label={saved ? "Saved to wardrobe" : "Save to wardrobe"}
-            filled={saved}
-            onClick={() => onToggleSave?.(card)}
-          />
-        </div>
-        {/* bottom-right add to look */}
-        <div className="absolute bottom-2.5 right-2.5">
-          <CircleBtn
-            icon={inLook ? Check : Plus}
-            label={inLook ? "Remove from look" : "Add to look"}
-            filled={inLook}
-            onClick={() => onToggleLook?.(card)}
-          />
-        </div>
+    <div className="group glass relative aspect-[3/4] overflow-hidden rounded-xl2">
+      {/* full-bleed figure (fades when swapped) */}
+      <div key={`${card.brand}-${card.name}`} className="animate-fade-up absolute inset-0">
+        <GarmentArt type={card.type} />
       </div>
 
-      {/* Meta */}
-      <div className="mt-3">
-        <p className="font-display text-[15px] font-semibold uppercase tracking-tight text-ink">
+      {/* edge controls */}
+      <div className="absolute left-2 top-2 flex gap-1.5">
+        <CircleBtn icon={Refresh} label="Swap suggestion" onClick={() => onSwap?.(card.id)} />
+        <CircleBtn
+          icon={Heart}
+          label={saved ? "Saved to wardrobe" : "Save to wardrobe"}
+          filled={saved}
+          onClick={() => onToggleSave?.(card)}
+        />
+      </div>
+      <div className="absolute right-2 top-2">
+        <CircleBtn
+          icon={inLook ? Check : Plus}
+          label={inLook ? "Remove from look" : "Add to look"}
+          filled={inLook}
+          onClick={() => onToggleLook?.(card)}
+        />
+      </div>
+
+      {/* frosted label overlay */}
+      <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10"
+        style={{ background: "linear-gradient(to top, rgba(255,255,255,0.82) 28%, rgba(255,255,255,0))" }}>
+        <p className="font-display text-[14px] font-semibold uppercase tracking-tight text-ink">
           {card.brand}
         </p>
-        <p className="mt-0.5 text-[13.5px] text-muted">{card.name}</p>
-        {price ? (
-          <p className="mt-2 text-[15px] font-medium text-ink">
-            {price.whole}
-            <sup className="text-[10px] font-medium">{price.cents}</sup> lei
-          </p>
-        ) : (
-          <p className="mt-2 text-[14px] text-muted">Already yours</p>
-        )}
-        <div className="mt-2.5">
+        <p className="mt-0.5 truncate text-[12.5px] text-muted">
+          {card.name}
+          {price && (
+            <> · {price.whole}<sup className="text-[9px]">{price.cents}</sup> lei</>
+          )}
+        </p>
+        <div className="mt-1.5">
           <RetailerTag retailer={card.retailer} source={card.source} />
         </div>
       </div>

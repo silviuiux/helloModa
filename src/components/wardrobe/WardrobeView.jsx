@@ -104,7 +104,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
             {/* Upload tile */}
             <button
               onClick={() => setModalOpen(true)}
-              className="group grid aspect-[4/5] place-items-center rounded-xl2 border border-dashed border-accent-soft bg-white/30 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/50 hover:text-accent-deep"
+              className="group grid aspect-[3/4] place-items-center rounded-xl2 border border-dashed border-accent-soft bg-white/30 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/50 hover:text-accent-deep"
             >
               <span className="text-center">
                 <span className="glass-circle mx-auto grid h-12 w-12 place-items-center rounded-full transition-transform group-hover:scale-105">
