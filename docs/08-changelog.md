@@ -4,6 +4,25 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Bonheur Royale title font; cycling "thinking" line
+
+Per direct request:
+
+- Swapped the `script` font token (`tailwind.config.js`) from Caveat to
+  **Bonheur Royale** — free on Google Fonts, closer to the calligraphic feel
+  originally wanted from Liza (still unavailable — paid Underware webfont,
+  see the 2026-09-19 "wider content column" entry below). Applies to outfit
+  titles and the thinking line, both `font-script`.
+- New `ThinkingLine.jsx`: instead of a static "thinking…" label, cycles
+  every 1.5s through a fixed list of fashion-flavored synonyms ("Styling…",
+  "Draping…", "Consulting the moodboard…", "Auditioning fabrics…", etc.) —
+  purely decorative, see `docs/09-conversation-design.md`.
+- Verified with the same temporary preview-route + Playwright pattern as
+  prior redesigns (removed after) — confirmed both the new title font and
+  the cycling phrase text render correctly.
+
+---
+
 ## 2026-09-19 — All controls into one bottom bar; ditched turn containers
 
 Per direct request, against new mockups:

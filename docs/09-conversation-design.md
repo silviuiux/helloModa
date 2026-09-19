@@ -15,10 +15,12 @@ interchangeable product cards. A turn has:
 
 1. **Title** — a short (1–4 word) evocative phrase, e.g. "Vineyard wedding,"
    "Chic direction," "West coast ease." Rendered in a script/handwritten
-   display face (`font-script`, currently **Caveat** — a free stand-in for
-   **Liza** (Underware), which is a paid webfont this project doesn't have a
-   license for; swap the `script` token in `tailwind.config.js` if/when a
+   display face (`font-script`, currently **Bonheur Royale**, free on
+   Google Fonts — an earlier stand-in for **Liza** (Underware), a paid
+   webfont this project doesn't have a license for, was replaced by this
+   direct request; swap the `script` token in `tailwind.config.js` if/when a
    Liza license and font files exist), large, as the turn's visual anchor.
+   The same face is used for the cycling "thinking" line (below).
 2. **Narrative** — 2–4 sentences, editorial voice, explaining the direction
    and why it answers the occasion/mood/constraint the user gave.
 3. **Hero visual** — one image representing the outfit in its setting, laid
@@ -45,6 +47,13 @@ interchangeable product cards. A turn has:
    product-card grid, for save-to-closet / swap. The pieces exist whether or
    not the user ever expands this — decluttering the default view doesn't
    mean losing the data.
+
+**While a reply is generating:** `ThinkingLine.jsx` shows one line, in the
+script face, cycling every 1.5s through a fixed list of fashion-flavored
+synonyms for "thinking/compiling an outfit" ("Styling…", "Draping…",
+"Consulting the moodboard…", etc.) instead of a static "thinking…" label —
+purely decorative, the order/timing carries no meaning. Edit the `PHRASES`
+array in that file to change the list.
 
 **What this replaces:** the previous default view showed 2–4 product cards
 inline with every reply and a right-hand "Look context" panel for assembling

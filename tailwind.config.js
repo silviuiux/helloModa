@@ -32,7 +32,7 @@ export default {
       },
       fontFamily: {
         display: ['Fraunces', 'Iowan Old Style', 'Georgia', 'serif'],
-        script: ['Caveat', 'cursive'],
+        script: ['"Bonheur Royale"', 'cursive'],
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },

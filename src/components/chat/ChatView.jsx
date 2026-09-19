@@ -1,11 +1,8 @@
 import { useRef, useEffect } from "react";
 import MessageBubble from "./MessageBubble.jsx";
 import EmptyState from "./EmptyState.jsx";
+import ThinkingLine from "./ThinkingLine.jsx";
 import { cardToWardrobeItem } from "../../lib/look.js";
-
-function ThinkingLine() {
-  return <p className="animate-fade-up font-script text-[22px] text-accent-deep">thinking…</p>;
-}
 
 // See docs/09-conversation-design.md: one outfit direction per turn, no
 // containers, generous spacing. The composer lives in BottomBar.jsx now —
