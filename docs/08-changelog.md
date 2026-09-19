@@ -4,6 +4,30 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Switched auth from magic-link to email + password
+
+Replaced the OTP/magic-link sign-in with standard email + password
+login (`/login`) and registration (`/register`), per direct request. Added
+inert placeholder buttons for Google/Apple/Facebook/X
+(`src/components/auth/SocialButtons.jsx`) — visible, disabled, no-op —
+to wire up later. Added `/auth/confirm` (token_hash-based) alongside the
+existing `/auth/callback` (PKCE code-based) since Supabase's default signup
+confirmation email uses the former.
+
+Deleted the magic-link-only placeholder account created earlier
+(`silviuxardelean@gmail.com` had no password set, incompatible with the new
+flow) so it can be created fresh through the real Register form instead —
+this means no password ever passed through this session/chat.
+
+**Net effect on the low-profile posture (`06-risks-legal.md`):** registration
+is now **open self-serve sign-up** — the `shouldCreateUser: false` guard that
+gated the old magic-link flow doesn't have an equivalent for
+`auth.signUp()`. The only remaining gate is whatever the Supabase Auth
+dashboard's "Allow new users to sign up" toggle is set to, and that still
+hasn't been confirmed disabled. Until it is (or an invite-code check gets
+added to `/register`), this app is realistically public-signable if the URL
+leaks — flagged in `README.md` too so it isn't missed before any public step.
+
 ## 2026-09-19 — Phase 0 shipped: real Next.js + Supabase infra
 
 Migrated the app from the Vite/mock-data prototype to the actual production

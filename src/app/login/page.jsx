@@ -1,29 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Sparkle } from "@/components/Icons.jsx";
+import SocialButtons from "@/components/auth/SocialButtons.jsx";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | loading | error
   const [error, setError] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setStatus("sending");
+    setStatus("loading");
     setError("");
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithOtp({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-        // Invite-only: this venture is low-profile for now (docs/06-risks-legal.md).
-        // Public sign-up is disabled in the Supabase Auth dashboard, so only
-        // pre-invited emails will actually receive a usable magic link.
-        shouldCreateUser: false,
-      },
+      password,
     });
 
     if (signInError) {
@@ -31,7 +30,9 @@ export default function LoginPage() {
       setError(signInError.message);
       return;
     }
-    setStatus("sent");
+
+    router.push("/");
+    router.refresh();
   }
 
   return (
@@ -42,21 +43,19 @@ export default function LoginPage() {
           "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
       }}
     >
-      <div className="glass w-full max-w-sm rounded-xl3 p-7 text-center">
-        <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-accent text-white shadow-soft">
-          <Sparkle size={18} />
-        </span>
-        <h1 className="mt-4 font-display text-[24px] font-medium text-ink">helloModa</h1>
-        <p className="mt-1.5 text-[13.5px] text-muted">
-          Private beta — sign in with your invited email.
-        </p>
+      <div className="glass w-full max-w-sm rounded-xl3 p-7">
+        <div className="text-center">
+          <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-accent text-white shadow-soft">
+            <Sparkle size={18} />
+          </span>
+          <h1 className="mt-4 font-display text-[24px] font-medium text-ink">helloModa</h1>
+          <p className="mt-1.5 text-[13.5px] text-muted">Private beta — sign in to continue.</p>
+        </div>
 
-        {status === "sent" ? (
-          <p className="mt-6 text-[14px] text-ink">
-            Check <span className="font-medium">{email}</span> for a sign-in link.
-          </p>
-        ) : (
-          <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
+        <div className="mt-6">
+          <SocialButtons />
+
+          <form onSubmit={handleSubmit} className="space-y-3 text-left">
             <input
               required
               type="email"
@@ -64,22 +63,35 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
+              autoComplete="email"
+              className="h-11 w-full rounded-xl2 border border-line bg-white/70 px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
+            />
+            <input
+              required
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              autoComplete="current-password"
               className="h-11 w-full rounded-xl2 border border-line bg-white/70 px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
             />
             <button
               type="submit"
-              disabled={status === "sending"}
+              disabled={status === "loading"}
               className="h-11 w-full rounded-xl2 bg-accent text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep disabled:opacity-60"
             >
-              {status === "sending" ? "Sending…" : "Send sign-in link"}
+              {status === "loading" ? "Signing in…" : "Sign in"}
             </button>
-            {status === "error" && (
-              <p className="text-[13px] text-red-500">
-                {error || "That email isn't invited yet — ping Silviu."}
-              </p>
-            )}
+            {status === "error" && <p className="text-[13px] text-red-500">{error}</p>}
           </form>
-        )}
+
+          <p className="mt-5 text-center text-[13px] text-muted">
+            No account yet?{" "}
+            <Link href="/register" className="font-medium text-accent-deep hover:underline">
+              Register
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

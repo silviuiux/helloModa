@@ -13,14 +13,20 @@ Phase 0 (Foundations) in progress — see `docs/03-roadmap.md`. Real Next.js +
 Supabase infra is live: auth, database, RLS. Chat is still seed/mock data;
 wiring it to a real LLM is Phase 1.
 
-**This app is invite-only / private beta** (docs/06-risks-legal.md — low-profile
-posture pending a Fashion Days employment-contract review). Public sign-up is
-meant to be disabled in the Supabase Auth dashboard — **confirm this manually**,
-no MCP tool exposes that toggle:
-Authentication → Providers → Email → disable "Allow new users to sign up", on
-the `helloModa` project (ref `hdbwcjtvbjeisgtpisne`, eu-central-1). Until then,
-`shouldCreateUser: false` on the login form's `signInWithOtp` call is the only
-thing stopping open sign-up.
+**Auth:** email + password (`/login`, `/register`). Social sign-in buttons
+(Google, Apple, Facebook, X) are on the login/register pages but are inert
+placeholders — `src/components/auth/SocialButtons.jsx` — wire these up to
+real Supabase OAuth providers when that's prioritized.
+
+**This app is meant to be invite-only / private beta** (docs/06-risks-legal.md —
+low-profile posture pending a Fashion Days employment-contract review), but
+registration is currently **open self-serve sign-up** — anyone who finds
+`/register` can create an account. If that's not the intent, the actual gate
+now has to be one of: disabling "Allow new users to sign up" in the Supabase
+Auth dashboard (Authentication → Providers → Email, project ref
+`hdbwcjtvbjeisgtpisne`, eu-central-1 — no MCP tool exposes this toggle, it's
+dashboard-only), or adding an invite-code check in the register flow. Neither
+is done yet — flagging so it doesn't get lost before this goes public.
 
 ## Run
 
@@ -31,7 +37,7 @@ npm run dev
 ```
 
 Open the printed localhost URL. Unauthenticated requests redirect to `/login`
-(magic-link sign-in) — you'll need an invited Supabase Auth user to get in.
+— register a new account at `/register` (email + password) to get in.
 
 ## Stack
 
@@ -52,8 +58,10 @@ src/
     globals.css                Tailwind + glass/HUD surface styles
     page.jsx                   protected home route — fetches real wardrobe data
     AppShell.jsx                app shell, view routing, wardrobe state (client)
-    login/page.jsx              magic-link sign-in
-    auth/callback/route.js      exchanges the magic-link code for a session
+    login/page.jsx              email + password sign-in
+    register/page.jsx           email + password sign-up
+    auth/callback/route.js      PKCE "code" exchange (OAuth, future)
+    auth/confirm/route.js       "token_hash" confirmation (signup email link)
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
     auth.js                     Server Action: sign out
@@ -66,6 +74,7 @@ src/
   components/
     Sidebar.jsx                 brand, style memory, nav, account/sign-out
     Icons.jsx                   inline stroke icon set (no deps)
+    auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/
       ChatView.jsx               header + chips + messages + composer
       MessageBubble.jsx          user / AI bubbles
