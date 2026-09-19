@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Sidebar from "@/components/Sidebar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
 import { Sparkle, Chat, Hanger } from "@/components/Icons.jsx";
 import { addWardrobeItem, toggleWardrobeFavorite, removeWardrobeItem } from "@/actions/wardrobe";
+import { getConversationMessages } from "@/actions/conversations";
 import { signOut } from "@/actions/auth";
 
 const ICON_BY_CATEGORY = {
@@ -63,12 +64,19 @@ function MobileBar({ view, setView, wardrobeCount }) {
   );
 }
 
-// The wardrobe view is real, DB-backed data (per-user, via RLS) — new accounts
-// start empty. Chat still runs on seed data until the LLM is wired up in Phase 1
-// (docs/03-roadmap.md).
-export default function AppShell({ initialWardrobe, userEmail }) {
+export default function AppShell({
+  initialWardrobe,
+  userEmail,
+  initialConversations,
+  initialActiveConversationId,
+  initialMessages,
+}) {
   const [view, setView] = useState("chat");
   const [wardrobe, setWardrobe] = useState(initialWardrobe.map(dbRowToItem));
+  const [conversations, setConversations] = useState(initialConversations || []);
+  const [activeConversationId, setActiveConversationId] = useState(initialActiveConversationId);
+  const [messages, setMessages] = useState(initialMessages || []);
+  const [isSwitching, startSwitching] = useTransition();
 
   async function handleAdd(item) {
     const tempId = item.id;
@@ -112,6 +120,31 @@ export default function AppShell({ initialWardrobe, userEmail }) {
     }
   }
 
+  function handleNewChat() {
+    setActiveConversationId(null);
+    setMessages([]);
+  }
+
+  function handleSelectConversation(id) {
+    if (id === activeConversationId) return;
+    startSwitching(async () => {
+      setActiveConversationId(id);
+      try {
+        const msgs = await getConversationMessages(id);
+        setMessages(msgs);
+      } catch (err) {
+        console.error("Failed to load conversation:", err);
+        setMessages([]);
+      }
+    });
+  }
+
+  // Called by ChatView once a message round-trip creates a new conversation.
+  function handleConversationCreated(id, title) {
+    setActiveConversationId(id);
+    setConversations((prev) => [{ id, title, created_at: new Date().toISOString() }, ...prev]);
+  }
+
   return (
     <div
       className="relative min-h-screen w-full overflow-hidden p-3 font-sans text-ink sm:p-5 lg:p-7"
@@ -135,11 +168,24 @@ export default function AppShell({ initialWardrobe, userEmail }) {
           wardrobeCount={wardrobe.length}
           userEmail={userEmail}
           onSignOut={signOut}
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewChat={handleNewChat}
         />
         <main className="relative flex min-w-0 flex-1 flex-col">
           <MobileBar view={view} setView={setView} wardrobeCount={wardrobe.length} />
           {view === "chat" ? (
-            <ChatView wardrobe={wardrobe} onWardrobeAdd={handleAdd} onWardrobeRemove={removeItem} />
+            <ChatView
+              wardrobe={wardrobe}
+              onWardrobeAdd={handleAdd}
+              onWardrobeRemove={removeItem}
+              conversationId={activeConversationId}
+              messages={messages}
+              setMessages={setMessages}
+              onConversationCreated={handleConversationCreated}
+              isSwitching={isSwitching}
+            />
           ) : (
             <WardrobeView
               items={wardrobe}

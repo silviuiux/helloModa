@@ -1,4 +1,4 @@
-import { Sparkle, Chat, Hanger, Dress } from "./Icons.jsx";
+import { Sparkle, Chat, Hanger, Dress, Plus } from "./Icons.jsx";
 import { styleMemory } from "../data/seed.js";
 
 function NavItem({ active, icon: Icon, label, count, onClick }) {
@@ -26,7 +26,55 @@ function NavItem({ active, icon: Icon, label, count, onClick }) {
   );
 }
 
-export default function Sidebar({ view, setView, wardrobeCount, userEmail, onSignOut }) {
+function ConversationList({ conversations, activeConversationId, onSelect, onNewChat }) {
+  return (
+    <div className="mt-4 flex min-h-0 flex-1 flex-col">
+      <div className="flex items-center justify-between px-1">
+        <p className="label text-faint">Conversations</p>
+        <button
+          onClick={onNewChat}
+          aria-label="New chat"
+          title="New chat"
+          className="grid h-6 w-6 place-items-center rounded-full text-muted transition-colors hover:bg-white/60 hover:text-accent-deep"
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+      <div className="scroll-area mt-2 min-h-0 flex-1 space-y-1 overflow-y-auto">
+        {conversations.length === 0 ? (
+          <p className="px-1 text-[12.5px] text-faint">No conversations yet.</p>
+        ) : (
+          conversations.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => onSelect(c.id)}
+              className={`w-full truncate rounded-xl px-3 py-2 text-left text-[13px] transition-colors ${
+                c.id === activeConversationId
+                  ? "bg-accent-tint text-accent-deep"
+                  : "text-muted hover:bg-white/50 hover:text-ink"
+              }`}
+              title={c.title}
+            >
+              {c.title || "Untitled"}
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function Sidebar({
+  view,
+  setView,
+  wardrobeCount,
+  userEmail,
+  onSignOut,
+  conversations = [],
+  activeConversationId,
+  onSelectConversation,
+  onNewChat,
+}) {
   return (
     <aside className="glass-panel hidden w-[270px] shrink-0 flex-col border-r border-white/40 px-5 pb-5 pt-6 md:flex">
       {/* Brand */}
@@ -38,7 +86,7 @@ export default function Sidebar({ view, setView, wardrobeCount, userEmail, onSig
       </div>
 
       {/* Style memory card */}
-      <div className="glass mt-6 rounded-xl2 p-5 text-center">
+      <div className="glass mt-6 shrink-0 rounded-xl2 p-5 text-center">
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-tint text-accent-deep">
           <Dress size={24} />
         </span>
@@ -51,7 +99,7 @@ export default function Sidebar({ view, setView, wardrobeCount, userEmail, onSig
       </div>
 
       {/* Nav */}
-      <nav className="mt-6 space-y-1.5">
+      <nav className="mt-6 shrink-0 space-y-1.5">
         <NavItem
           active={view === "chat"}
           icon={Chat}
@@ -67,17 +115,23 @@ export default function Sidebar({ view, setView, wardrobeCount, userEmail, onSig
         />
       </nav>
 
-      {/* Today's intent */}
-      <div className="rounded-xl2 border border-dashed border-accent-soft bg-white/40 p-4">
-        <p className="label text-accent-deep">Today&rsquo;s intent</p>
-        <p className="mt-2 text-[13px] leading-relaxed text-muted">
-          {styleMemory.intent}
-        </p>
-      </div>
+      {view === "chat" ? (
+        <ConversationList
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onSelect={onSelectConversation}
+          onNewChat={onNewChat}
+        />
+      ) : (
+        <div className="mt-4 shrink-0 rounded-xl2 border border-dashed border-accent-soft bg-white/40 p-4">
+          <p className="label text-accent-deep">Today&rsquo;s intent</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">{styleMemory.intent}</p>
+        </div>
+      )}
 
       {/* Account */}
       {userEmail && (
-        <div className="mt-auto flex items-center justify-between gap-2 px-1 pt-5">
+        <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-white/40 px-1 pt-4">
           <span className="truncate text-[12px] text-faint" title={userEmail}>
             {userEmail}
           </span>

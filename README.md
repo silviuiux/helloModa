@@ -9,9 +9,15 @@ data model, affiliate integrations, risks/legal, costs). Start at
 
 ## Status
 
-Phase 0 (Foundations) in progress — see `docs/03-roadmap.md`. Real Next.js +
-Supabase infra is live: auth, database, RLS. Chat is still seed/mock data;
-wiring it to a real LLM is Phase 1.
+Phase 0 (Foundations) done; Phase 1 (`docs/03-roadmap.md`) underway. Real
+Next.js + Supabase infra: auth, database, RLS. **Chat is real** — `POST
+/api/chat` calls Claude (`claude-opus-5`) with structured output, persisted
+to Postgres, with multi-conversation support (sidebar: list/switch/new chat).
+Requires `ANTHROPIC_API_KEY` set (server-only) — see `.env.local.example`.
+Wardrobe is real (add/favorite/remove, no photo upload/AI tagging yet — that's
+next in Phase 1). "Shop" suggestions in chat are honest AI guesses with no
+fabricated price/retailer, since there's no real product catalog yet
+(Awin integration, `docs/05-integrations-affiliates.md`, not started).
 
 **Auth:** email + password (`/login`, `/register`). Social sign-in buttons
 (Google, Apple, Facebook, X) are on the login/register pages but are inert
@@ -56,27 +62,30 @@ src/
   app/
     layout.jsx                 root layout, fonts, metadata
     globals.css                Tailwind + glass/HUD surface styles
-    page.jsx                   protected home route — fetches real wardrobe data
-    AppShell.jsx                app shell, view routing, wardrobe state (client)
+    page.jsx                   protected home route — fetches wardrobe + conversations
+    AppShell.jsx                app shell, view routing, wardrobe + conversation state (client)
     login/page.jsx              email + password sign-in
     register/page.jsx           email + password sign-up
     auth/callback/route.js      PKCE "code" exchange (OAuth, future)
     auth/confirm/route.js       "token_hash" confirmation (signup email link)
+    api/chat/route.js           real chat: Claude call, structured output, DB persistence
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
+    conversations.js            Server Actions: list conversations, load a conversation's messages
     auth.js                     Server Action: sign out
   lib/
     supabase/client.js          browser Supabase client
     supabase/server.js          server Supabase client (Server Components/Actions)
     supabase/middleware.js      session-refresh helper used by middleware.js
+    stylist.js                  Zod schema + system prompt for structured chat replies
     iconMap.jsx                 garment-icon resolver
-  data/seed.js                  mock data still used by chat (real LLM wiring is Phase 1)
+  data/seed.js                  mock data still used for the header chips + swap-suggestion pool
   components/
-    Sidebar.jsx                 brand, style memory, nav, account/sign-out
+    Sidebar.jsx                 brand, style memory, nav, conversation list, account/sign-out
     Icons.jsx                   inline stroke icon set (no deps)
     auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/
-      ChatView.jsx               header + chips + messages + composer
+      ChatView.jsx               header + chips + messages + composer, calls /api/chat
       MessageBubble.jsx          user / AI bubbles
       RecommendationCards.jsx    outfit suggestion cards
       Composer.jsx                input + quick prompts
@@ -95,6 +104,6 @@ helloCorp's DNA.
 
 ## Next ideas (Phase 1+, see `docs/03-roadmap.md`)
 
-Real chat wired to Claude · photo upload + AI tagging for wardrobe items ·
-outfit preview render (SDXL) · affiliate product matching · calendar sync ·
-digital avatar · circular marketplace.
+Photo upload + AI tagging for wardrobe items · Awin signup + affiliate
+product matching for "shop" suggestions · outfit preview render (SDXL,
+Phase 2) · calendar sync · digital avatar · circular marketplace.

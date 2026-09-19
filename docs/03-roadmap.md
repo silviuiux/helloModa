@@ -23,13 +23,20 @@ real infra, privately.
 **Goal:** The core "describe an occasion → get styled" loop, real (not mocked), for one
 high-intent niche, matching the business plan's Phase 1 GTM.
 
-- Real chat: Claude API call with a system prompt encoding stylist persona + occasion
-  reasoning; store conversation history in Postgres.
+- ✅ **Real chat, shipped 2026-09-19:** `POST /api/chat` calls Claude (`claude-opus-5`) with a
+  system prompt encoding the stylist persona; structured JSON output (title/narration/cards/
+  follow-up) via Zod + `output_config.format`, not freeform text, so it plugs directly into the
+  existing recommendation-card UI. Multi-conversation support (list, switch, new chat) in the
+  sidebar. Conversation + message history persisted in Postgres (`conversations`, `messages`,
+  `outfit_recommendations`, `outfit_recommendation_items`). The AI prioritizes real wardrobe
+  items (passed by exact id, validated server-side against hallucination) before suggesting new
+  pieces — "shop" suggestions are honestly unmatched (no fabricated retailer/price) since the
+  affiliate catalog below doesn't exist yet.
 - Digital closet: photo upload → background removal + AI attribute tagging (color/cut/category)
   via a vision-capable model call, stored as structured wardrobe items.
-- Outfit recommendations: LLM proposes an outfit (mix of closet items + suggested new pieces);
-  new pieces resolved to real affiliate products from the cached catalog (`05-integrations-affiliates.md`)
-  via text/category match — no image generation or CV matching yet, keep this phase cheap and fast.
+- Outfit recommendations: resolve today's "shop" suggestions to real affiliate products from the
+  cached catalog (`05-integrations-affiliates.md`) via text/category match once Awin is live —
+  no image generation or CV matching yet, keep this phase cheap and fast.
 - "Upload your invitation" tool: parse a wedding invitation image/text for dress code cues (can
   reuse the same vision-model call as closet tagging).
 - SEO landing pages: "What to wear to a [X] wedding" templates, statically generated.

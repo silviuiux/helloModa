@@ -4,6 +4,40 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Real chat, wired to Claude, with multi-conversation support
+
+Replaced the mock seed conversation with real chat, the first Phase 1 item
+(`docs/03-roadmap.md`) to ship:
+
+- `POST /api/chat` — calls Claude (`claude-opus-5`) with a stylist system
+  prompt (`src/lib/stylist.js`) and structured JSON output (Zod +
+  `output_config.format` via `client.messages.parse`), so the reply plugs
+  directly into the existing recommendation-card UI without a redesign.
+- The AI is given the user's real wardrobe (exact ids) and told to prefer
+  reusing owned pieces; a returned `wardrobeItemId` is validated server-side
+  against the actual wardrobe before trusting it (never rendered on
+  unverified model output).
+- New pieces the AI suggests to buy are stored and shown honestly as
+  unmatched AI suggestions — no fabricated retailer name or price — since
+  there's no real product catalog yet (Awin integration not started).
+- Conversation + message history now persists in Postgres (`conversations`,
+  `messages`, `outfit_recommendations`, `outfit_recommendation_items`).
+  Multi-conversation support shipped ahead of its original Phase 3 slot
+  (list/switch/new-chat in the sidebar), per direct request.
+- Schema changes: added `outfit_recommendations.title`; relaxed
+  `outfit_recommendation_items`' check constraint and added
+  `suggested_brand/name/category` columns to hold a pure AI suggestion that
+  isn't yet linked to a wardrobe item or a real catalog product — the
+  original constraint only anticipated those first two cases.
+- Also revoked a leftover `PUBLIC` execute grant on `handle_new_user()`
+  (the anon/authenticated-specific revoke from Phase 0 didn't cover the
+  broader `PUBLIC` role grant that PostgREST exposure inherits from) —
+  closes a security-advisor warning that had persisted silently since then.
+
+Requires `ANTHROPIC_API_KEY` (server-only). Not yet set anywhere at the time
+of this entry — verified via a clean build only; the live round-trip to
+Claude is unverified pending that key being added to Vercel.
+
 ## 2026-09-19 — Gated registration behind an invite code
 
 Closed the open self-serve sign-up gap from the previous entry: `/register`

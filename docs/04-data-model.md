@@ -41,6 +41,7 @@ messages
 outfit_recommendations
   id (uuid, pk)
   message_id (fk -> messages)     -- the assistant message that produced this
+  title                    text   -- e.g. "The relaxed gallery column"
   generated_image_url             -- Phase 2, nullable until then
   occasion                text
   weather_context         jsonb
@@ -50,8 +51,14 @@ outfit_recommendation_items
   id (uuid, pk)
   recommendation_id (fk -> outfit_recommendations)
   wardrobe_item_id (fk -> wardrobe_items, nullable)   -- set if sourced from closet
-  product_id (fk -> products, nullable)                -- set if sourced from catalog
+  product_id (fk -> products, nullable)                -- set if matched to real catalog (Phase 3)
+  suggested_brand         text   -- set instead, when this is a pure AI suggestion not yet
+  suggested_name          text   -- matched to a real product (Phase 1 reality: no catalog
+  suggested_category      text   -- exists yet — see 05-integrations-affiliates.md)
   role                    text   -- e.g. 'hero', 'layer', 'accessory'
+  -- No longer requires wardrobe_item_id OR product_id to be set (the original
+  -- constraint) — a row can have all three source fields null-but-suggested_*,
+  -- since Phase 1 chat produces real AI suggestions with no catalog to link to yet.
 
 products                          -- cached/synced from affiliate feeds, see 05-integrations
   id (uuid, pk)

@@ -3,7 +3,7 @@ import { Sparkle, Rain, Bag } from "../Icons.jsx";
 import MessageBubble from "./MessageBubble.jsx";
 import Composer from "./Composer.jsx";
 import LookContextPanel from "./LookContextPanel.jsx";
-import { seedMessages, lookContext } from "../../data/seed.js";
+import { lookContext } from "../../data/seed.js";
 import { pickAlternative, cardToWardrobeItem } from "../../lib/look.js";
 
 function Chip({ icon: Icon, children }) {
@@ -40,12 +40,19 @@ function Dot({ delay }) {
   );
 }
 
-export default function ChatView({ wardrobe = [], onWardrobeAdd, onWardrobeRemove }) {
-  const [messages, setMessages] = useState(seedMessages);
+export default function ChatView({
+  wardrobe = [],
+  onWardrobeAdd,
+  onWardrobeRemove,
+  conversationId,
+  messages,
+  setMessages,
+  onConversationCreated,
+  isSwitching = false,
+}) {
   const [thinking, setThinking] = useState(false);
   const [look, setLook] = useState([]);
   const scrollRef = useRef(null);
-  const timers = useRef([]);
 
   // Saved = present in wardrobe under its derived id.
   const savedIds = useMemo(() => {
@@ -65,35 +72,61 @@ export default function ChatView({ wardrobe = [], onWardrobeAdd, onWardrobeRemov
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, thinking]);
 
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
-
-  function handleSend(text) {
+  async function handleSend(text) {
     if (thinking) return;
-    const stamp = Date.now();
-    setMessages((prev) => [...prev, { id: `u-${stamp}`, role: "user", text }]);
+    const tempId = `u-${Date.now()}`;
+    setMessages((prev) => [...prev, { id: tempId, role: "user", text }]);
     setThinking(true);
 
-    const delay = 1400 + Math.random() * 1100;
-    const t = setTimeout(() => {
-      const aiMsg = {
-        id: `a-${stamp}`,
-        role: "ai",
-        title: "A refined direction",
-        hero: true,
-        text: "Noted. I'll keep your tailoring-forward, soft-neutral signature and weigh that against tonight's gallery dinner and the light rain. Here's a refined direction.",
-        cards: [
-          { id: `r-${stamp}-1`, brand: "COS", name: "Sheer rib knit", type: "top", price: 159.99, retailer: "Zalando", source: "shop" },
-          { id: `r-${stamp}-2`, brand: "By Far", name: "Satin micro bag", type: "bag", price: null, retailer: "Closet", source: "closet" },
-          { id: `r-${stamp}-3`, brand: "The Row", name: "Sculptural flats", type: "shoe", price: null, retailer: "Closet", source: "closet" },
-        ],
-      };
-      setMessages((prev) => [...prev, aiMsg]);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversationId, message: text }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `err-${Date.now()}`,
+            role: "ai",
+            text: data.error || "Something went wrong. Please try again.",
+          },
+        ]);
+        return;
+      }
+
+      // Replace the optimistic user bubble with the real (DB-backed) one, then
+      // append the assistant reply.
+      setMessages((prev) => [
+        ...prev.filter((m) => m.id !== tempId),
+        data.userMessage,
+        data.message,
+      ]);
+
+      if (!conversationId && data.conversationId) {
+        onConversationCreated?.(data.conversationId, data.conversationTitle);
+      }
+    } catch (err) {
+      console.error("Chat request failed:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `err-${Date.now()}`,
+          role: "ai",
+          text: "Couldn't reach the server. Please try again.",
+        },
+      ]);
+    } finally {
       setThinking(false);
-    }, delay);
-    timers.current.push(t);
+    }
   }
 
-  // Re-roll a single suggestion in place.
+  // Re-roll a single suggestion in place — still swaps against the static
+  // mock catalog (src/data/seed.js) since there's no real product catalog
+  // yet (docs/05-integrations-affiliates.md, Phase 1+). Local-only, not persisted.
   function handleSwap(messageId, cardId) {
     setMessages((prev) =>
       prev.map((m) =>
@@ -154,20 +187,28 @@ export default function ChatView({ wardrobe = [], onWardrobeAdd, onWardrobeRemov
             <Chip>Budget: {lookContext.budget}</Chip>
           </div>
 
-          <div className="space-y-5">
-            {messages.map((m) => (
-              <MessageBubble
-                key={m.id}
-                message={m}
-                onSwap={handleSwap}
-                onToggleSave={handleToggleSave}
-                onToggleLook={handleToggleLook}
-                savedIds={savedIds}
-                lookIds={lookIds}
-              />
-            ))}
-            {thinking && <TypingBubble />}
-          </div>
+          {messages.length === 0 && !isSwitching ? (
+            <div className="grid place-items-center py-20 text-center text-muted">
+              <p className="text-[15px]">
+                Describe an occasion, and helloModa will style a look from your closet.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {messages.map((m) => (
+                <MessageBubble
+                  key={m.id}
+                  message={m}
+                  onSwap={handleSwap}
+                  onToggleSave={handleToggleSave}
+                  onToggleLook={handleToggleLook}
+                  savedIds={savedIds}
+                  lookIds={lookIds}
+                />
+              ))}
+              {thinking && <TypingBubble />}
+            </div>
+          )}
         </div>
 
         <Composer onSend={handleSend} disabled={thinking} />
