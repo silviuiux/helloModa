@@ -4,6 +4,42 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Wider content column, two-column outfit turns
+
+Layout refinements from new mockups, per direct request:
+
+- Content column widened from `max-w-xl` (576px) to a new `max-w-content`
+  token (1160px, `tailwind.config.js`) — used in `ChatView.jsx`'s message
+  list and `EmptyState.jsx`. `Composer.jsx`'s input stayed narrower
+  (`max-w-2xl`, 672px) — a 1160px-wide text field is poor ergonomics even
+  when the surrounding content column is that wide.
+- Each outfit turn (`MessageBubble.jsx`) is now a two-column split at `sm`+
+  (`OutfitHero` image left, title/narrative/actions right) instead of the
+  image stacked above the text — matches the reference mockups, collapses
+  back to a single stacked column below `sm`. Title moved out of the
+  image-overlay position (`OutfitHero.jsx` no longer renders it) into the
+  text column as a standalone heading.
+- `EmptyState.jsx`'s occasion-card and example-prompt rows switched from
+  horizontal-scroll carousels to `flex-wrap` — at the new width they fit
+  without scrolling; still wraps correctly on mobile.
+- Asked about the requested **Liza** title font: it's a paid webfont
+  (Underware, via their own store or Type Network), not on Google Fonts and
+  not something this session can purchase or embed. Kept **Caveat**
+  (already in place, already free/licensed) as the stand-in per the user's
+  choice — swappable later via the single `script` token in
+  `tailwind.config.js` if a Liza license gets purchased.
+- Verified again via the same temporary unauthenticated preview route +
+  Playwright pattern as the previous redesign entry (removed after).
+  Found and worked around one sandbox-only issue this time: Playwright's
+  Chromium doesn't trust this environment's proxy CA, so Google Fonts
+  requests failed with a cert error and the title silently fell back to a
+  generic serif in the first screenshot pass — not a real app bug (the CA
+  is specific to this dev sandbox's egress proxy; Vercel has no such
+  intercepting proxy). Re-shot with `--ignore-certificate-errors` on the
+  local test browser only, confirmed Caveat actually renders correctly.
+
+---
+
 ## 2026-09-19 — Documented Magnific as an image-gen alternative
 
 Added Magnific (formerly Freepik, rebranded April 2026) as a documented

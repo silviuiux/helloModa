@@ -39,6 +39,10 @@ export default {
       letterSpacing: {
         label: "0.16em",
       },
+      maxWidth: {
+        // The chat/wardrobe content column — see docs/09-conversation-design.md.
+        content: "1160px",
+      },
       borderRadius: {
         xl2: "20px",
         xl3: "28px",

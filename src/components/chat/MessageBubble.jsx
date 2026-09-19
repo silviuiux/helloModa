@@ -10,7 +10,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   if (isUser) {
     return (
       <div className="animate-fade-up">
-        <div className="ml-auto max-w-[85%] rounded-xl3 rounded-tr-lg border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md">
+        <div className="ml-auto max-w-md rounded-xl3 rounded-tr-lg border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.text}</p>
         </div>
       </div>
@@ -19,36 +19,38 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
 
   return (
     <div className="animate-fade-up space-y-3">
-      <div className="glass overflow-hidden rounded-xl3">
-        <OutfitHero title={message.title} />
-        <div className="px-5 py-5 sm:px-6">
-          <p className="text-[15.5px] leading-relaxed text-ink">{message.narrative}</p>
+      <div className="glass overflow-hidden rounded-xl3 p-5 sm:p-6">
+        <div className="grid gap-6 sm:grid-cols-2 sm:items-start">
+          <OutfitHero />
+          <div className="flex flex-col">
+            {message.title && (
+              <h2 className="font-script text-[44px] leading-[0.9] text-ink sm:text-[52px]">
+                {message.title}
+              </h2>
+            )}
+            <p className="mt-3 text-[15.5px] leading-relaxed text-ink">{message.narrative}</p>
 
-          {message.pieces?.length > 0 && (
-            <div className="mt-4">
+            {message.pieces?.length > 0 && (
               <button
                 onClick={() => setShowPieces((v) => !v)}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-accent-deep hover:underline"
+                className="mt-4 flex items-center gap-1.5 text-[13px] font-medium text-accent-deep hover:underline"
               >
                 <Hanger size={14} />
                 {showPieces ? "Hide items" : "Find items for this outfit"}
               </button>
-              {showPieces && (
-                <RecommendationCards
-                  cards={message.pieces}
-                  onToggleSave={onToggleSave}
-                  savedIds={savedIds}
-                />
-              )}
-            </div>
-          )}
+            )}
 
-          {/* Response toolbar */}
-          <div className="mt-4 flex items-center gap-1 border-t border-white/50 pt-3 text-faint">
-            <ToolbarBtn icon={Heart} label="Love" />
-            <ToolbarBtn icon={Refresh} label="Retry" />
+            {/* Response toolbar */}
+            <div className="mt-4 flex items-center gap-1 border-t border-white/50 pt-3 text-faint">
+              <ToolbarBtn icon={Heart} label="Love" />
+              <ToolbarBtn icon={Refresh} label="Retry" />
+            </div>
           </div>
         </div>
+
+        {showPieces && (
+          <RecommendationCards cards={message.pieces} onToggleSave={onToggleSave} savedIds={savedIds} />
+        )}
       </div>
 
       {message.quickReplies?.length > 0 && (

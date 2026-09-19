@@ -15,16 +15,22 @@ interchangeable product cards. A turn has:
 
 1. **Title** — a short (1–4 word) evocative phrase, e.g. "Vineyard wedding,"
    "Chic direction," "West coast ease." Rendered in a script/handwritten
-   display face, large, as the turn's visual anchor.
+   display face (`font-script`, currently **Caveat** — a free stand-in for
+   **Liza** (Underware), which is a paid webfont this project doesn't have a
+   license for; swap the `script` token in `tailwind.config.js` if/when a
+   Liza license and font files exist), large, as the turn's visual anchor.
 2. **Narrative** — 2–4 sentences, editorial voice, explaining the direction
    and why it answers the occasion/mood/constraint the user gave.
-3. **Hero visual** — one image representing the outfit in its setting.
-   **Currently a styled illustrated placeholder** (`OutfitHero.jsx`), not a
-   real photorealistic render — real image generation (SDXL via a hosted
-   provider) is a deliberately separate next step, not bundled into this
-   layout change. Swapping the placeholder for a real generated image later
-   should only mean changing what `OutfitHero` renders, not the surrounding
-   turn shape.
+3. **Hero visual** — one image representing the outfit in its setting, laid
+   out **beside** the title/narrative in a two-column split (`sm:grid-cols-2`
+   in `MessageBubble.jsx`) rather than stacked above the text — image left,
+   content right, matching the reference mockups. Collapses to a single
+   stacked column below the `sm` breakpoint. **Currently a styled
+   illustrated placeholder** (`OutfitHero.jsx`), not a real photorealistic
+   render — real image generation (SDXL via a hosted provider) is a
+   deliberately separate next step, not bundled into this layout change.
+   Swapping the placeholder for a real generated image later should only
+   mean changing what `OutfitHero` renders, not the surrounding turn shape.
 4. **Quick-reply chips** — 2–4 AI-authored follow-up prompts specific to
    *this* turn (e.g. "Show me something more casual," "Keep it under $150"),
    not a static global list. Clicking one sends it as the next message
@@ -65,13 +71,16 @@ its history; starting a new chat shows this welcome screen again.
 Replaced across the whole app (not just chat) with a minimal top bar:
 brand mark, Chat/Wardrobe nav, a conversation-history control (dropdown, not
 a persistent rail — multi-conversation support still exists, just doesn't
-cost permanent screen space), and an account menu. Content runs in a narrow,
-centered column — editorial reading width, not a dashboard-width grid.
+cost permanent screen space), and an account menu. Content runs in a
+centered column, capped at `max-w-content` (1160px, `tailwind.config.js`) —
+wide enough for the two-column outfit turns above to read as image-beside-text
+rather than cramped, not a dashboard-width grid.
 
 Rationale: the previous three-column shell (sidebar + chat + look-context
 panel) was information-dense in a way that fought the "one outfit at a
 time" conversation model above. A single centered column keeps attention on
-the one thing being discussed.
+the one thing being discussed. The column started narrower (max-w-xl,
+576px) than this — widened once the two-column turn layout needed the room.
 
 ## How to adjust this later
 

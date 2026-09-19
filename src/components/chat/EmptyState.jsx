@@ -40,7 +40,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
   const name = userDisplayName || firstNameFromEmail(userEmail);
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col items-center px-4 py-10 text-center sm:py-16">
+    <div className="mx-auto flex w-full max-w-content flex-col items-center px-4 py-10 text-center sm:px-6 sm:py-16">
       <h1 className="font-display text-[36px] font-medium leading-tight text-ink sm:text-[44px]">
         hello{name ? `, ${name}` : ""}
       </h1>
@@ -49,12 +49,12 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
         Describe an occasion, and I'll style a look from your closet — plus what to add.
       </p>
 
-      <div className="scroll-area mt-9 flex w-full snap-x gap-3 overflow-x-auto pb-2">
+      <div className="mt-9 flex w-full flex-wrap justify-center gap-3">
         {OCCASION_CARDS.map((c) => (
           <button
             key={c.label}
             onClick={() => onPrompt(c.prompt)}
-            className="group relative aspect-[4/5] w-40 shrink-0 snap-start overflow-hidden rounded-xl2 shadow-soft transition-transform hover:-translate-y-0.5 sm:w-48"
+            className="group relative aspect-[4/5] w-40 shrink-0 overflow-hidden rounded-xl2 shadow-soft transition-transform hover:-translate-y-0.5 sm:w-52"
           >
             <GarmentArt type={c.type} />
             <div
@@ -68,12 +68,12 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
         ))}
       </div>
 
-      <div className="scroll-area mt-4 flex w-full snap-x gap-2 overflow-x-auto pb-1">
+      <div className="mt-4 flex w-full flex-wrap justify-center gap-2">
         {EXAMPLE_PROMPTS.map((p) => (
           <button
             key={p}
             onClick={() => onPrompt(p)}
-            className="glass-soft shrink-0 snap-start whitespace-nowrap rounded-full px-4 py-2 text-[13px] text-muted transition-colors hover:text-accent-deep"
+            className="glass-soft shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[13px] text-muted transition-colors hover:text-accent-deep"
           >
             {p}
           </button>

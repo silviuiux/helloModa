@@ -18,7 +18,7 @@ export default function Composer({ onSend, disabled = false }) {
 
   return (
     <div className="border-t border-white/40 px-4 py-4 sm:px-6">
-      <form onSubmit={submit} className="mx-auto flex max-w-xl items-center gap-3">
+      <form onSubmit={submit} className="mx-auto flex max-w-2xl items-center gap-3">
         <div
           className={`glass flex flex-1 items-center rounded-full px-5 transition-opacity focus-within:border-accent/60 ${
             disabled ? "opacity-60" : ""
