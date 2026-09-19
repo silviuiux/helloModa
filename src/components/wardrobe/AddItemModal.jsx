@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plus } from "../Icons.jsx";
+import { resizeImageFile, blobToBase64 } from "../../lib/imageResize.js";
+import { createClient } from "../../lib/supabase/client.js";
 
 const categories = ["Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Bags", "Accessories"];
 const iconByCategory = {
@@ -18,12 +20,89 @@ export default function AddItemModal({ open, onClose, onAdd }) {
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("Tops");
   const [color, setColor] = useState(swatches[0]);
+  const [photoBlob, setPhotoBlob] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [photoError, setPhotoError] = useState(null);
+  const fileInputRef = useRef(null);
 
   if (!open) return null;
 
-  function submit(e) {
+  // Doesn't revoke previewUrl — the caller decides that, since a successful
+  // submit hands the blob URL off to the just-added wardrobe item (it stays
+  // alive until AppShell swaps in the server-confirmed image).
+  function resetForm() {
+    setName("");
+    setBrand("");
+    setCategory("Tops");
+    setColor(swatches[0]);
+    setPhotoBlob(null);
+    setPreviewUrl(null);
+    setPhotoError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function handleCancel() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    resetForm();
+    onClose();
+  }
+
+  async function handlePhotoChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoError(null);
+    setAnalyzing(true);
+    try {
+      const resized = await resizeImageFile(file);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPhotoBlob(resized);
+      setPreviewUrl(URL.createObjectURL(resized));
+
+      const imageBase64 = await blobToBase64(resized);
+      const res = await fetch("/api/wardrobe/tag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64, mediaType: "image/jpeg" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Couldn't analyze that photo.");
+
+      if (data.tags.name) setName(data.tags.name);
+      if (data.tags.category) setCategory(data.tags.category);
+      if (data.tags.colorHex) setColor(data.tags.colorHex);
+      if (data.tags.brand) setBrand(data.tags.brand);
+    } catch (err) {
+      console.error("Wardrobe photo tagging failed:", err);
+      setPhotoError("Couldn't auto-tag that photo — fill in the details below.");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  async function submit(e) {
     e.preventDefault();
     if (!name.trim()) return;
+
+    let imagePath = null;
+    if (photoBlob) {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const path = `${user.id}/${crypto.randomUUID()}.jpg`;
+        const { error } = await supabase.storage
+          .from("wardrobe-photos")
+          .upload(path, photoBlob, { contentType: "image/jpeg" });
+        if (error) {
+          console.error("Failed to upload wardrobe photo:", error.message);
+        } else {
+          imagePath = path;
+        }
+      }
+    }
+
     onAdd({
       id: `w-${Date.now()}`,
       name: name.trim(),
@@ -33,25 +112,54 @@ export default function AddItemModal({ open, onClose, onAdd }) {
       icon: iconByCategory[category],
       tags: ["New"],
       fav: false,
+      image: previewUrl,
+      imagePath,
     });
-    setName("");
-    setBrand("");
+    resetForm();
     onClose();
   }
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" onClick={handleCancel} />
       <form
         onSubmit={submit}
         className="glass animate-fade-up relative w-full max-w-md rounded-xl3 p-6"
       >
         <h3 className="font-display text-[22px] font-medium text-ink">Add wardrobe item</h3>
         <p className="mt-1 text-[13px] text-muted">
-          Log a piece so helloModa can style around it.
+          Snap a photo and helloModa fills in the details — or log it manually.
         </p>
 
         <div className="mt-5 space-y-4">
+          <Field label="Photo">
+            <label className="flex cursor-pointer items-center gap-3">
+              <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/40">
+                {previewUrl ? (
+                  <img src={previewUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <Plus size={18} className="text-muted" />
+                )}
+              </div>
+              <span className="text-[13px] text-muted">
+                {analyzing
+                  ? "Analyzing photo…"
+                  : previewUrl
+                    ? "Tap to replace photo"
+                    : "Tap to take or upload a photo"}
+              </span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhotoChange}
+                className="sr-only"
+              />
+            </label>
+            {photoError && <p className="mt-1.5 text-[12px] text-red-500">{photoError}</p>}
+          </Field>
+
           <Field label="Name">
             <input
               autoFocus
@@ -105,14 +213,15 @@ export default function AddItemModal({ open, onClose, onAdd }) {
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCancel}
             className="rounded-xl2 px-4 py-2.5 text-[14px] font-medium text-muted transition-colors hover:text-ink"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
+            disabled={analyzing}
+            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
           >
             <Plus size={16} />
             Add item

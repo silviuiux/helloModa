@@ -32,8 +32,12 @@ high-intent niche, matching the business plan's Phase 1 GTM.
   items (passed by exact id, validated server-side against hallucination) before suggesting new
   pieces — "shop" suggestions are honestly unmatched (no fabricated retailer/price) since the
   affiliate catalog below doesn't exist yet.
-- Digital closet: photo upload → background removal + AI attribute tagging (color/cut/category)
-  via a vision-capable model call, stored as structured wardrobe items.
+- ✅ **Digital closet photo upload + AI tagging, shipped 2026-09-19:** `AddItemModal.jsx`
+  uploads a photo to a private Storage bucket and calls Claude vision
+  (`POST /api/wardrobe/tag`) to prefill name/category/color/brand — still
+  editable, brand only ever set from a visible logo. Background removal is
+  deliberately deferred (needs a separate paid service, not required for a
+  usable loop).
 - Outfit recommendations: resolve today's "shop" suggestions to real affiliate products from the
   cached catalog (`05-integrations-affiliates.md`) via text/category match once Awin is live —
   no image generation or CV matching yet, keep this phase cheap and fast.

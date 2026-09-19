@@ -14,8 +14,10 @@ Next.js + Supabase infra: auth, database, RLS. **Chat is real** — `POST
 /api/chat` calls Claude (`claude-opus-5`) with structured output, persisted
 to Postgres, with multi-conversation support (History dropdown in the bottom
 bar: list/switch/new chat). Requires `ANTHROPIC_API_KEY` set (server-only) —
-see `.env.local.example`. Wardrobe is real (add/favorite/remove, no photo
-upload/AI tagging yet — that's next in Phase 1). "Shop" suggestions in chat
+see `.env.local.example`. Wardrobe is real (add/favorite/remove, plus photo
+upload + AI attribute tagging — snap a photo, Claude vision prefills name/
+category/color/brand, still editable; stored in the private `wardrobe-photos`
+Storage bucket). "Shop" suggestions in chat
 are honest AI guesses with no fabricated price/retailer, since there's no
 real product catalog yet (Awin integration,
 `docs/05-integrations-affiliates.md`, not started).
@@ -81,6 +83,7 @@ src/
     auth/callback/route.js      PKCE "code" exchange (OAuth, future)
     auth/confirm/route.js       "token_hash" confirmation (signup email link)
     api/chat/route.js           real chat: Claude call, structured output, DB persistence
+    api/wardrobe/tag/route.js   vision call: photo -> name/category/color/brand
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
     conversations.js            Server Actions: list conversations, load a conversation's messages
@@ -90,6 +93,9 @@ src/
     supabase/server.js          server Supabase client (Server Components/Actions)
     supabase/middleware.js      session-refresh helper used by middleware.js
     stylist.js                  Zod schema + system prompt for structured chat replies
+    wardrobeTagger.js           Zod schema + system prompt for photo -> attributes
+    wardrobeImages.js           signs `wardrobe-photos` Storage paths into short-lived URLs
+    imageResize.js               client-side photo downscale before tag/upload
     look.js                     stylist piece -> wardrobe item shape (save-to-closet)
     iconMap.jsx                 garment-icon resolver
   data/seed.js                  static reference data (wardrobe categories)
@@ -107,7 +113,7 @@ src/
     wardrobe/
       WardrobeView.jsx            grid, search, category filters
       WardrobeItemCard.jsx        item tile (favorite / remove)
-      AddItemModal.jsx            add a piece (now persists via Server Action)
+      AddItemModal.jsx            add a piece — photo picker + AI tagging, or manual fields
 ```
 
 ## Design language
@@ -118,6 +124,6 @@ helloCorp's DNA.
 
 ## Next ideas (Phase 1+, see `docs/03-roadmap.md`)
 
-Photo upload + AI tagging for wardrobe items · Awin signup + affiliate
-product matching for "shop" suggestions · outfit preview render (SDXL,
-Phase 2) · calendar sync · digital avatar · circular marketplace.
+Awin signup + affiliate product matching for "shop" suggestions · outfit
+preview render (SDXL, Phase 2) · calendar sync · digital avatar · circular
+marketplace.

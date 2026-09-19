@@ -16,12 +16,20 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove }) {
 
   return (
     <div className="group glass relative aspect-[3/4] overflow-hidden rounded-xl2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
-      {/* full-bleed swatch */}
-      <div className="absolute inset-0 grid place-items-center" style={{ backgroundColor: item.color }}>
-        <div className={`opacity-70 ${tone}`}>
-          <GarmentIcon name={item.icon} size={52} />
+      {/* full-bleed photo, or a color swatch + icon when there isn't one */}
+      {item.image ? (
+        <img
+          src={item.image}
+          alt={item.name}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 grid place-items-center" style={{ backgroundColor: item.color }}>
+          <div className={`opacity-70 ${tone}`}>
+            <GarmentIcon name={item.icon} size={52} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* edge controls */}
       <button

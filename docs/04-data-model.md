@@ -18,7 +18,9 @@ wardrobe_items
   tags                   text[]
   brand
   color_hex
-  image_url                     -- Supabase Storage path
+  image_url                     -- Supabase Storage path, `wardrobe-photos` bucket
+                                    (private; RLS-scoped to auth.uid(), signed URL
+                                    via src/lib/wardrobeImages.js — never public)
   embedding              vector -- pgvector, CLIP embedding of the item photo
   is_favorite             bool
   available_for_rent      bool  default false   -- Phase 4

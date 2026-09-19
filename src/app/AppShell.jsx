@@ -29,6 +29,7 @@ function dbRowToItem(row) {
     icon: ICON_BY_CATEGORY[row.category] || "hanger",
     tags: row.tags || [],
     fav: row.is_favorite,
+    image: row.image_signed_url || null,
   };
 }
 
@@ -58,11 +59,17 @@ export default function AppShell({
         category: item.category,
         color: item.color,
         tags: item.tags,
+        imagePath: item.imagePath,
       });
       setWardrobe((prev) => prev.map((w) => (w.id === tempId ? dbRowToItem(saved) : w)));
     } catch (err) {
       console.error("Failed to save wardrobe item:", err);
       setWardrobe((prev) => prev.filter((w) => w.id !== tempId));
+    } finally {
+      // The temp item's `image` is a local blob: URL (AddItemModal.jsx) handed
+      // off for the optimistic card — safe to free once it's been swapped for
+      // the server-confirmed signed URL (or dropped on failure).
+      if (item.image?.startsWith("blob:")) URL.revokeObjectURL(item.image);
     }
   }
 

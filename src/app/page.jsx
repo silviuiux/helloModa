@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { listConversations } from "@/actions/conversations";
+import { signWardrobeItems } from "@/lib/wardrobeImages";
 import AppShell from "./AppShell.jsx";
 
 // Auth is already enforced by middleware (src/middleware.js) — an unauthenticated
@@ -18,6 +19,7 @@ export default async function HomePage() {
   if (error) {
     console.error("Failed to load wardrobe:", error.message);
   }
+  const wardrobeWithImages = wardrobe ? await signWardrobeItems(supabase, wardrobe) : [];
 
   const conversations = await listConversations().catch((err) => {
     console.error("Failed to load conversations:", err.message);
@@ -29,7 +31,7 @@ export default async function HomePage() {
   // auto-resumed.
   return (
     <AppShell
-      initialWardrobe={wardrobe || []}
+      initialWardrobe={wardrobeWithImages}
       userEmail={user?.email}
       userDisplayName={user?.user_metadata?.display_name}
       initialConversations={conversations}

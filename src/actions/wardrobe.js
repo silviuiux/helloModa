@@ -2,13 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { signWardrobeImageUrl } from "@/lib/wardrobeImages";
 
 // Real persistence for the wardrobe view (docs/04-data-model.md's `wardrobe_items`
-// table). Photo upload + AI background-removal/tagging is a Phase 1 feature
-// (docs/03-roadmap.md) — for now items are logged manually, same fields the
-// existing AddItemModal UI already collects.
+// table). Photo upload + AI attribute tagging (docs/03-roadmap.md, Phase 1)
+// happens client-side (AddItemModal.jsx calls /api/wardrobe/tag, then uploads
+// the photo to the `wardrobe-photos` Storage bucket) — this action just
+// persists the resulting fields plus the Storage path, if any.
 
-export async function addWardrobeItem({ name, brand, category, color, tags }) {
+export async function addWardrobeItem({ name, brand, category, color, tags, imagePath }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -24,13 +26,14 @@ export async function addWardrobeItem({ name, brand, category, color, tags }) {
       category,
       color_hex: color,
       tags: tags || [],
+      image_url: imagePath || null,
     })
     .select()
     .single();
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
-  return data;
+  return { ...data, image_signed_url: await signWardrobeImageUrl(supabase, data.image_url) };
 }
 
 export async function toggleWardrobeFavorite(id, nextValue) {

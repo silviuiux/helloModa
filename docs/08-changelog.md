@@ -4,6 +4,52 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Wardrobe photo upload + AI attribute tagging
+
+Phase 1 roadmap item (`docs/03-roadmap.md`'s "Digital closet"):
+
+- `AddItemModal.jsx` now opens with a photo picker (`capture="environment"`
+  for a direct camera shot on mobile) instead of only manual fields. Picking
+  a photo downscales it client-side to ≤1024px jpeg (`src/lib/imageResize.js`)
+  for speed/cost, shows an instant preview, and calls the new
+  `POST /api/wardrobe/tag` route — a Claude vision call
+  (`src/lib/wardrobeTagger.js`'s `WardrobeTagSchema`: name/category/colorHex/
+  brand) that prefills the form. Every field stays editable — tagging is a
+  starting point, never silently trusted, and brand is only ever set when a
+  logo/label is actually legible in the shot (never guessed from style).
+  If tagging fails (bad photo, model hiccup, no `ANTHROPIC_API_KEY`
+  configured), the modal degrades to a clear inline message and the manual
+  fields still work — photo capture and manual logging were never coupled.
+- On submit, the photo uploads to a new private Supabase Storage bucket,
+  `wardrobe-photos`, at `{user_id}/{uuid}.jpg` — RLS-scoped so a user can only
+  read/write/delete their own folder (`wardrobe photos: owner select/insert/
+  delete` policies), matching every other table's `auth.uid()` scoping in
+  this project. `wardrobe_items.image_url` stores that Storage path, not a
+  public URL; `src/lib/wardrobeImages.js` turns it into a 1-hour signed URL
+  wherever wardrobe rows are read (`page.jsx` on load, `addWardrobeItem` on
+  save) — never a public bucket, consistent with the private-beta posture.
+  `WardrobeItemCard.jsx` renders the real photo when present, falling back to
+  the existing color-swatch-plus-icon tile otherwise (saved-from-chat items
+  still have no photo, and that's fine).
+- Background removal (also named in the roadmap line) is deliberately not
+  bundled here — it needs a separate paid service and isn't required for a
+  usable upload+tag loop; the photo is stored/shown as-is for now.
+- QA note: this sandbox's egress proxy blocks `*.supabase.co` outright (not
+  just a cert-trust issue like prior UI passes), and `ANTHROPIC_API_KEY` isn't
+  set locally either, so the real Storage upload and real vision tagging
+  couldn't be exercised end-to-end here. Verified instead via a temporary
+  unauthenticated preview route (removed after) exercising the actual
+  component code: photo picker → preview → tagging call fails closed with the
+  intended inline error (proving the fallback path) → manual fields still
+  submit → card renders the uploaded photo. Caught and fixed a real bug in
+  that pass: the preview blob URL was being revoked immediately after handoff
+  to the parent, breaking the just-added card's image — fixed by making
+  `AppShell.jsx#handleAdd` the one place that revokes it, only once the
+  server-confirmed image has taken over (or the add failed). Real
+  Storage/Claude calls should be spot-checked once deployed.
+
+---
+
 ## 2026-09-19 — Bonheur Royale title font; cycling "thinking" line
 
 Per direct request:
