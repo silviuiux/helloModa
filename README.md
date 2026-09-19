@@ -4,20 +4,31 @@ Conversational AI stylist — turns mood, occasion, wardrobe, and budget into
 curated outfit direction. Part of helloCorp.
 
 See `docs/` for the full production plan (architecture, tech stack, roadmap,
-data model, affiliate integrations, risks/legal, costs). Start at
-`docs/00-overview.md`.
+data model, affiliate integrations, risks/legal, costs, conversation design).
+Start at `docs/00-overview.md`.
 
 ## Status
 
 Phase 0 (Foundations) done; Phase 1 (`docs/03-roadmap.md`) underway. Real
 Next.js + Supabase infra: auth, database, RLS. **Chat is real** — `POST
 /api/chat` calls Claude (`claude-opus-5`) with structured output, persisted
-to Postgres, with multi-conversation support (sidebar: list/switch/new chat).
-Requires `ANTHROPIC_API_KEY` set (server-only) — see `.env.local.example`.
-Wardrobe is real (add/favorite/remove, no photo upload/AI tagging yet — that's
-next in Phase 1). "Shop" suggestions in chat are honest AI guesses with no
-fabricated price/retailer, since there's no real product catalog yet
-(Awin integration, `docs/05-integrations-affiliates.md`, not started).
+to Postgres, with multi-conversation support (History dropdown in the top
+bar: list/switch/new chat). Requires `ANTHROPIC_API_KEY` set (server-only) —
+see `.env.local.example`. Wardrobe is real (add/favorite/remove, no photo
+upload/AI tagging yet — that's next in Phase 1). "Shop" suggestions in chat
+are honest AI guesses with no fabricated price/retailer, since there's no
+real product catalog yet (Awin integration,
+`docs/05-integrations-affiliates.md`, not started).
+
+**Conversation UX, redesigned 2026-09-19** per `docs/09-conversation-design.md`
+(the maintained rules doc — read it before changing chat behavior/layout):
+one outfit direction per turn (title + narrative + hero visual, currently a
+styled placeholder — real image generation is a deliberate later step), the
+underlying product cards collapsed by default behind "Find items for this
+outfit", AI-authored quick-reply chips, a welcome screen with example
+occasion cards before the first message, and no sidebar anywhere — just a
+minimal top bar (brand, Chat/Wardrobe nav, a History dropdown, account menu)
+over a narrow, centered column.
 
 **Auth:** email + password (`/login`, `/register`). Social sign-in buttons
 (Google, Apple, Facebook, X) are on the login/register pages but are inert
@@ -62,7 +73,7 @@ src/
   app/
     layout.jsx                 root layout, fonts, metadata
     globals.css                Tailwind + glass/HUD surface styles
-    page.jsx                   protected home route — fetches wardrobe + conversations
+    page.jsx                   protected home route — fetches wardrobe + conversation list
     AppShell.jsx                app shell, view routing, wardrobe + conversation state (client)
     login/page.jsx              email + password sign-in
     register/page.jsx           email + password sign-up
@@ -78,18 +89,20 @@ src/
     supabase/server.js          server Supabase client (Server Components/Actions)
     supabase/middleware.js      session-refresh helper used by middleware.js
     stylist.js                  Zod schema + system prompt for structured chat replies
+    look.js                     stylist piece -> wardrobe item shape (save-to-closet)
     iconMap.jsx                 garment-icon resolver
-  data/seed.js                  mock data still used for the header chips + swap-suggestion pool
+  data/seed.js                  static reference data (wardrobe categories)
   components/
-    Sidebar.jsx                 brand, style memory, nav, conversation list, account/sign-out
+    TopBar.jsx                  brand, Chat/Wardrobe nav, History dropdown, account menu
     Icons.jsx                   inline stroke icon set (no deps)
     auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/
-      ChatView.jsx               header + chips + messages + composer, calls /api/chat
-      MessageBubble.jsx          user / AI bubbles
-      RecommendationCards.jsx    outfit suggestion cards
-      Composer.jsx                input + quick prompts
-      LookContextPanel.jsx        right panel: silhouette / palette / risk
+      EmptyState.jsx             welcome screen: greeting, occasion cards, example prompts
+      ChatView.jsx                narrow-column message list + composer, calls /api/chat
+      MessageBubble.jsx           one turn: title, narrative, hero, quick replies, toolbar
+      OutfitHero.jsx               placeholder outfit-in-scene visual (real image-gen: later)
+      RecommendationCards.jsx     product-card grid, revealed via "Find items for this outfit"
+      Composer.jsx                 just the input now
     wardrobe/
       WardrobeView.jsx            grid, search, category filters
       WardrobeItemCard.jsx        item tile (favorite / remove)

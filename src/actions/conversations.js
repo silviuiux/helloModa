@@ -24,8 +24,9 @@ export async function listConversations() {
 }
 
 // Loads one conversation's messages and reassembles them into the UI's
-// message shape (src/components/chat/MessageBubble.jsx). Resolves
-// closet-sourced cards against the *current* wardrobe_items row (name/brand
+// message shape (src/components/chat/MessageBubble.jsx — see
+// docs/09-conversation-design.md for the turn contract). Resolves
+// closet-sourced pieces against the *current* wardrobe_items row (name/brand
 // may have changed since the message was sent) rather than freezing a copy.
 export async function getConversationMessages(conversationId) {
   const supabase = await createClient();
@@ -45,7 +46,7 @@ export async function getConversationMessages(conversationId) {
 
   const { data: recs, error: recsError } = await supabase
     .from("outfit_recommendations")
-    .select("id, message_id, title, followup_question")
+    .select("id, message_id, title, hero_prompt, quick_replies")
     .in("message_id", assistantIds);
   if (recsError) throw new Error(recsError.message);
 
@@ -67,7 +68,7 @@ export async function getConversationMessages(conversationId) {
       return { id: m.id, role: "user", text: m.content };
     }
     const rec = (recs || []).find((r) => r.message_id === m.id);
-    const cards = rec
+    const pieces = rec
       ? items
           .filter((it) => it.recommendation_id === rec.id)
           .map((it) => {
@@ -96,11 +97,11 @@ export async function getConversationMessages(conversationId) {
     return {
       id: m.id,
       role: "ai",
-      hero: true,
       title: rec?.title || null,
-      text: m.content,
-      cards,
-      followup: rec?.followup_question || null,
+      narrative: m.content,
+      heroPrompt: rec?.hero_prompt || null,
+      quickReplies: rec?.quick_replies || [],
+      pieces,
     };
   });
 }

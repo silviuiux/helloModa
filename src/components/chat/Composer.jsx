@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ArrowRight } from "../Icons.jsx";
-import { composerPrompts } from "../../data/seed.js";
 
+// Static suggestion chips live in EmptyState.jsx (first-time prompts) and
+// per-turn quickReplies (AI-authored follow-ups, in MessageBubble.jsx) —
+// see docs/09-conversation-design.md. Composer itself is just the input now.
 export default function Composer({ onSend, disabled = false }) {
   const [value, setValue] = useState("");
 
@@ -15,20 +17,8 @@ export default function Composer({ onSend, disabled = false }) {
   }
 
   return (
-    <div className="border-t border-white/40 px-6 py-4 sm:px-8">
-      <div className="mb-3 flex flex-wrap gap-2">
-        {composerPrompts.map((p) => (
-          <button
-            key={p}
-            onClick={() => !disabled && onSend?.(p)}
-            disabled={disabled}
-            className="glass-soft rounded-full px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:text-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-      <form onSubmit={submit} className="flex items-center gap-3">
+    <div className="border-t border-white/40 px-4 py-4 sm:px-6">
+      <form onSubmit={submit} className="mx-auto flex max-w-xl items-center gap-3">
         <div
           className={`glass flex flex-1 items-center rounded-full px-5 transition-opacity focus-within:border-accent/60 ${
             disabled ? "opacity-60" : ""
@@ -39,9 +29,7 @@ export default function Composer({ onSend, disabled = false }) {
             onChange={(e) => setValue(e.target.value)}
             disabled={disabled}
             placeholder={
-              disabled
-                ? "helloModa is styling your look…"
-                : "Ask for a look, refine a silhouette, or upload a closet item…"
+              disabled ? "helloModa is styling your look…" : "Describe an occasion…"
             }
             className="h-12 flex-1 bg-transparent text-[15px] text-ink placeholder:text-faint focus:outline-none disabled:cursor-not-allowed"
           />

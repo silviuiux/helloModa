@@ -1,6 +1,5 @@
 import GarmentArt from "../GarmentArt.jsx";
-import { Heart, Plus, Refresh, Hanger, Check } from "../Icons.jsx";
-import { priceParts } from "../../lib/format.js";
+import { Heart, Hanger } from "../Icons.jsx";
 
 function RetailerTag({ retailer, source }) {
   if (source === "closet") {
@@ -26,12 +25,12 @@ function RetailerTag({ retailer, source }) {
   );
 }
 
-function CircleBtn({ icon: Icon, label, onClick, filled, title }) {
+function CircleBtn({ icon: Icon, label, onClick, filled }) {
   return (
     <button
       onClick={onClick}
       aria-label={label}
-      title={title || label}
+      title={label}
       aria-pressed={filled}
       className={`grid h-8 w-8 place-items-center rounded-full transition-transform hover:scale-105 active:scale-95 ${
         filled ? "bg-accent text-white shadow-soft" : "glass-circle text-ink"
@@ -42,18 +41,14 @@ function CircleBtn({ icon: Icon, label, onClick, filled, title }) {
   );
 }
 
-function ProductCard({ card, onSwap, onToggleSave, onToggleLook, saved, inLook }) {
-  const price = priceParts(card.price);
+function ProductCard({ card, onToggleSave, saved }) {
   return (
     <div className="group glass relative aspect-[3/4] overflow-hidden rounded-xl2">
-      {/* full-bleed figure (fades when swapped) */}
-      <div key={`${card.brand}-${card.name}`} className="animate-fade-up absolute inset-0">
+      <div className="absolute inset-0">
         <GarmentArt type={card.type} />
       </div>
 
-      {/* edge controls */}
-      <div className="absolute left-2 top-2 flex gap-1.5">
-        <CircleBtn icon={Refresh} label="Swap suggestion" onClick={() => onSwap?.(card.id)} />
+      <div className="absolute right-2 top-2">
         <CircleBtn
           icon={Heart}
           label={saved ? "Saved to wardrobe" : "Save to wardrobe"}
@@ -61,27 +56,15 @@ function ProductCard({ card, onSwap, onToggleSave, onToggleLook, saved, inLook }
           onClick={() => onToggleSave?.(card)}
         />
       </div>
-      <div className="absolute right-2 top-2">
-        <CircleBtn
-          icon={inLook ? Check : Plus}
-          label={inLook ? "Remove from look" : "Add to look"}
-          filled={inLook}
-          onClick={() => onToggleLook?.(card)}
-        />
-      </div>
 
-      {/* frosted label overlay */}
-      <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10"
-        style={{ background: "linear-gradient(to top, rgba(255,255,255,0.82) 28%, rgba(255,255,255,0))" }}>
+      <div
+        className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10"
+        style={{ background: "linear-gradient(to top, rgba(255,255,255,0.82) 28%, rgba(255,255,255,0))" }}
+      >
         <p className="font-display text-[14px] font-semibold uppercase tracking-tight text-ink">
           {card.brand}
         </p>
-        <p className="mt-0.5 truncate text-[12.5px] text-muted">
-          {card.name}
-          {price && (
-            <> · {price.whole}<sup className="text-[9px]">{price.cents}</sup> lei</>
-          )}
-        </p>
+        <p className="mt-0.5 truncate text-[12.5px] text-muted">{card.name}</p>
         <div className="mt-1.5">
           <RetailerTag retailer={card.retailer} source={card.source} />
         </div>
@@ -90,27 +73,12 @@ function ProductCard({ card, onSwap, onToggleSave, onToggleLook, saved, inLook }
   );
 }
 
-export default function RecommendationCards({
-  cards = [],
-  onSwap,
-  onToggleSave,
-  onToggleLook,
-  savedIds,
-  lookIds,
-}) {
+export default function RecommendationCards({ cards = [], onToggleSave, savedIds }) {
   if (!cards.length) return null;
   return (
-    <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+    <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4">
       {cards.map((c) => (
-        <ProductCard
-          key={c.id}
-          card={c}
-          onSwap={onSwap}
-          onToggleSave={onToggleSave}
-          onToggleLook={onToggleLook}
-          saved={savedIds?.has(c.id)}
-          inLook={lookIds?.has(c.id)}
-        />
+        <ProductCard key={c.id} card={c} onToggleSave={onToggleSave} saved={savedIds?.has(c.id)} />
       ))}
     </div>
   );

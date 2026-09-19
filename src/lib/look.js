@@ -1,15 +1,4 @@
-import { catalog } from "../data/seed.js";
-
-// Pick a different product of the same type when the user taps "swap".
-export function pickAlternative(card) {
-  const pool = catalog[card.type] || [];
-  const options = pool.filter((p) => p.name !== card.name);
-  if (!options.length) return card;
-  const next = options[Math.floor(Math.random() * options.length)];
-  return { ...card, ...next }; // keep the slot id, swap product details
-}
-
-// Map a stylist card to a wardrobe item shape (used by the heart / save action).
+// Map a stylist piece to a wardrobe item shape (used by the heart / save action).
 const TYPE_CATEGORY = {
   top: "Tops",
   bottoms: "Bottoms",

@@ -142,16 +142,16 @@ export async function POST(request) {
 
   // Defensive: never trust a model-returned wardrobeItemId at face value.
   const wardrobeById = new Map((wardrobe || []).map((w) => [w.id, w]));
-  const cards = parsed.cards.map((c) => {
-    const wardrobeItem = c.source === "closet" ? wardrobeById.get(c.wardrobeItemId) : null;
+  const pieces = parsed.pieces.map((p) => {
+    const wardrobeItem = p.source === "closet" ? wardrobeById.get(p.wardrobeItemId) : null;
     return wardrobeItem
       ? { source: "closet", wardrobeItem }
-      : { source: "shop", brand: c.brand, name: c.name, type: c.type };
+      : { source: "shop", brand: p.brand, name: p.name, type: p.type };
   });
 
   const { data: assistantMessageRow, error: assistantMessageError } = await supabase
     .from("messages")
-    .insert({ conversation_id: conversation.id, role: "assistant", content: parsed.text })
+    .insert({ conversation_id: conversation.id, role: "assistant", content: parsed.narrative })
     .select("id")
     .single();
   if (assistantMessageError) {
@@ -163,7 +163,8 @@ export async function POST(request) {
     .insert({
       message_id: assistantMessageRow.id,
       title: parsed.title,
-      followup_question: parsed.followup,
+      hero_prompt: parsed.heroPrompt,
+      quick_replies: parsed.quickReplies,
     })
     .select("id")
     .single();
@@ -171,14 +172,14 @@ export async function POST(request) {
     return NextResponse.json({ error: recommendationError.message }, { status: 500 });
   }
 
-  const itemRows = cards.map((c) =>
-    c.source === "closet"
-      ? { recommendation_id: recommendationRow.id, wardrobe_item_id: c.wardrobeItem.id }
+  const itemRows = pieces.map((p) =>
+    p.source === "closet"
+      ? { recommendation_id: recommendationRow.id, wardrobe_item_id: p.wardrobeItem.id }
       : {
           recommendation_id: recommendationRow.id,
-          suggested_brand: c.brand,
-          suggested_name: c.name,
-          suggested_category: c.type,
+          suggested_brand: p.brand,
+          suggested_name: p.name,
+          suggested_category: p.type,
         }
   );
   const { data: insertedItems, error: itemsError } = await supabase
@@ -189,7 +190,7 @@ export async function POST(request) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  const uiCards = insertedItems.map((it) => {
+  const uiPieces = insertedItems.map((it) => {
     if (it.wardrobe_item_id) {
       const w = wardrobeById.get(it.wardrobe_item_id);
       return {
@@ -220,11 +221,11 @@ export async function POST(request) {
     message: {
       id: assistantMessageRow.id,
       role: "ai",
-      hero: true,
       title: parsed.title,
-      text: parsed.text,
-      cards: uiCards,
-      followup: parsed.followup,
+      narrative: parsed.narrative,
+      heroPrompt: parsed.heroPrompt,
+      quickReplies: parsed.quickReplies,
+      pieces: uiPieces,
     },
   });
 }

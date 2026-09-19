@@ -4,6 +4,48 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Conversation redesign: one outfit per turn, no sidebar
+
+Reworked the chat UX from XD mockups, per direct request. New rules doc:
+`docs/09-conversation-design.md` — read it before changing chat behavior or
+layout; it's the maintained source of truth, not this entry.
+
+- **Turn shape:** one focused outfit direction per reply (short script-font
+  title, editorial narrative, hero visual, 2-4 AI-authored quick-reply
+  chips), not a grid of interchangeable product cards. The underlying
+  structured pieces still generate and persist every turn — they're just
+  collapsed by default behind a "Find items for this outfit" toggle.
+- **Hero visual is a styled placeholder, not a real generated image** — by
+  direct decision, to ship the layout/flow change without pulling in a paid
+  image-gen provider signup today. `heroPrompt` is generated and stored on
+  every turn regardless, so wiring real generation later is additive, not a
+  rework of this schema.
+- **Welcome screen** before the first message: greeting, GTM-relevant example
+  occasion cards (Wedding Guest wedge + adjacent), example prompt chips.
+  Conversations no longer auto-resume on page load — always start here;
+  past conversations are one click away in the top bar's History dropdown.
+- **No sidebar anywhere** (was: Chat-only decision, widened to the whole app
+  per direct request) — replaced by a minimal top bar (brand, Chat/Wardrobe
+  nav, History dropdown, account menu) over a narrow centered column.
+  `Sidebar.jsx` and `LookContextPanel.jsx` deleted (recoverable from git
+  history) along with the look-builder feature they implemented — no mockup
+  called for it, and decluttering only meant something if things were
+  actually removed, not just moved.
+- Removed the "swap suggestion" control and its mock catalog
+  (`lib/look.js#pickAlternative`, `seed.js#catalog`) — no longer part of the
+  simplified per-piece card. `seed.js` trimmed to just what's still real
+  (wardrobe categories); everything else in it was already-dead mock data
+  from before real chat/wardrobe existed.
+- Schema: added `outfit_recommendations.hero_prompt` and `.quick_replies`.
+- Verified visually via a temporary unauthenticated preview route (this
+  sandbox's network egress blocks direct browser/server calls to
+  `*.supabase.co`, so a real logged-in Playwright session wasn't possible
+  here) — desktop and mobile screenshots confirmed the welcome screen, a
+  live-shaped turn, the "Find items" toggle, and the History dropdown all
+  render and behave correctly; one real bug found and fixed this way (the
+  History dropdown overflowed the viewport edge). The preview route,
+  its middleware bypass, and the test account used were all removed after.
+
 ## 2026-09-19 — Real chat, wired to Claude, with multi-conversation support
 
 Replaced the mock seed conversation with real chat, the first Phase 1 item

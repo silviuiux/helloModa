@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { listConversations, getConversationMessages } from "@/actions/conversations";
+import { listConversations } from "@/actions/conversations";
 import AppShell from "./AppShell.jsx";
 
 // Auth is already enforced by middleware (src/middleware.js) — an unauthenticated
@@ -23,21 +23,18 @@ export default async function HomePage() {
     console.error("Failed to load conversations:", err.message);
     return [];
   });
-  const activeConversationId = conversations[0]?.id || null;
-  const initialMessages = activeConversationId
-    ? await getConversationMessages(activeConversationId).catch((err) => {
-        console.error("Failed to load messages:", err.message);
-        return [];
-      })
-    : [];
 
+  // Always land on the welcome screen (docs/09-conversation-design.md) — past
+  // conversations are reachable via the top bar's History dropdown, not
+  // auto-resumed.
   return (
     <AppShell
       initialWardrobe={wardrobe || []}
       userEmail={user?.email}
+      userDisplayName={user?.user_metadata?.display_name}
       initialConversations={conversations}
-      initialActiveConversationId={activeConversationId}
-      initialMessages={initialMessages}
+      initialActiveConversationId={null}
+      initialMessages={[]}
     />
   );
 }

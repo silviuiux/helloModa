@@ -1,45 +1,17 @@
-import { useRef, useState, useEffect, useMemo } from "react";
-import { Sparkle, Rain, Bag } from "../Icons.jsx";
+import { useRef, useEffect, useState } from "react";
 import MessageBubble from "./MessageBubble.jsx";
 import Composer from "./Composer.jsx";
-import LookContextPanel from "./LookContextPanel.jsx";
-import { lookContext } from "../../data/seed.js";
-import { pickAlternative, cardToWardrobeItem } from "../../lib/look.js";
+import EmptyState from "./EmptyState.jsx";
+import { cardToWardrobeItem } from "../../lib/look.js";
 
-function Chip({ icon: Icon, children }) {
+function ThinkingLine() {
   return (
-    <span className="glass-soft inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12.5px] text-muted">
-      {Icon && <Icon size={14} />}
-      {children}
-    </span>
+    <p className="animate-fade-up font-script text-[22px] text-accent-deep">thinking…</p>
   );
 }
 
-function TypingBubble() {
-  return (
-    <div className="animate-fade-up">
-      <div className="glass mr-auto inline-flex items-center gap-3 rounded-xl3 rounded-tl-lg px-5 py-4">
-        <span className="label text-accent-deep">helloModa AI</span>
-        <span className="flex items-center gap-1">
-          <Dot delay="0ms" />
-          <Dot delay="180ms" />
-          <Dot delay="360ms" />
-        </span>
-        <span className="text-[13px] text-muted">styling your look…</span>
-      </div>
-    </div>
-  );
-}
-
-function Dot({ delay }) {
-  return (
-    <span
-      className="h-1.5 w-1.5 rounded-full bg-faint"
-      style={{ animation: "hm-blink 1.2s ease-in-out infinite", animationDelay: delay }}
-    />
-  );
-}
-
+// See docs/09-conversation-design.md for the rules this implements: one
+// outfit direction per turn, no sidebar, narrow editorial column.
 export default function ChatView({
   wardrobe = [],
   onWardrobeAdd,
@@ -49,23 +21,17 @@ export default function ChatView({
   setMessages,
   onConversationCreated,
   isSwitching = false,
+  userEmail,
+  userDisplayName,
 }) {
   const [thinking, setThinking] = useState(false);
-  const [look, setLook] = useState([]);
   const scrollRef = useRef(null);
 
-  // Saved = present in wardrobe under its derived id.
-  const savedIds = useMemo(() => {
-    const ids = new Set();
-    wardrobe.forEach((it) => {
-      if (typeof it.id === "string" && it.id.startsWith("saved-")) {
-        ids.add(it.id.slice("saved-".length));
-      }
-    });
-    return ids;
-  }, [wardrobe]);
-
-  const lookIds = useMemo(() => new Set(look.map((c) => c.id)), [look]);
+  const savedIds = new Set(
+    wardrobe
+      .filter((it) => typeof it.id === "string" && it.id.startsWith("saved-"))
+      .map((it) => it.id.slice("saved-".length))
+  );
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -92,14 +58,13 @@ export default function ChatView({
           {
             id: `err-${Date.now()}`,
             role: "ai",
-            text: data.error || "Something went wrong. Please try again.",
+            title: null,
+            narrative: data.error || "Something went wrong. Please try again.",
           },
         ]);
         return;
       }
 
-      // Replace the optimistic user bubble with the real (DB-backed) one, then
-      // append the assistant reply.
       setMessages((prev) => [
         ...prev.filter((m) => m.id !== tempId),
         data.userMessage,
@@ -116,7 +81,8 @@ export default function ChatView({
         {
           id: `err-${Date.now()}`,
           role: "ai",
-          text: "Couldn't reach the server. Please try again.",
+          title: null,
+          narrative: "Couldn't reach the server. Please try again.",
         },
       ]);
     } finally {
@@ -124,104 +90,38 @@ export default function ChatView({
     }
   }
 
-  // Re-roll a single suggestion in place — still swaps against the static
-  // mock catalog (src/data/seed.js) since there's no real product catalog
-  // yet (docs/05-integrations-affiliates.md, Phase 1+). Local-only, not persisted.
-  function handleSwap(messageId, cardId) {
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id !== messageId
-          ? m
-          : { ...m, cards: m.cards.map((c) => (c.id === cardId ? pickAlternative(c) : c)) }
-      )
-    );
-  }
-
-  // Heart → toggle the piece in the wardrobe favorites.
-  function handleToggleSave(card) {
-    if (savedIds.has(card.id)) {
-      onWardrobeRemove?.(`saved-${card.id}`);
+  function handleToggleSave(piece) {
+    if (savedIds.has(piece.id)) {
+      onWardrobeRemove?.(`saved-${piece.id}`);
     } else {
-      onWardrobeAdd?.(cardToWardrobeItem(card));
+      onWardrobeAdd?.(cardToWardrobeItem(piece));
     }
   }
 
-  // + → toggle the piece in the assembled look.
-  function handleToggleLook(card) {
-    setLook((prev) =>
-      prev.some((c) => c.id === card.id)
-        ? prev.filter((c) => c.id !== card.id)
-        : [...prev, card]
-    );
-  }
-
-  function removeFromLook(id) {
-    setLook((prev) => prev.filter((c) => c.id !== id));
-  }
+  const hasMessages = messages.length > 0 || isSwitching;
 
   return (
-    <div className="flex min-h-0 flex-1">
-      {/* Center column */}
-      <section className="flex min-w-0 flex-1 flex-col">
-        {/* Header */}
-        <header className="flex items-start justify-between gap-4 border-b border-line px-6 py-5 sm:px-8">
-          <div>
-            <h1 className="font-display text-[26px] font-medium leading-tight text-ink">
-              Evening capsule assistant
-            </h1>
-            <p className="mt-1 text-[13.5px] text-muted">
-              AI stylist · remembers wardrobe, fit notes, and taste boundaries
-            </p>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div ref={scrollRef} className="scroll-area min-h-0 flex-1 overflow-y-auto">
+        {!hasMessages ? (
+          <EmptyState userEmail={userEmail} userDisplayName={userDisplayName} onPrompt={handleSend} />
+        ) : (
+          <div className="mx-auto w-full max-w-xl space-y-5 px-4 py-6 sm:px-0">
+            {messages.map((m) => (
+              <MessageBubble
+                key={m.id}
+                message={m}
+                onToggleSave={handleToggleSave}
+                savedIds={savedIds}
+                onQuickReply={handleSend}
+              />
+            ))}
+            {thinking && <ThinkingLine />}
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent-tint px-3.5 py-2 text-[12.5px] font-medium text-accent-deep">
-            <Sparkle size={14} />
-            Context on
-          </span>
-        </header>
+        )}
+      </div>
 
-        {/* Messages */}
-        <div ref={scrollRef} className="scroll-area min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-          <div className="mb-6 flex flex-wrap gap-2.5">
-            <Chip icon={Bag}>Occasion: {lookContext.occasion}</Chip>
-            <Chip icon={Rain}>{lookContext.weather}</Chip>
-            <Chip>Budget: {lookContext.budget}</Chip>
-          </div>
-
-          {messages.length === 0 && !isSwitching ? (
-            <div className="grid place-items-center py-20 text-center text-muted">
-              <p className="text-[15px]">
-                Describe an occasion, and helloModa will style a look from your closet.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-5">
-              {messages.map((m) => (
-                <MessageBubble
-                  key={m.id}
-                  message={m}
-                  onSwap={handleSwap}
-                  onToggleSave={handleToggleSave}
-                  onToggleLook={handleToggleLook}
-                  savedIds={savedIds}
-                  lookIds={lookIds}
-                />
-              ))}
-              {thinking && <TypingBubble />}
-            </div>
-          )}
-        </div>
-
-        <Composer onSend={handleSend} disabled={thinking} />
-      </section>
-
-      <LookContextPanel look={look} onRemove={removeFromLook} />
-
-      <style>{`
-        @keyframes hm-blink {
-          0%, 100% { opacity: 0.25; transform: translateY(0); }
-          50% { opacity: 1; transform: translateY(-1px); }
-        }
-      `}</style>
+      <Composer onSend={handleSend} disabled={thinking} />
     </div>
   );
 }

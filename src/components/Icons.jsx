@@ -138,3 +138,30 @@ export const Sun = (p) => (
     <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" />
   </Svg>
 );
+
+export const History = (p) => (
+  <Svg {...p}>
+    <path d="M4 4v5h5" />
+    <path d="M4.6 12A8 8 0 1 0 7 6" />
+    <path d="M12 8v5l3.5 2" />
+  </Svg>
+);
+
+export const ChevronDown = (p) => (
+  <Svg {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </Svg>
+);
+
+export const X = (p) => (
+  <Svg {...p}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </Svg>
+);
+
+export const User = (p) => (
+  <Svg {...p}>
+    <circle cx="12" cy="8.5" r="3.5" />
+    <path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5" />
+  </Svg>
+);

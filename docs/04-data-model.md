@@ -41,11 +41,13 @@ messages
 outfit_recommendations
   id (uuid, pk)
   message_id (fk -> messages)     -- the assistant message that produced this
-  title                    text   -- e.g. "The relaxed gallery column"
+  title                    text   -- short evocative phrase, e.g. "Vineyard wedding" (docs/09-conversation-design.md)
+  hero_prompt              text   -- image-gen prompt, written now, used once Phase 2 wires up real generation
+  quick_replies            jsonb  -- AI-authored follow-up chips for this turn, e.g. ["Show me something more casual"]
   generated_image_url             -- Phase 2, nullable until then
   occasion                text
   weather_context         jsonb
-  followup_question       text
+  followup_question       text   -- superseded by quick_replies; unused going forward, kept for now
 
 outfit_recommendation_items
   id (uuid, pk)
