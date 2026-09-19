@@ -26,7 +26,7 @@ function NavItem({ active, icon: Icon, label, count, onClick }) {
   );
 }
 
-export default function Sidebar({ view, setView, wardrobeCount }) {
+export default function Sidebar({ view, setView, wardrobeCount, userEmail, onSignOut }) {
   return (
     <aside className="glass-panel hidden w-[270px] shrink-0 flex-col border-r border-white/40 px-5 pb-5 pt-6 md:flex">
       {/* Brand */}
@@ -68,12 +68,31 @@ export default function Sidebar({ view, setView, wardrobeCount }) {
       </nav>
 
       {/* Today's intent */}
-      <div className="mt-auto rounded-xl2 border border-dashed border-accent-soft bg-white/40 p-4">
+      <div className="rounded-xl2 border border-dashed border-accent-soft bg-white/40 p-4">
         <p className="label text-accent-deep">Today&rsquo;s intent</p>
         <p className="mt-2 text-[13px] leading-relaxed text-muted">
           {styleMemory.intent}
         </p>
       </div>
+
+      {/* Account */}
+      {userEmail && (
+        <div className="mt-auto flex items-center justify-between gap-2 px-1 pt-5">
+          <span className="truncate text-[12px] text-faint" title={userEmail}>
+            {userEmail}
+          </span>
+          {onSignOut && (
+            <form action={onSignOut}>
+              <button
+                type="submit"
+                className="shrink-0 text-[12px] font-medium text-muted hover:text-accent-deep"
+              >
+                Sign out
+              </button>
+            </form>
+          )}
+        </div>
+      )}
     </aside>
   );
 }
