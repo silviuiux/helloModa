@@ -4,6 +4,40 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — All controls into one bottom bar; ditched turn containers
+
+Per direct request, against new mockups:
+
+- **New `BottomBar.jsx` replaces `TopBar.jsx` entirely** — every control
+  (Home/new-chat, Chat toggle, Wardrobe toggle, the composer, History with a
+  conversation-count badge, Share, Account) now lives in one bar anchored to
+  the bottom of the screen, flanking the composer, instead of split between
+  a header and an in-chat composer.
+- **The composer moved out of `ChatView.jsx`** into the global bar, which
+  means the send logic (`handleSend`) moved up to `AppShell.jsx` — it's no
+  longer scoped to the chat view, since the bar (and its composer) is now
+  visible and functional from every view. Sending while on Wardrobe switches
+  to Chat and sends there.
+- **Share is real, not a placeholder** — Web Share API, falling back to
+  clipboard copy, sharing the most recent outfit's title+narrative as plain
+  text. Deliberately not a link — there's no public/shareable conversation
+  page built yet, and sharing a link a recipient couldn't open would be
+  exactly the kind of dishonest UI this project has been avoiding elsewhere
+  (fabricated retailer data, fake product prices, etc.).
+- **Turn containers removed** — `MessageBubble.jsx`'s outer `glass` card is
+  gone; the image and text sit directly on the page background. Same for
+  the revealed "Find items" grid (`RecommendationCards.jsx`): flat images
+  with a plain-text caption below, no bordered/gradient-overlay tile.
+  Spacing increased throughout (title, gaps, inter-turn spacing) now that
+  there's no box implicitly providing visual separation.
+- Verified with the same temporary preview-route + Playwright pattern as the
+  prior two redesigns (removed after). Caught one real bug this pass: the
+  bottom bar overflowed the viewport on mobile (six icons + input in one
+  row) — fixed with a responsive two-row layout (input on top, icons split
+  evenly below) under the `sm` breakpoint.
+
+---
+
 ## 2026-09-19 — Wider content column, two-column outfit turns
 
 Layout refinements from new mockups, per direct request:

@@ -31,6 +31,10 @@ interchangeable product cards. A turn has:
    deliberately separate next step, not bundled into this layout change.
    Swapping the placeholder for a real generated image later should only
    mean changing what `OutfitHero` renders, not the surrounding turn shape.
+   The turn itself has **no container/card chrome** — the image and text sit
+   directly on the page background, not inside a bordered/glass box. Applies
+   to the revealed "Find items" grid too: flat images with a caption below,
+   no bordered tile.
 4. **Quick-reply chips** — 2–4 AI-authored follow-up prompts specific to
    *this* turn (e.g. "Show me something more casual," "Keep it under $150"),
    not a static global list. Clicking one sends it as the next message
@@ -66,21 +70,40 @@ blank chat log:
 This view is per-conversation: switching to an existing conversation shows
 its history; starting a new chat shows this welcome screen again.
 
-## Layout: no sidebar, anywhere
+## Layout: no top bar either — everything lives in one bottom bar
 
-Replaced across the whole app (not just chat) with a minimal top bar:
-brand mark, Chat/Wardrobe nav, a conversation-history control (dropdown, not
-a persistent rail — multi-conversation support still exists, just doesn't
-cost permanent screen space), and an account menu. Content runs in a
-centered column, capped at `max-w-content` (1160px, `tailwind.config.js`) —
-wide enough for the two-column outfit turns above to read as image-beside-text
-rather than cramped, not a dashboard-width grid.
+The top bar (`TopBar.jsx`) is gone too, replaced by `BottomBar.jsx` — every
+control the app needs, anchored to the bottom of the screen, flanking the
+composer input rather than living in a separate header:
+
+- **Left of the input:** Home (brand mark — starts a new chat, also switches
+  to the Chat view), Chat view toggle, Wardrobe view toggle (with an item-count
+  badge).
+- **The composer itself** — sits in the bar, not inside `ChatView`. It's
+  global: typing and sending from the Wardrobe view switches to Chat and
+  sends there (see `AppShell.jsx#handleSend`), so the input is always live,
+  never a dead control.
+- **Right of the input:** History (conversation-count badge; click opens the
+  list/new-chat dropdown upward, since the bar is at the bottom), Share
+  (Web Share API, falling back to clipboard copy — shares the most recent
+  outfit's title+narrative as plain text; there's no public/shareable
+  conversation page yet, so this never implies a link a recipient couldn't
+  actually open), Account (email + sign out).
+- **Responsive:** at `sm`+ it's one row (nav icons, input, utility icons).
+  Below `sm` it becomes two rows — input on top, all six icons split evenly
+  underneath — rather than letting the single row overflow.
+
+Content runs in a centered column, capped at `max-w-content` (1160px,
+`tailwind.config.js`) — wide enough for the two-column outfit turns above to
+read as image-beside-text rather than cramped, not a dashboard-width grid.
 
 Rationale: the previous three-column shell (sidebar + chat + look-context
 panel) was information-dense in a way that fought the "one outfit at a
-time" conversation model above. A single centered column keeps attention on
-the one thing being discussed. The column started narrower (max-w-xl,
-576px) than this — widened once the two-column turn layout needed the room.
+time" conversation model above. Moving every control into one bottom bar
+(rather than top bar + in-chat composer) goes further in the same
+direction — the content area above it is *only* content, ever. The column
+started narrower (max-w-xl, 576px) than this — widened once the two-column
+turn layout needed the room.
 
 ## How to adjust this later
 
@@ -94,3 +117,6 @@ the one thing being discussed. The column started narrower (max-w-xl,
 - **Bring back the look-builder panel / multi-card default view:** both are
   cleanly removed (not half-migrated), so this is a straightforward revert
   of the relevant commit rather than an architectural fight.
+- **Change the bottom bar itself:** edit `src/components/BottomBar.jsx`. The
+  send handler (`handleSend`) lives in `AppShell.jsx`, not inside `ChatView`
+  or the bar — both the bar and `ChatView` just call it via props.

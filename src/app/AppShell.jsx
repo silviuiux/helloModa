@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import TopBar from "@/components/TopBar.jsx";
+import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
 import { addWardrobeItem, toggleWardrobeFavorite, removeWardrobeItem } from "@/actions/wardrobe";
@@ -45,6 +45,7 @@ export default function AppShell({
   const [conversations, setConversations] = useState(initialConversations || []);
   const [activeConversationId, setActiveConversationId] = useState(initialActiveConversationId);
   const [messages, setMessages] = useState(initialMessages || []);
+  const [thinking, setThinking] = useState(false);
   const [isSwitching, startSwitching] = useTransition();
 
   async function handleAdd(item) {
@@ -92,10 +93,12 @@ export default function AppShell({
   function handleNewChat() {
     setActiveConversationId(null);
     setMessages([]);
+    setView("chat");
   }
 
   function handleSelectConversation(id) {
     if (id === activeConversationId) return;
+    setView("chat");
     startSwitching(async () => {
       setActiveConversationId(id);
       try {
@@ -108,11 +111,55 @@ export default function AppShell({
     });
   }
 
-  // Called by ChatView once a message round-trip creates a new conversation.
-  function handleConversationCreated(id, title) {
-    setActiveConversationId(id);
-    setConversations((prev) => [{ id, title, created_at: new Date().toISOString() }, ...prev]);
+  // The composer lives in the global bottom bar now, not inside ChatView —
+  // sending from any view (e.g. while on Wardrobe) switches to Chat.
+  async function handleSend(text) {
+    if (thinking) return;
+    setView("chat");
+    const tempId = `u-${Date.now()}`;
+    setMessages((prev) => [...prev, { id: tempId, role: "user", text }]);
+    setThinking(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversationId: activeConversationId, message: text }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          { id: `err-${Date.now()}`, role: "ai", title: null, narrative: data.error || "Something went wrong. Please try again." },
+        ]);
+        return;
+      }
+
+      setMessages((prev) => [...prev.filter((m) => m.id !== tempId), data.userMessage, data.message]);
+
+      if (!activeConversationId && data.conversationId) {
+        setActiveConversationId(data.conversationId);
+        setConversations((prev) => [
+          { id: data.conversationId, title: data.conversationTitle, created_at: new Date().toISOString() },
+          ...prev,
+        ]);
+      }
+    } catch (err) {
+      console.error("Chat request failed:", err);
+      setMessages((prev) => [
+        ...prev,
+        { id: `err-${Date.now()}`, role: "ai", title: null, narrative: "Couldn't reach the server. Please try again." },
+      ]);
+    } finally {
+      setThinking(false);
+    }
   }
+
+  const lastAiMessage = [...messages].reverse().find((m) => m.role === "ai" && m.title);
+  const shareText = lastAiMessage
+    ? `${lastAiMessage.title} — ${lastAiMessage.narrative}\n\nStyled by helloModa.`
+    : undefined;
 
   return (
     <div
@@ -121,27 +168,15 @@ export default function AppShell({
         background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
       }}
     >
-      <TopBar
-        view={view}
-        setView={setView}
-        wardrobeCount={wardrobe.length}
-        userEmail={userEmail}
-        onSignOut={signOut}
-        conversations={conversations}
-        activeConversationId={activeConversationId}
-        onSelectConversation={handleSelectConversation}
-        onNewChat={handleNewChat}
-      />
       <main className="relative flex min-h-0 flex-1 flex-col">
         {view === "chat" ? (
           <ChatView
             wardrobe={wardrobe}
             onWardrobeAdd={handleAdd}
             onWardrobeRemove={removeItem}
-            conversationId={activeConversationId}
             messages={messages}
-            setMessages={setMessages}
-            onConversationCreated={handleConversationCreated}
+            thinking={thinking}
+            onQuickReply={handleSend}
             isSwitching={isSwitching}
             userEmail={userEmail}
             userDisplayName={userDisplayName}
@@ -155,6 +190,20 @@ export default function AppShell({
           />
         )}
       </main>
+      <BottomBar
+        view={view}
+        setView={setView}
+        wardrobeCount={wardrobe.length}
+        userEmail={userEmail}
+        onSignOut={signOut}
+        conversations={conversations}
+        activeConversationId={activeConversationId}
+        onSelectConversation={handleSelectConversation}
+        onNewChat={handleNewChat}
+        onSend={handleSend}
+        sending={thinking}
+        shareText={shareText}
+      />
     </div>
   );
 }

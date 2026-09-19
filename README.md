@@ -12,7 +12,7 @@ Start at `docs/00-overview.md`.
 Phase 0 (Foundations) done; Phase 1 (`docs/03-roadmap.md`) underway. Real
 Next.js + Supabase infra: auth, database, RLS. **Chat is real** — `POST
 /api/chat` calls Claude (`claude-opus-5`) with structured output, persisted
-to Postgres, with multi-conversation support (History dropdown in the top
+to Postgres, with multi-conversation support (History dropdown in the bottom
 bar: list/switch/new chat). Requires `ANTHROPIC_API_KEY` set (server-only) —
 see `.env.local.example`. Wardrobe is real (add/favorite/remove, no photo
 upload/AI tagging yet — that's next in Phase 1). "Shop" suggestions in chat
@@ -22,13 +22,14 @@ real product catalog yet (Awin integration,
 
 **Conversation UX, redesigned 2026-09-19** per `docs/09-conversation-design.md`
 (the maintained rules doc — read it before changing chat behavior/layout):
-one outfit direction per turn (title + narrative + hero visual, currently a
-styled placeholder — real image generation is a deliberate later step), the
-underlying product cards collapsed by default behind "Find items for this
-outfit", AI-authored quick-reply chips, a welcome screen with example
-occasion cards before the first message, and no sidebar anywhere — just a
-minimal top bar (brand, Chat/Wardrobe nav, a History dropdown, account menu)
-over a narrow, centered column.
+one outfit direction per turn (title + narrative + hero visual side by side,
+no container chrome — hero visual is currently a styled placeholder, real
+image generation is a deliberate later step), the underlying product cards
+collapsed by default behind "Find items for this outfit", AI-authored
+quick-reply chips, a welcome screen with example occasion cards before the
+first message, and every control (nav, composer, history, share, account)
+in one bottom bar (`BottomBar.jsx`) — no top bar, no sidebar, just a wide
+centered content column.
 
 **Auth:** email + password (`/login`, `/register`). Social sign-in buttons
 (Google, Apple, Facebook, X) are on the login/register pages but are inert
@@ -93,16 +94,16 @@ src/
     iconMap.jsx                 garment-icon resolver
   data/seed.js                  static reference data (wardrobe categories)
   components/
-    TopBar.jsx                  brand, Chat/Wardrobe nav, History dropdown, account menu
+    BottomBar.jsx                every control, one bar: home/new-chat, chat/wardrobe
+                                 toggle, composer, history, share, account (docs/09)
     Icons.jsx                   inline stroke icon set (no deps)
     auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/
       EmptyState.jsx             welcome screen: greeting, occasion cards, example prompts
-      ChatView.jsx                narrow-column message list + composer, calls /api/chat
+      ChatView.jsx                message list only — sending lives in AppShell now
       MessageBubble.jsx           one turn: title, narrative, hero, quick replies, toolbar
       OutfitHero.jsx               placeholder outfit-in-scene visual (real image-gen: later)
-      RecommendationCards.jsx     product-card grid, revealed via "Find items for this outfit"
-      Composer.jsx                 just the input now
+      RecommendationCards.jsx     product grid, revealed via "Find items for this outfit"
     wardrobe/
       WardrobeView.jsx            grid, search, category filters
       WardrobeItemCard.jsx        item tile (favorite / remove)

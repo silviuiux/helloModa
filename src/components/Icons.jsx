@@ -165,3 +165,17 @@ export const User = (p) => (
     <path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5" />
   </Svg>
 );
+
+export const Share = (p) => (
+  <Svg {...p}>
+    <path d="M12 15V4M12 4 8 8M12 4l4 4" />
+    <path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+  </Svg>
+);
+
+export const Home = (p) => (
+  <Svg {...p}>
+    <path d="M4 11.5 12 4l8 7.5" />
+    <path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9" />
+  </Svg>
+);
