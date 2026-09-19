@@ -4,6 +4,16 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Documented Magnific as an image-gen alternative
+
+Added Magnific (formerly Freepik, rebranded April 2026) as a documented
+alternative in `docs/02-tech-stack.md`'s image-generation row, per direct
+request — same async task-id/poll API shape as fal.ai/Replicate so it fits
+the existing background-job plan without rework, but subscription+credit
+priced rather than pure pay-per-generation. Documentation only — no code
+changed; the actual choice gets made when Phase 2 (real image generation)
+starts, by trialing both on real outfit prompts.
+
 ## 2026-09-19 — Conversation redesign: one outfit per turn, no sidebar
 
 Reworked the chat UX from XD mockups, per direct request. New rules doc:
