@@ -4,6 +4,27 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-19 — Gated registration behind an invite code
+
+Closed the open self-serve sign-up gap from the previous entry: `/register`
+now requires a shared `INVITE_CODE` (server-only env var, checked in
+`registerWithInvite` in `src/actions/auth.js` before `signUp()` runs).
+Verified with a headless-browser test against the real dev build: a wrong
+code is rejected with no Supabase call made; a correct code passes the gate
+and reaches the actual `signUp()` call (that last leg couldn't be fully
+round-tripped in this dev sandbox — its network egress policy blocks direct
+calls to `*.supabase.co` outright, confirmed independently with a raw
+`fetch()`, unrelated to this app's code and not a constraint that exists on
+Vercel). Also hardened `registerWithInvite` to return a clean error message
+instead of raw parser text if Supabase's response is ever unavailable or
+non-JSON (outage, network blip).
+
+This is a single shared secret, not per-invite tracked codes — reasonable for
+a solo private beta, worth a real `invite_codes` table (per-code, single-use,
+attributable) before a wider beta. The Supabase dashboard's "Allow new users
+to sign up" toggle is still unconfirmed and worth disabling too, as defense
+in depth alongside the code check.
+
 ## 2026-09-19 — Switched auth from magic-link to email + password
 
 Replaced the OTP/magic-link sign-in with standard email + password

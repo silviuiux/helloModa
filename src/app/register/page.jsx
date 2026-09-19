@@ -3,14 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Sparkle } from "@/components/Icons.jsx";
 import SocialButtons from "@/components/auth/SocialButtons.jsx";
+import { registerWithInvite } from "@/actions/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | error | confirm
   const [error, setError] = useState("");
 
@@ -19,39 +20,23 @@ export default function RegisterPage() {
     setStatus("loading");
     setError("");
 
-    if (password.length < 8) {
+    const result = await registerWithInvite({ email, password, inviteCode });
+
+    if (result.error) {
       setStatus("error");
-      setError("Password must be at least 8 characters.");
+      setError(result.error);
       return;
     }
 
-    const supabase = createClient();
-    const {
-      data: { session },
-      error: signUpError,
-    } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
-      },
-    });
-
-    if (signUpError) {
-      setStatus("error");
-      setError(signUpError.message);
+    if (result.needsConfirmation) {
+      // Email confirmation is on — wait for the user to click the link.
+      setStatus("confirm");
       return;
     }
 
-    if (session) {
-      // Email confirmation is off for this project — signed in immediately.
-      router.push("/");
-      router.refresh();
-      return;
-    }
-
-    // Email confirmation is on — wait for the user to click the link.
-    setStatus("confirm");
+    // Email confirmation is off — the action already set the session cookie.
+    router.push("/");
+    router.refresh();
   }
 
   return (
@@ -69,7 +54,7 @@ export default function RegisterPage() {
           </span>
           <h1 className="mt-4 font-display text-[24px] font-medium text-ink">helloModa</h1>
           <p className="mt-1.5 text-[13.5px] text-muted">
-            Private beta — create your account.
+            Invite-only private beta — create your account.
           </p>
         </div>
 
@@ -86,8 +71,15 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} className="space-y-3 text-left">
                 <input
                   required
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  placeholder="Invite code"
+                  autoComplete="off"
+                  className="label h-11 w-full rounded-xl2 border border-dashed border-accent-soft bg-accent-tint/40 px-4 text-[13px] tracking-normal text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
+                />
+                <input
+                  required
                   type="email"
-                  autoFocus
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"

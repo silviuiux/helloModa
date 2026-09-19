@@ -18,15 +18,15 @@ wiring it to a real LLM is Phase 1.
 placeholders — `src/components/auth/SocialButtons.jsx` — wire these up to
 real Supabase OAuth providers when that's prioritized.
 
-**This app is meant to be invite-only / private beta** (docs/06-risks-legal.md —
-low-profile posture pending a Fashion Days employment-contract review), but
-registration is currently **open self-serve sign-up** — anyone who finds
-`/register` can create an account. If that's not the intent, the actual gate
-now has to be one of: disabling "Allow new users to sign up" in the Supabase
-Auth dashboard (Authentication → Providers → Email, project ref
-`hdbwcjtvbjeisgtpisne`, eu-central-1 — no MCP tool exposes this toggle, it's
-dashboard-only), or adding an invite-code check in the register flow. Neither
-is done yet — flagging so it doesn't get lost before this goes public.
+**Registration is gated by a shared invite code** (docs/06-risks-legal.md —
+low-profile/private-beta posture pending a Fashion Days employment-contract
+review). Set `INVITE_CODE` (server-only, never `NEXT_PUBLIC_*`) in your env —
+see `.env.local.example` — and ask Silviu for the actual value; it's not
+committed anywhere. This is one shared secret, not per-user tracked codes —
+fine for a solo private beta, worth revisiting with a real `invite_codes`
+table before a wider beta. The Supabase Auth dashboard's "Allow new users to
+sign up" toggle (Authentication → Providers → Email) is still worth confirming
+disabled too, as defense in depth — no MCP tool exposes that setting.
 
 ## Run
 
