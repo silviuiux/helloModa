@@ -4,6 +4,25 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Watercolor style wasn't showing up in real generations — reordered + strengthened
+
+First real generation seen (with `REPLICATE_API_TOKEN`/`ANTHROPIC_API_KEY` finally live) came
+back **fully photorealistic**, zero watercolor quality — the style directive wasn't taking
+effect at all, contradicting the intent behind the two style entries above. Two likely causes,
+both fixed in `src/lib/imageGen.js`:
+
+- `STYLE_DIRECTIVE` was appended *after* the scene description; diffusion prompt encoders weight
+  earlier tokens more heavily, so it was losing to a `heroPrompt` written as vivid photographic
+  scene description. Now prepended instead (`${STYLE_DIRECTIVE} Scene: ${prompt}`).
+- Wording strengthened to explicitly say "NOT a photograph" up front — Flux's photorealism bias
+  is strong enough that a soft "rendered as..." framing wasn't enough to override it.
+
+Not yet re-verified against a real generation (this sandbox still can't reach
+`api.replicate.com`) — next real generation is the actual test of whether this fixes it. If it
+still doesn't hold, the LoRA route documented in `02-tech-stack.md` is the next step up.
+
+---
+
 ## 2026-09-20 — Reverted: soft-to-white feathered margins
 
 Per direct request ("let's ditch the feathering done like that") — removed entirely, not
