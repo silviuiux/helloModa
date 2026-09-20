@@ -4,6 +4,43 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — CLIP embedding + wardrobe similarity matching infrastructure
+
+Prompted by "how do we find matching pieces for a suggested outfit" — the real answer (a synced
+Awin catalog, CLIP-embedded and pgvector-matched, per `05-integrations-affiliates.md`/Phase 3) is
+blocked on the Awin signup, still on hold. Built the shared infrastructure that's a prerequisite
+either way and *is* fully testable today without Awin — matching against the user's own wardrobe:
+
+- `src/lib/embeddings.js`: `embedText()`/`embedImageUrl()` via Replicate's
+  `krthr/clip-embeddings` (clip-vit-large-patch14, 768-dim). Chosen specifically because text and
+  images land in the *same* vector space — a wardrobe photo gets embedded directly as an image,
+  no need to write a text description of it first, which is a better design than the
+  "describe both sides, then text-match" approach originally proposed.
+- `wardrobe_items.embedding`/`products.embedding` resized from a never-used placeholder
+  `vector(512)` to `vector(768)` to match (safe — verified 0 rows had an embedding first), plus
+  HNSW cosine-distance indexes on both.
+- New `match_wardrobe_items()` Postgres function (SQL, `SECURITY INVOKER` — runs under the
+  caller's RLS, not a separate access-control boundary) — cosine-similarity search over the
+  caller's own wardrobe, optional category filter. `src/lib/wardrobeMatching.js` wraps it.
+- `addWardrobeItem` (`src/actions/wardrobe.js`) now embeds every new item automatically — the
+  photo if one exists, else a text embedding of brand/name/category. Best-effort: a failed embed
+  (Sentry-reported) doesn't block adding the item.
+- New `POST /api/wardrobe/backfill-embeddings`: embeds any of the caller's existing items that
+  predate this (run once per account, manually — see the route's own comment for the one-line
+  fetch to trigger it from the browser console while signed in).
+- Verified the SQL side properly (the one part testable without Replicate, which this sandbox
+  can't reach): loaded synthetic 768-dim vectors into the 3 real wardrobe items, confirmed
+  `match_wardrobe_items()` ranks by actual cosine similarity (exact-match query scored 1.0,
+  near-opposite scored -0.99) and that the category filter correctly excludes non-matching rows,
+  then cleared the test vectors back to null. The Replicate embedding calls themselves are
+  unverified end-to-end — next real wardrobe add is the actual test.
+- **Deliberately not wired into the live chat/recommendation flow yet** — surfacing "you might
+  already own something like this" for an AI "shop" suggestion without stepping on the stylist's
+  explicit closet-vs-buy-new intent is a UX decision, not an infra one; worth its own pass once
+  there's real embedded wardrobe data to try it against.
+
+---
+
 ## 2026-09-20 — Watercolor style wasn't showing up in real generations — reordered + strengthened
 
 First real generation seen (with `REPLICATE_API_TOKEN`/`ANTHROPIC_API_KEY` finally live) came

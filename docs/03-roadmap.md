@@ -42,7 +42,10 @@ high-intent niche, matching the business plan's Phase 1 GTM.
   usable loop).
 - Outfit recommendations: resolve today's "shop" suggestions to real affiliate products from the
   cached catalog (`05-integrations-affiliates.md`) via text/category match once Awin is live —
-  no image generation or CV matching yet, keep this phase cheap and fast.
+  no image generation or CV matching yet, keep this phase cheap and fast. (Image generation
+  ended up shipping anyway, Phase 2, see below — this bullet's "no CV matching yet" still holds:
+  ✅ the shared CLIP-embedding/pgvector-matching infra shipped 2026-09-20, scoped to the wardrobe
+  only since Awin itself is still on hold — see Phase 3's embedding bullet.)
 - "Upload your invitation" tool: parse a wedding invitation image/text for dress code cues (can
   reuse the same vision-model call as closet tagging).
 - SEO landing pages: "What to wear to a [X] wedding" templates, statically generated.
@@ -77,7 +80,11 @@ plus retention features.
 
 - CLIP-embed the product catalog (from affiliate feeds) and generated look images; pgvector
   nearest-neighbor match to surface the closest real, buyable items instead of only
-  text/category-matched ones.
+  text/category-matched ones. **The embedding + matching infra itself shipped early, 2026-09-20**
+  (`src/lib/embeddings.js`, `wardrobeMatching.js`, `match_wardrobe_items()`) — built and tested
+  against the wardrobe (which is real, needs no Awin) since it's a shared prerequisite either way.
+  What's left here once Awin exists: the ingestion job that populates `products.embedding`, and
+  extending `match_wardrobe_items()`'s pattern to a `products` equivalent.
 - helloAvatar v1: user-uploaded reference photos → a simple digital twin the generated outfit
   is rendered on (start basic — this is a GDPR-sensitive feature, see risks doc, don't over-build
   before the legal/consent flow is right).

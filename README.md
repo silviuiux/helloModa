@@ -23,7 +23,11 @@ feeds the stylist prompt (`formatProfileForPrompt`, `src/lib/stylist.js`),
 not just storage. "Shop" suggestions in chat
 are honest AI guesses with no fabricated price/retailer, since there's no
 real product catalog yet (Awin integration,
-`docs/05-integrations-affiliates.md`, not started).
+`docs/05-integrations-affiliates.md`, on hold). **Wardrobe items are CLIP-embedded**
+(`src/lib/embeddings.js`, `wardrobe_items.embedding`) with a pgvector similarity search
+(`match_wardrobe_items()`, `src/lib/wardrobeMatching.js`) — shared infra for the eventual
+Awin-catalog matching, usable today against the closet. Not yet wired into the chat/
+recommendation flow itself.
 
 **Error monitoring (Sentry) + product analytics (PostHog) are wired** — the
 last Phase 0 exit criterion, done 2026-09-20. Both are safe no-ops until you
@@ -106,6 +110,7 @@ src/
     profile/page.jsx            protected profile route — loads + signs the avatar
     api/chat/route.js           real chat: Claude call, structured output, DB persistence
     api/wardrobe/tag/route.js   vision call: photo -> name/category/color/brand
+    api/wardrobe/backfill-embeddings/route.js  one-off: embeds pre-existing wardrobe items
     api/generate-image/route.js Replicate call: heroPrompt -> real outfit image, cached + signed
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
@@ -123,6 +128,8 @@ src/
     profileImages.js            signs `avatars` Storage paths into short-lived URLs
     lookImages.js                signs `generated-looks` Storage paths into short-lived URLs
     imageGen.js                  Replicate call: heroPrompt -> generated outfit image (Blob)
+    embeddings.js                 CLIP text/image embeddings via Replicate (shared vector space)
+    wardrobeMatching.js           pgvector similarity search over the caller's own wardrobe
     imageResize.js               client-side photo downscale before tag/upload
     analytics.js                 PostHog init + track()/identifyUser(), safe no-op without a key
     look.js                     stylist piece -> wardrobe item shape (save-to-closet)

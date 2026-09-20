@@ -28,7 +28,11 @@ wardrobe_items
   image_url                     -- Supabase Storage path, `wardrobe-photos` bucket
                                     (private; RLS-scoped to auth.uid(), signed URL
                                     via src/lib/wardrobeImages.js — never public)
-  embedding              vector -- pgvector, CLIP embedding of the item photo
+  embedding              vector(768) -- CLIP (krthr/clip-embeddings via Replicate), image-embedded
+                                    when a photo exists, else text-embedded from name/brand/
+                                    category (src/lib/embeddings.js). Populated automatically on
+                                    add (src/actions/wardrobe.js); pre-existing items need
+                                    POST /api/wardrobe/backfill-embeddings run once.
   is_favorite             bool
   available_for_rent      bool  default false   -- Phase 4
   available_for_sale      bool  default false   -- Phase 4
@@ -85,7 +89,8 @@ products                          -- cached/synced from affiliate feeds, see 05-
   currency
   product_url               text  -- outbound affiliate link
   image_url
-  embedding                vector -- pgvector, CLIP embedding of the product image
+  embedding                vector(768) -- same CLIP space as wardrobe_items.embedding; populated
+                                          once the Awin ingestion pipeline exists (on hold)
   last_synced_at
 
   unique(retailer, external_id)
@@ -128,9 +133,13 @@ marketplace_transactions            -- Phase 4
   height/weight/bust/waist/hip fields don't trigger the same Article 9 bar, but keep them scoped
   to what the stylist actually uses if this table grows further.
 - **Two `embedding` columns** (`wardrobe_items`, `products`) both use the same CLIP embedding
-  space so a generated look, a closet item, and a catalog product can all be compared with the
-  same `pgvector` cosine-distance query — that's the mechanism behind "Shop Your Closet" (prefer
-  owned items) and CV product matching (Phase 3).
+  space (`krthr/clip-embeddings`, 768-dim, text and images comparable directly — see
+  `src/lib/embeddings.js`) so a generated look, a closet item, and a catalog product can all be
+  compared with the same `pgvector` cosine-distance query. The `wardrobe_items` half of this
+  (embedding pipeline + `match_wardrobe_items()` similarity search, `src/lib/wardrobeMatching.js`)
+  shipped 2026-09-20 — that's the mechanism behind "Shop Your Closet." The `products` half (CV
+  product matching, Phase 3) is blocked on the Awin catalog pipeline (`05-integrations-
+  affiliates.md`, currently on hold) — same embedding infra, just no data yet.
 - `outfit_recommendation_items.role` lets the UI distinguish "hero piece" vs "layer" vs
   "accessory," matching the business plan's outfit-narration style ("Start with the trousers
   as the anchor...").
