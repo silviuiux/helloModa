@@ -2,6 +2,7 @@ import Link from "next/link";
 import { guides } from "@/data/guides.js";
 import { SITE_URL } from "@/lib/siteConfig.js";
 import GuideLayout from "@/components/guides/GuideLayout.jsx";
+import GuideHeroImage from "@/components/guides/GuideHeroImage.jsx";
 
 export const metadata = {
   title: "Style Guides — What to Wear | helloModa",
@@ -22,31 +23,34 @@ export default function GuidesIndexPage() {
 
   return (
     <GuideLayout>
-      <h1 className="mt-6 font-display text-[34px] font-medium leading-tight text-ink sm:text-[42px]">
+      <h1 className="mt-6 font-display text-[38px] font-medium leading-[0.98] text-ink sm:text-[56px]">
         What to wear, by occasion
       </h1>
-      <p className="mt-3 max-w-2xl text-[15.5px] leading-relaxed text-muted">
+      <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
         Outfit dressing depends more on the specific occasion than most advice admits — what
         works at a beach wedding will look out of place at a job interview. Pick your occasion
         below for real, specific guidance.
       </p>
 
-      {categories.map((category) => (
-        <section key={category} className="mt-12 first:mt-10">
-          <h2 className="font-display text-[20px] font-medium text-ink">{category}</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {categories.map((category, i) => (
+        <section key={category} className={i === 0 ? "mt-16 sm:mt-20" : "mt-24 sm:mt-28"}>
+          <h2 className="font-display text-[22px] font-medium text-ink">{category}</h2>
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {guides
               .filter((g) => g.category === category)
               .map((g) => (
-                <Link
-                  key={g.slug}
-                  href={`/what-to-wear/${g.slug}`}
-                  className="glass group rounded-xl3 p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
-                >
-                  <h3 className="font-display text-[20px] font-medium text-ink group-hover:text-accent-deep">
+                <Link key={g.slug} href={`/what-to-wear/${g.slug}`} className="group">
+                  <div className="aspect-[4/5] overflow-hidden rounded-xl3 transition-transform duration-300 group-hover:-translate-y-1">
+                    <GuideHeroImage
+                      src={`/guides/${g.slug}-hero.jpg`}
+                      alt={g.occasion}
+                      className="h-full w-full"
+                    />
+                  </div>
+                  <h3 className="mt-4 font-display text-[20px] font-medium text-ink group-hover:text-accent-deep">
                     {g.occasion}
                   </h3>
-                  <p className="mt-2 text-[13.5px] leading-relaxed text-muted">{g.hook}</p>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{g.hook}</p>
                 </Link>
               ))}
           </div>

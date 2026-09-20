@@ -34,7 +34,10 @@ recommendation flow itself.
 fall, winter) and Everyday Occasions (job interview, first date, summer festival) — the one
 deliberate exception to the app's invite-only auth gate. Cleared 2026-09-20 per
 `docs/06-risks-legal.md`'s Fashion Days conflict-of-interest review (previously blocked, see
-that doc's changelog note).
+that doc's changelog note). Editorial redesign with real generated hero images
+(`scripts/generate-guide-images.mjs`, run manually — needs `REPLICATE_API_TOKEN`) and a
+"See it in helloModa" showcase styled like a real chat turn — pages degrade gracefully to
+illustrated placeholders until that script has been run.
 
 **Error monitoring (Sentry) + product analytics (PostHog) are wired** — the
 last Phase 0 exit criterion, done 2026-09-20. Both are safe no-ops until you
@@ -168,6 +171,8 @@ src/
       ProfileForm.jsx              username/gender/avatar/measurements/sizes/style/brands
     guides/
       GuideLayout.jsx               shared chrome for /what-to-wear pages (not AppShell)
+      GuideHeroImage.jsx             real generated image, falls back to GarmentArt illustration
+      GuideShowcase.jsx              "See it in helloModa" — styled like a real chat turn
 ```
 
 ## Design language

@@ -10,12 +10,22 @@
 // "Everyday Occasions" for now, add a new one freely as the set grows.
 // `contextNotes` covers weather for outdoor occasions or venue/culture
 // context for others — same field, occasion-appropriate content.
+// `heroImagePrompt` feeds scripts/generate-guide-images.mjs — a real
+// generated hero image (house watercolor style, src/lib/imageGen.js), saved
+// as a static file at public/guides/{slug}-hero.jpg. Run that script after
+// adding a guide (needs REPLICATE_API_TOKEN); pages degrade gracefully to
+// an illustrated placeholder until the file exists (GuideHeroImage.jsx).
+// `palette` is a handful of hex swatches matching the guide's described
+// color story — rendered as literal color chips, not an image.
 export const guides = [
   {
     slug: "beach-wedding",
     occasion: "Beach Wedding",
     category: "Wedding Guest",
     title: "What to Wear to a Beach Wedding",
+    heroImagePrompt:
+      "A woman in a flowing sand-toned linen midi dress walking barefoot along a beach wedding aisle at golden hour, soft ocean breeze, warm sunset light",
+    palette: ["#e8dcc8", "#9dc2b8", "#a9c0d6", "#f5f0e6", "#e8b3a0"],
     metaDescription:
       "A real guide to beach wedding guest attire — what actually works on sand, in wind, and in humidity, for her and for him.",
     hook: "Beach weddings look effortless in photos and are the easiest occasion to get wrong in person — heels sink, structured fabric wilts, and \"resort wear\" can tip into too casual. Here's what actually holds up.",
@@ -40,6 +50,9 @@ export const guides = [
     occasion: "Black-Tie Wedding",
     category: "Wedding Guest",
     title: "What to Wear to a Black-Tie Wedding",
+    heroImagePrompt:
+      "A couple in black-tie eveningwear, her in a full-length emerald silk gown and him in a classic black tuxedo, at an elegant indoor gala reception, warm chandelier light",
+    palette: ["#1a1a1a", "#1c2440", "#1f4d3a", "#5c1a2b", "#1e3a5f"],
     metaDescription:
       "What \"black tie\" actually requires for a wedding guest — the real dress code rules, and where a little personal style is still allowed.",
     hook: "\"Black tie\" is the one dress code on a wedding invitation that isn't a suggestion — it's a specific, well-defined standard, and showing up underdressed is more noticeable here than anywhere else on this list.",
@@ -64,6 +77,9 @@ export const guides = [
     occasion: "Garden Wedding",
     category: "Wedding Guest",
     title: "What to Wear to a Garden Wedding",
+    heroImagePrompt:
+      "A woman in a soft floral midi dress and a man in a light grey suit standing together at a lush garden wedding reception, dappled afternoon sunlight through trees",
+    palette: ["#a8b89a", "#d4a8ab", "#f2ead9", "#c9bfe0"],
     metaDescription:
       "Garden wedding guest attire that handles grass, sun, and a semi-formal dress code — real outfit guidance, not just a mood board.",
     hook: "A garden wedding sits right in the middle of the formality scale — dressier than beach, softer than black tie — and the real challenge is practical: grass, uneven ground, and often full sun for at least part of the day.",
@@ -88,6 +104,9 @@ export const guides = [
     occasion: "Vineyard Wedding",
     category: "Wedding Guest",
     title: "What to Wear to a Vineyard Wedding",
+    heroImagePrompt:
+      "A couple in warm earth-toned linen outfits standing among vineyard rows at golden hour, rolling hills in the background",
+    palette: ["#c1694a", "#7d7a4a", "#f0e6d2", "#c9a44e"],
     metaDescription:
       "Vineyard wedding guest outfits that match the setting's relaxed elegance — golden-hour-ready, and built for uneven ground and shifting temperatures.",
     hook: "Vineyard weddings have a specific visual identity — golden light, rolling rows, rustic-elegant styling — and the best guest outfits lean into that rather than fighting it with anything too sharp or too casual.",
@@ -112,6 +131,9 @@ export const guides = [
     occasion: "Fall Wedding",
     category: "Wedding Guest",
     title: "What to Wear to a Fall Wedding",
+    heroImagePrompt:
+      "A woman in a burgundy midi dress with a tailored coat and a man in a deep navy suit at an outdoor fall wedding, autumn leaves, warm afternoon light",
+    palette: ["#722f37", "#2f4a3c", "#c1622d", "#4a2c4a"],
     metaDescription:
       "Fall wedding guest attire that actually matches the season — rich color, real layering, and what to do when the weather can't decide.",
     hook: "Fall weddings give you the most room to have fun with color and texture of any season — but the real challenge is a temperature swing that can run 20 degrees between an afternoon ceremony and an evening reception.",
@@ -136,6 +158,9 @@ export const guides = [
     occasion: "Winter Wedding",
     category: "Wedding Guest",
     title: "What to Wear to a Winter Wedding",
+    heroImagePrompt:
+      "A woman in a velvet emerald gown with a wool coat and a man in a heavy wool suit with an overcoat, outside a winter wedding venue, soft snow, warm string lights",
+    palette: ["#1f4d3a", "#5c1a2b", "#1a1a1a", "#1c2440"],
     metaDescription:
       "Winter wedding guest attire that handles real cold without sacrificing the outfit — layering, fabric, and what to actually wear over your dress.",
     hook: "Winter weddings are the season most guests get wrong by treating the coat as an afterthought — for an outdoor ceremony or any real walk between venues, what you wear over the outfit matters as much as the outfit itself.",
@@ -160,6 +185,9 @@ export const guides = [
     occasion: "Job Interview",
     category: "Everyday Occasions",
     title: "What to Wear to a Job Interview",
+    heroImagePrompt:
+      "A woman in a tailored blazer and trousers walking confidently into a modern office lobby, natural daylight, composed and professional",
+    palette: ["#1c2440", "#3a3a3f", "#1a1a1a", "#f2f0ec"],
     metaDescription:
       "What to actually wear to a job interview by industry and culture — real guidance, not just \"dress professionally.\"",
     hook: "A job interview isn't really governed by a written dress code, since most companies don't have one — the real skill is reading the room correctly. Overdressing signals you don't know the culture; underdressing suggests you didn't take it seriously.",
@@ -184,6 +212,9 @@ export const guides = [
     occasion: "First Date",
     category: "Everyday Occasions",
     title: "What to Wear on a First Date",
+    heroImagePrompt:
+      "A man in a well-fitted casual button-down and dark jeans sitting at a cozy restaurant table set for two, warm evening light",
+    palette: ["#d9c7b8", "#33465c", "#232323", "#f0e9de"],
     metaDescription:
       "First date outfit guidance that actually accounts for the venue and the plan — comfortable, considered, not overthought.",
     hook: "The real goal of a first-date outfit is comfort with intention — something that lets you actually be present instead of adjusting a waistband all night, but that still shows you made an effort.",
@@ -208,6 +239,9 @@ export const guides = [
     occasion: "Summer Festival",
     category: "Everyday Occasions",
     title: "What to Wear to a Summer Festival",
+    heroImagePrompt:
+      "A woman in breathable festival separates and sunglasses at an outdoor summer music festival, golden afternoon light, crowd softly blurred in the background",
+    palette: ["#e8dcc8", "#a9c9dc", "#e8c96a", "#e8927a"],
     metaDescription:
       "Festival outfit guidance built for standing all day in real weather — not just the outfit you'll photograph in the first hour.",
     hook: "Festival outfits get planned for photos and regretted by hour six — the real brief is something you can stand, dance, and sweat in for eight-plus hours that still looks considered.",

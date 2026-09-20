@@ -4,6 +4,46 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Editorial redesign of the /what-to-wear guides
+
+Per direct request: same helloModa look and feel (warm lavender-gray canvas, glass panels,
+Fraunces/Bonheur Royale, purple accent — explicitly *not* the dark/industrial "mission control"
+direction a loaded design-taste reference leaned toward, which would have fought the established
+brand), but heavier editorial composition, real imagery, and a literal demonstration of the
+product rather than just a CTA button.
+
+- **Real generated hero images, one per guide.** Each guide now has a `heroImagePrompt`
+  (`src/data/guides.js`) and a new one-off script, `scripts/generate-guide-images.mjs` — run
+  manually with `REPLICATE_API_TOKEN` set, saves real watercolor-style images (the same house
+  style/pipeline as chat's `OutfitHero`) to `public/guides/{slug}-hero.jpg` as static files. No
+  Supabase Storage/signing needed — this is public marketing content, not per-user data. Not run
+  here (this sandbox still can't reach `api.replicate.com`); pages work correctly without it.
+- **`GuideHeroImage.jsx`**: renders the real image when present, falls back to the same
+  illustrated `GarmentArt` placeholder the chat UI already uses otherwise — never a broken image.
+  **Real bug caught and fixed while verifying this**: the first version rendered the `<img src>`
+  directly in server HTML, so on a fast local 404 the native `error` event fired *before* React
+  hydration attached the `onError` listener — the event was lost, and the fallback silently never
+  appeared (confirmed via `naturalWidth: 0` with zero re-render, no console errors in production
+  mode masking it further). Fixed by deferring `src` to a client-only effect after mount, so the
+  request — and any error — only happens once the listener is live. Documented in the component
+  itself since it's a non-obvious gotcha, not something a future edit should "simplify" away.
+  Verified via direct DOM inspection (img/svg counts, `naturalWidth`), not just a screenshot,
+  since a screenshot alone wouldn't have caught the original silent failure.
+- **Detail page redesign**: split hero (oversized headline + hook rendered as a script-font pull
+  quote, image alongside — not stacked), alternating for-her/for-him sections with illustrated
+  look tiles (not the same photo repeated — repeating one generated image across a page reads as
+  repetitive, not "lots of images"), a new `palette` field per guide rendered as literal color
+  swatches instead of prose-only color description, and a new **`GuideShowcase.jsx`** — "See it
+  in helloModa" — styled with the *exact* visual grammar of a real chat turn (`MessageBubble.jsx`:
+  script-font title, narrative copy, a prompt chip), reusing the guide's own hero image. This is
+  a literal, honest demonstration of the product's real UI, not a mockup or screenshot standing
+  in for one.
+- **Index page redesign**: large image-forward cards per guide (still grouped by category),
+  replacing the earlier small text-only glass cards.
+- `weatherNotes`→`contextNotes` rename (previous entry) stays; this pass didn't touch that.
+
+---
+
 ## 2026-09-20 — Broadened SEO guides beyond weddings
 
 Direct follow-up to a real inconsistency: while pitching Awin advertisers on helloModa as "an AI
