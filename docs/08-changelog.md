@@ -4,6 +4,18 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Reverted: soft-to-white feathered margins
+
+Per direct request ("let's ditch the feathering done like that") — removed entirely, not
+replaced with a different technique. `imageGen.js` is back to returning Replicate's output
+directly (full-bleed), the `sharp` post-processing step and `applyWatercolorMargin()` are gone,
+and the `sharp` dependency is uninstalled. Also reverted the prompt-side "generous empty space
+toward the edges" line in `STYLE_DIRECTIVE` that was added specifically to complement the
+feathering — the watercolor-style wording itself stays. See the entry below for what was reverted
+and why it was built the way it was (kept for history, not rewritten).
+
+---
+
 ## 2026-09-20 — Soft-to-white feathered margins on generated images
 
 Per direct request: generated images shouldn't reach the photo edge, like an unfinished
