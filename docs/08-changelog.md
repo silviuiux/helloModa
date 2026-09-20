@@ -4,6 +4,41 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Profile page (username, gender, avatar, measurements, sizes, style preferences, brands)
+
+Per direct request, scoped down from a broader "full profile" list (colors-to-avoid, budget
+range, location/climate deliberately left out this pass — easy to add to `profiles` later if
+needed):
+
+- New `/profile` page (`src/components/profile/ProfileForm.jsx`), linked from the bottom bar's
+  Account dropdown. Extends the `profiles` table (which already existed with `display_name` +
+  `style_traits`, auto-created per user by the `on_auth_user_created` trigger) with `gender`,
+  `avatar_url`, `height_cm`/`weight_kg`/`bust_cm`/`waist_cm`/`hip_cm`, `size_top`/`size_bottom`/
+  `size_shoe`, `favorite_brands`, `avoid_brands` — see `docs/04-data-model.md`.
+- Avatar photo reuses the wardrobe-photo pattern end to end: client-side downscale
+  (`imageResize.js`), upload to a new private `avatars` Storage bucket (owner-scoped RLS, same
+  shape as `wardrobe-photos`), `image_url`-style path stored and turned into a signed URL
+  (`src/lib/profileImages.js`) wherever it's read.
+- Style preferences and brands are a new reusable `TagField` (chip list + free-text add, with
+  one-tap suggestion chips for style preferences) — same component handles favorite brands and
+  brands-to-avoid as two independent lists.
+- **The profile now actually feeds the stylist**, not just storage: `formatProfileForPrompt`
+  (`src/lib/stylist.js`) builds a context block from it, injected into every `POST /api/chat`
+  call alongside the wardrobe list. The system prompt was updated with an explicit rule to use
+  sizes/measurements only for silent fit/silhouette language and never comment on the user's body
+  directly, and to favor favorite brands / avoid avoid-listed ones.
+- The home screen's greeting name (`EmptyState.jsx`) now reads `profiles.display_name` instead of
+  the never-actually-set `auth.users.user_metadata.display_name` — `/profile` is the first real
+  way to set it.
+- QA note: same sandbox limitation as the wardrobe-photo entry below (`*.supabase.co` blocked by
+  this environment's proxy) — verified via a temporary unauthenticated preview route (removed
+  after): avatar upload/preview, gender toggle, all measurement/size fields, style-preference
+  suggestion chips + custom tags, and both brand tag lists all work; save correctly surfaces "Not
+  signed in" inline in the unauthenticated harness, proving the error path. Real Storage
+  upload/save should be spot-checked once deployed.
+
+---
+
 ## 2026-09-19 — Wardrobe photo upload + AI attribute tagging
 
 Phase 1 roadmap item (`docs/03-roadmap.md`'s "Digital closet"):

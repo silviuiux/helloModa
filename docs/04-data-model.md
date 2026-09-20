@@ -7,7 +7,14 @@ All tables get Row-Level Security scoped to `auth.uid()` unless noted.
 users                          -- from Supabase Auth, extended via a public.profiles table
   id (uuid, pk, = auth.users.id)
   display_name
+  gender
+  avatar_url                    -- Supabase Storage path, `avatars` bucket (private, signed URL
+                                    via src/lib/profileImages.js — same pattern as wardrobe photos)
+  height_cm | weight_kg | bust_cm | waist_cm | hip_cm    numeric, all nullable
+  size_top | size_bottom | size_shoe                     text, free-form (brand/region vary)
   style_traits          jsonb  -- e.g. ["Minimal tailoring", "Soft neutrals"]
+  favorite_brands        text[]
+  avoid_brands            text[]
   created_at
 
 wardrobe_items
@@ -108,6 +115,16 @@ marketplace_transactions            -- Phase 4
 
 ## Notes
 
+- **`profiles` feeds the stylist prompt** — `src/lib/stylist.js`'s `formatProfileForPrompt`
+  injects display name/gender/style traits/sizes/measurements/favorite-avoid brands into every
+  chat turn (`src/app/api/chat/route.js`), same pattern as the wardrobe list. The system prompt
+  is instructed to use measurements/sizes only for silent fit/silhouette guidance, never to
+  comment on the user's body directly.
+- **`profiles.avatar_url` and body measurements are ordinary personal data, not the GDPR
+  special-category concern in `06-risks-legal.md`'s helloAvatar section** — that's about a
+  biometric digital-twin render from reference photos (Phase 3); a profile photo and numeric
+  height/weight/bust/waist/hip fields don't trigger the same Article 9 bar, but keep them scoped
+  to what the stylist actually uses if this table grows further.
 - **Two `embedding` columns** (`wardrobe_items`, `products`) both use the same CLIP embedding
   space so a generated look, a closet item, and a catalog product can all be compared with the
   same `pgvector` cosine-distance query — that's the mechanism behind "Shop Your Closet" (prefer

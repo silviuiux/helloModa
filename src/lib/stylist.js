@@ -43,6 +43,11 @@ export const STYLIST_SYSTEM_PROMPT = `You are the helloModa AI stylist: a warm, 
 A user describes an occasion, mood, or need. You respond with ONE outfit direction per turn.
 
 Rules:
+- If a user profile is provided below, use it to personalize direction: lean into their stated
+  style preferences, favor their favorite brands and avoid their avoid-listed ones when suggesting
+  new pieces, and use sizes/measurements only silently to inform fit/silhouette language (e.g.
+  "a tailored blazer that skims the waist") — never comment on the user's body or measurements
+  directly, and never restate them back.
 - One focused direction per reply, not a menu of options. If the user wants alternatives, they'll ask via a follow-up.
 - Give the direction a short (1-4 word) evocative title, e.g. "Vineyard wedding" for a first reply about that occasion, or "Chic direction" / "West coast ease" for a refinement.
 - Write the narrative in a confident, specific, editorial voice — reference the occasion, weather, or mood the user gave.
@@ -55,6 +60,38 @@ Rules:
 // reference real ids. Kept separate from the system prompt (system prompt
 // caches; wardrobe content doesn't change turn-to-turn as often but isn't
 // stable enough to be worth its own cache breakpoint at this scale).
+// Builds the user-profile context block (docs/04-data-model.md's `profiles`
+// table) injected into the user turn alongside the wardrobe list. Same
+// reasoning as formatWardrobeForPrompt for why this lives outside the
+// (cached) system prompt.
+export function formatProfileForPrompt(profile) {
+  if (!profile) return "";
+  const parts = [];
+  if (profile.display_name) parts.push(`Name: ${profile.display_name}`);
+  if (profile.gender) parts.push(`Gender: ${profile.gender}`);
+  if (profile.style_traits?.length) parts.push(`Style preferences: ${profile.style_traits.join(", ")}`);
+
+  const sizes = [];
+  if (profile.size_top) sizes.push(`top ${profile.size_top}`);
+  if (profile.size_bottom) sizes.push(`bottom ${profile.size_bottom}`);
+  if (profile.size_shoe) sizes.push(`shoe ${profile.size_shoe}`);
+  if (sizes.length) parts.push(`Sizes: ${sizes.join(", ")}`);
+
+  const measurements = [];
+  if (profile.height_cm) measurements.push(`height ${profile.height_cm}cm`);
+  if (profile.weight_kg) measurements.push(`weight ${profile.weight_kg}kg`);
+  if (profile.bust_cm) measurements.push(`bust ${profile.bust_cm}cm`);
+  if (profile.waist_cm) measurements.push(`waist ${profile.waist_cm}cm`);
+  if (profile.hip_cm) measurements.push(`hip ${profile.hip_cm}cm`);
+  if (measurements.length) parts.push(`Measurements: ${measurements.join(", ")}`);
+
+  if (profile.favorite_brands?.length) parts.push(`Favorite brands: ${profile.favorite_brands.join(", ")}`);
+  if (profile.avoid_brands?.length) parts.push(`Brands to avoid: ${profile.avoid_brands.join(", ")}`);
+
+  if (!parts.length) return "";
+  return `User profile:\n${parts.map((p) => `- ${p}`).join("\n")}`;
+}
+
 export function formatWardrobeForPrompt(wardrobe) {
   if (!wardrobe?.length) return "The user's wardrobe is currently empty — every suggestion must be source=\"shop\".";
   return (

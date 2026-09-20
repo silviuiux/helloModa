@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { createClient } from "@/lib/supabase/server";
-import { StylistReplySchema, STYLIST_SYSTEM_PROMPT, formatWardrobeForPrompt } from "@/lib/stylist";
+import {
+  StylistReplySchema,
+  STYLIST_SYSTEM_PROMPT,
+  formatWardrobeForPrompt,
+  formatProfileForPrompt,
+} from "@/lib/stylist";
 
 // Model choice: claude-opus-5 (current default per house policy). Swappable
 // to claude-sonnet-5 here alone if per-message cost becomes a concern at
@@ -76,6 +81,15 @@ export async function POST(request) {
     return NextResponse.json({ error: wardrobeError.message }, { status: 500 });
   }
 
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profileError) {
+    console.error("Failed to load profile for chat context:", profileError.message);
+  }
+
   const { data: priorMessages, error: priorError } = await supabase
     .from("messages")
     .select("role, content")
@@ -95,11 +109,14 @@ export async function POST(request) {
     return NextResponse.json({ error: userMessageError.message }, { status: 500 });
   }
 
+  const contextBlock = [formatProfileForPrompt(profile), formatWardrobeForPrompt(wardrobe)]
+    .filter(Boolean)
+    .join("\n\n");
   const apiMessages = [
     ...priorMessages.map((m) => ({ role: m.role, content: m.content })),
     {
       role: "user",
-      content: `${formatWardrobeForPrompt(wardrobe)}\n\nUser: ${message}`,
+      content: `${contextBlock}\n\nUser: ${message}`,
     },
   ];
 

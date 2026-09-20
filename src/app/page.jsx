@@ -21,6 +21,12 @@ export default async function HomePage() {
   }
   const wardrobeWithImages = wardrobe ? await signWardrobeItems(supabase, wardrobe) : [];
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const conversations = await listConversations().catch((err) => {
     console.error("Failed to load conversations:", err.message);
     return [];
@@ -33,7 +39,7 @@ export default async function HomePage() {
     <AppShell
       initialWardrobe={wardrobeWithImages}
       userEmail={user?.email}
-      userDisplayName={user?.user_metadata?.display_name}
+      userDisplayName={profile?.display_name}
       initialConversations={conversations}
       initialActiveConversationId={null}
       initialMessages={[]}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Home,
   Chat,
@@ -145,6 +146,12 @@ function AccountMenu({ userEmail, onSignOut }) {
           <p className="truncate px-2 py-1.5 text-[12.5px] text-faint" title={userEmail}>
             {userEmail}
           </p>
+          <Link
+            href="/profile"
+            className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/60 hover:text-accent-deep"
+          >
+            Profile
+          </Link>
           <form action={onSignOut}>
             <button
               type="submit"

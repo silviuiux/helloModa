@@ -17,7 +17,10 @@ bar: list/switch/new chat). Requires `ANTHROPIC_API_KEY` set (server-only) —
 see `.env.local.example`. Wardrobe is real (add/favorite/remove, plus photo
 upload + AI attribute tagging — snap a photo, Claude vision prefills name/
 category/color/brand, still editable; stored in the private `wardrobe-photos`
-Storage bucket). "Shop" suggestions in chat
+Storage bucket). **Profile is real** (`/profile` — username, gender, avatar,
+measurements, sizes, style preferences, favorite/avoid brands) and actually
+feeds the stylist prompt (`formatProfileForPrompt`, `src/lib/stylist.js`),
+not just storage. "Shop" suggestions in chat
 are honest AI guesses with no fabricated price/retailer, since there's no
 real product catalog yet (Awin integration,
 `docs/05-integrations-affiliates.md`, not started).
@@ -82,26 +85,30 @@ src/
     register/page.jsx           email + password sign-up
     auth/callback/route.js      PKCE "code" exchange (OAuth, future)
     auth/confirm/route.js       "token_hash" confirmation (signup email link)
+    profile/page.jsx            protected profile route — loads + signs the avatar
     api/chat/route.js           real chat: Claude call, structured output, DB persistence
     api/wardrobe/tag/route.js   vision call: photo -> name/category/color/brand
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
+    profile.js                  Server Action: update profile (fields + avatar path)
     conversations.js            Server Actions: list conversations, load a conversation's messages
     auth.js                     Server Action: sign out
   lib/
     supabase/client.js          browser Supabase client
     supabase/server.js          server Supabase client (Server Components/Actions)
     supabase/middleware.js      session-refresh helper used by middleware.js
-    stylist.js                  Zod schema + system prompt for structured chat replies
+    stylist.js                  Zod schema + system prompt for structured chat replies;
+                                 formatProfileForPrompt/formatWardrobeForPrompt context builders
     wardrobeTagger.js           Zod schema + system prompt for photo -> attributes
     wardrobeImages.js           signs `wardrobe-photos` Storage paths into short-lived URLs
+    profileImages.js            signs `avatars` Storage paths into short-lived URLs
     imageResize.js               client-side photo downscale before tag/upload
     look.js                     stylist piece -> wardrobe item shape (save-to-closet)
     iconMap.jsx                 garment-icon resolver
   data/seed.js                  static reference data (wardrobe categories)
   components/
     BottomBar.jsx                every control, one bar: home/new-chat, chat/wardrobe
-                                 toggle, composer, history, share, account (docs/09)
+                                 toggle, composer, history, share, account -> profile link (docs/09)
     Icons.jsx                   inline stroke icon set (no deps)
     auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/
@@ -114,6 +121,8 @@ src/
       WardrobeView.jsx            grid, search, category filters
       WardrobeItemCard.jsx        item tile (favorite / remove)
       AddItemModal.jsx            add a piece — photo picker + AI tagging, or manual fields
+    profile/
+      ProfileForm.jsx              username/gender/avatar/measurements/sizes/style/brands
 ```
 
 ## Design language
