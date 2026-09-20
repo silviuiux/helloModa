@@ -1,13 +1,20 @@
-// SEO landing pages ("What to wear to a [X] wedding") — docs/03-roadmap.md
-// Phase 1 GTM wedge. Public, indexed content (cleared 2026-09-20, see
-// docs/06-risks-legal.md) — static and hand-curated rather than generated
-// per-request, so it stays stable for search engines and genuinely useful
-// rather than templated filler. Add a guide by adding an object here; the
-// route (src/app/what-to-wear/[slug]/page.jsx) picks it up automatically.
+// SEO landing pages ("What to wear to [X]") — docs/03-roadmap.md Phase 1 GTM
+// wedge, broadened 2026-09-20 beyond wedding-only (wedding was always meant
+// as one example occasion, not the whole scope — see that changelog entry).
+// Public, indexed content (cleared 2026-09-20, see docs/06-risks-legal.md) —
+// static and hand-curated rather than generated per-request, so it stays
+// stable for search engines and genuinely useful rather than templated
+// filler. Add a guide by adding an object here; the route
+// (src/app/what-to-wear/[slug]/page.jsx) picks it up automatically.
+// `category` groups guides on the index page — "Wedding Guest" or
+// "Everyday Occasions" for now, add a new one freely as the set grows.
+// `contextNotes` covers weather for outdoor occasions or venue/culture
+// context for others — same field, occasion-appropriate content.
 export const guides = [
   {
     slug: "beach-wedding",
     occasion: "Beach Wedding",
+    category: "Wedding Guest",
     title: "What to Wear to a Beach Wedding",
     metaDescription:
       "A real guide to beach wedding guest attire — what actually works on sand, in wind, and in humidity, for her and for him.",
@@ -18,7 +25,7 @@ export const guides = [
       "Linen or a linen-cotton blend shirt, short or long sleeve depending on the time of day, worn untucked or loosely tucked. Chinos or lightweight tailored trousers in a pale neutral — navy, tan, or sage — read intentional without a jacket. If the invite says \"jacket encouraged,\" bring one but expect to take it off; pick something unstructured that won't look wrinkled after an hour on a chair.",
     fabricAndColor:
       "Natural fibers only if you can help it — linen, cotton, lightweight viscose. Synthetic blends trap heat and show sweat differently than natural fabric does, which matters more here than at an indoor venue. Color-wise, think sun-bleached: sand, seafoam, dusty blue, warm white (not stark white), soft coral.",
-    weatherNotes:
+    contextNotes:
       "Wind is the real variable, not just heat — a full maxi skirt can become a liability during the ceremony itself. If the venue is genuinely exposed (no tent, right on the sand), a slightly shorter hem or a dress with some weight to the fabric behaves better than the lightest option in your closet.",
     avoid: [
       "Heels of any kind — they sink, and there's no elegant recovery from that",
@@ -31,6 +38,7 @@ export const guides = [
   {
     slug: "black-tie-wedding",
     occasion: "Black-Tie Wedding",
+    category: "Wedding Guest",
     title: "What to Wear to a Black-Tie Wedding",
     metaDescription:
       "What \"black tie\" actually requires for a wedding guest — the real dress code rules, and where a little personal style is still allowed.",
@@ -41,7 +49,7 @@ export const guides = [
       "A tuxedo, properly: black dinner jacket, matching trousers, a white dress shirt, and a black bow tie — not a long tie, not a skinny suit substituted in. If you don't own one, this is worth renting correctly rather than approximating with a dark suit; guests notice the difference more than you'd expect. Patent leather or highly polished black dress shoes, black socks.",
     fabricAndColor:
       "Black, midnight navy, or deep jewel tones (emerald, burgundy, sapphire) for her gown. For him, black is the standard — a midnight blue dinner jacket is a well-established, elegant substitute, but nothing lighter or more casual than that.",
-    weatherNotes:
+    contextNotes:
       "Black tie weddings are almost always indoor, evening events, so weather rarely changes the calculus — the exception is a warm-climate black-tie event, where breathable formal fabrics (a lightweight silk gown, a tropical-wool tuxedo) matter more than the color rules above.",
     avoid: [
       "A cocktail dress that reads more \"office party\" than \"gala\" — black tie sits above typical cocktail attire",
@@ -54,6 +62,7 @@ export const guides = [
   {
     slug: "garden-wedding",
     occasion: "Garden Wedding",
+    category: "Wedding Guest",
     title: "What to Wear to a Garden Wedding",
     metaDescription:
       "Garden wedding guest attire that handles grass, sun, and a semi-formal dress code — real outfit guidance, not just a mood board.",
@@ -64,7 +73,7 @@ export const guides = [
       "A suit in a lighter fabric and color than you'd wear indoors — tan, light grey, soft blue — reads appropriately dressed without looking overheated. A dress shirt with the jacket is usually enough; save the tie for anything explicitly formal. Loafers or leather derbies over anything with a slick sole, which struggles on grass and gravel paths.",
     fabricAndColor:
       "Lighter-weight wool, linen blends, and cotton poplin all read well here. Color palette leans soft and organic — sage, dusty rose, cream, soft lavender — rather than the deep jewel tones you'd wear to an evening event.",
-    weatherNotes:
+    contextNotes:
       "Check whether the ceremony and reception are both outdoors, or just one — a lot of garden venues move the reception under a tent or indoors as the evening cools, which changes what you actually need to carry with you (a wrap, a change of shoes) more than what you wear.",
     avoid: [
       "Stiletto heels — genuinely impractical on grass, not just uncomfortable",
@@ -77,6 +86,7 @@ export const guides = [
   {
     slug: "vineyard-wedding",
     occasion: "Vineyard Wedding",
+    category: "Wedding Guest",
     title: "What to Wear to a Vineyard Wedding",
     metaDescription:
       "Vineyard wedding guest outfits that match the setting's relaxed elegance — golden-hour-ready, and built for uneven ground and shifting temperatures.",
@@ -87,7 +97,7 @@ export const guides = [
       "Linen or lightweight cotton trousers with a relaxed button-down, sleeves rolled, works for a daytime ceremony; add a soft blazer as the evening cools, which it reliably does even after a hot afternoon. Suede or leather loafers suit the setting better than anything too polished or formal.",
     fabricAndColor:
       "Natural, textured fabrics — linen, raw silk, soft cotton — echo the setting's own materials (wood, stone, vines) better than anything glossy or synthetic. Warm neutrals and muted earth tones read as considered here; very bright or very cool-toned color can feel out of place against the landscape.",
-    weatherNotes:
+    contextNotes:
       "The temperature swing from afternoon to evening at a vineyard can be significant, especially in wine country's typically dry climate — bring a layer even if the forecast says warm, since most of these events run into evening.",
     avoid: [
       "Anything with a thin stiletto heel — gravel and soil will make the evening genuinely difficult",
@@ -100,6 +110,7 @@ export const guides = [
   {
     slug: "fall-wedding",
     occasion: "Fall Wedding",
+    category: "Wedding Guest",
     title: "What to Wear to a Fall Wedding",
     metaDescription:
       "Fall wedding guest attire that actually matches the season — rich color, real layering, and what to do when the weather can't decide.",
@@ -110,7 +121,7 @@ export const guides = [
       "A suit in a warmer, richer tone — deep navy, hunter green, chocolate brown — than you'd wear in summer, paired with a subtly textured tie (wool, knit) rather than a slick silk one. A well-fitted overcoat is worth having on hand for an outdoor ceremony, even if you shed it for the reception.",
     fabricAndColor:
       "This is the one season where heavier, textured fabric — wool, tweed, corduroy accents, velvet in small doses — actually works in your favor rather than against you. Jewel tones and warm earth tones both suit the season; this is a good time to wear a color you'd hold back on in summer.",
-    weatherNotes:
+    contextNotes:
       "Layer with the actual temperature swing in mind, not just the forecast high — a piece you can remove (blazer, wrap, cardigan) serves you better across a full day than a single warm outfit that's wrong for at least half of it.",
     avoid: [
       "Summer-weight fabric that won't hold up once the sun goes down",
@@ -123,6 +134,7 @@ export const guides = [
   {
     slug: "winter-wedding",
     occasion: "Winter Wedding",
+    category: "Wedding Guest",
     title: "What to Wear to a Winter Wedding",
     metaDescription:
       "Winter wedding guest attire that handles real cold without sacrificing the outfit — layering, fabric, and what to actually wear over your dress.",
@@ -133,7 +145,7 @@ export const guides = [
       "A wool suit in a heavier weight than you'd wear the rest of the year, with a proper wool overcoat rather than a casual jacket layered on top. A knit tie or a wool pocket square adds seasonal texture without straying from formal. Leather gloves and a real scarf, if you're walking between an outdoor ceremony and an indoor reception.",
     fabricAndColor:
       "Wool, velvet, and heavier silk blends hold up to cold in a way summer fabrics simply can't — this isn't just about warmth, thin fabric also drapes and photographs differently in cold, dry air. Jewel tones, black, and deep neutrals all suit winter's low light better than pastels do.",
-    weatherNotes:
+    contextNotes:
       "If any part of the event is outdoors — even just photos — plan the coat as part of the outfit, not a layer you'll shed at the door. A coat that clashes with or ignores the dress underneath is one of the most common winter-wedding missteps.",
     avoid: [
       "A thin shawl standing in for a real coat at an outdoor winter ceremony",
@@ -142,6 +154,78 @@ export const guides = [
       "Fabric with no structure or weight — it won't hold up to cold, wind, or a long coat check line",
     ],
     promptExample: "I have a winter wedding to attend — what should I wear?",
+  },
+  {
+    slug: "job-interview",
+    occasion: "Job Interview",
+    category: "Everyday Occasions",
+    title: "What to Wear to a Job Interview",
+    metaDescription:
+      "What to actually wear to a job interview by industry and culture — real guidance, not just \"dress professionally.\"",
+    hook: "A job interview isn't really governed by a written dress code, since most companies don't have one — the real skill is reading the room correctly. Overdressing signals you don't know the culture; underdressing suggests you didn't take it seriously.",
+    forHer:
+      "Tailored trousers with a structured blazer, or a sheath or midi dress with a blazer over it, scales cleanly from conservative to creative industries by how much you dress it down. Finance, law, and corporate roles call for a full, matched suit; startup and creative roles call for one notch above what current employees actually wear, not two.",
+    forHim:
+      "A full suit and tie for finance, law, and traditional corporate interviews; a dress shirt, chinos, and a blazer (no tie) reads correctly for most tech and startup interviews. Always bring a jacket you can remove rather than showing up without one and hoping the room reads as casual enough.",
+    fabricAndColor:
+      "Structured fabric holds its shape through a long, stressful day better than anything soft or clingy. Stick to a neutral base — navy, charcoal, black — with at most one considered color accent; busy patterns compete with what you're actually saying.",
+    contextNotes:
+      "Research the company's actual culture — team photos, office tour videos, Glassdoor reviews — rather than assuming from industry stereotypes alone. When genuinely unsure, one notch more formal than the room is a safer error than one notch more casual.",
+    avoid: [
+      "Wrinkled or visibly worn clothing — small details read as a proxy for competence here",
+      "Strong fragrance in a small interview room",
+      "Anything you have to keep adjusting during the interview — that's a sign it doesn't actually fit",
+      "Dressing for the job you're leaving rather than the one you're interviewing for",
+    ],
+    promptExample: "What should I wear to a job interview at a tech startup?",
+  },
+  {
+    slug: "first-date",
+    occasion: "First Date",
+    category: "Everyday Occasions",
+    title: "What to Wear on a First Date",
+    metaDescription:
+      "First date outfit guidance that actually accounts for the venue and the plan — comfortable, considered, not overthought.",
+    hook: "The real goal of a first-date outfit is comfort with intention — something that lets you actually be present instead of adjusting a waistband all night, but that still shows you made an effort.",
+    forHer:
+      "Match the outfit to the actual plan, not a generic \"date look\" — a relaxed dress or well-fitted separates for coffee or a casual dinner, something a little more considered for a nicer restaurant. Wear a piece that's genuinely you rather than what you think a first date is supposed to look like, and pick shoes you can actually walk in if the date includes any walking.",
+    forHim:
+      "A well-fitted casual button-down or a quality tee with a simple layer, dark jeans or chinos, works for most first dates without trying too hard. Skip a blazer if you're not used to wearing one — the unfamiliarity shows more than the absence would.",
+    fabricAndColor:
+      "Wear a color you actually feel good in rather than a color you think reads as \"date-appropriate\" — fit matters far more here than any specific palette.",
+    contextNotes:
+      "If you don't know the venue or the plan, ask rather than guess — dinner, drinks, and an activity date all call for genuinely different outfits, and guessing wrong is more noticeable than asking.",
+    avoid: [
+      "Anything brand new you haven't tested — save the debut for a lower-stakes day",
+      "Over-applying fragrance or cologne",
+      "An outfit that needs constant adjustment through the evening",
+      "Dressing for a type you think you should have, instead of your own actual style",
+    ],
+    promptExample: "Help me put together a first date outfit for a casual dinner",
+  },
+  {
+    slug: "summer-festival",
+    occasion: "Summer Festival",
+    category: "Everyday Occasions",
+    title: "What to Wear to a Summer Festival",
+    metaDescription:
+      "Festival outfit guidance built for standing all day in real weather — not just the outfit you'll photograph in the first hour.",
+    hook: "Festival outfits get planned for photos and regretted by hour six — the real brief is something you can stand, dance, and sweat in for eight-plus hours that still looks considered.",
+    forHer:
+      "Breathable separates beat one heavy piece — shorts or a flowy skirt with a top you can tie up as the day heats, plus a light layer for the temperature drop after dark. Wear shoes you've actually broken in; this is not the day to debut new ones.",
+    forHim:
+      "Lightweight or technical fabrics, shorts or lightweight trousers, and a breathable button-down or tee hold up far better than anything heavy. A hat and sunglasses are functional gear here, not just styling.",
+    fabricAndColor:
+      "Moisture-wicking or natural breathable fabric over anything synthetic that traps heat. Lighter colors reflect heat better for a full day in direct sun.",
+    contextNotes:
+      "Check whether the festival is single-day or multi-day, since that changes what's worth packing, and check the actual ground conditions (grass, mud, pavement) before picking footwear rather than after.",
+    avoid: [
+      "Brand-new shoes",
+      "All-black in full sun for a full day outdoors",
+      "Anything you're precious about — festivals are genuinely hard on clothes",
+      "No sun protection plan (hat, sunscreen) — not an outfit note exactly, but it wrecks the day if skipped",
+    ],
+    promptExample: "What should I wear to an outdoor music festival this summer?",
   },
 ];
 

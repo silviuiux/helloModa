@@ -48,12 +48,15 @@ high-intent niche, matching the business plan's Phase 1 GTM.
   only since Awin itself is still on hold — see Phase 3's embedding bullet.)
 - "Upload your invitation" tool: parse a wedding invitation image/text for dress code cues (can
   reuse the same vision-model call as closet tagging).
-- ✅ **SEO landing pages, shipped 2026-09-20:** `/what-to-wear/[slug]` — 6 statically generated,
-  hand-curated "What to Wear to a [X] Wedding" guides (beach, black-tie, garden, vineyard, fall,
-  winter), plus an index page, `robots.txt`, `sitemap.xml`, and JSON-LD Article schema. Public
-  and indexed — cleared 2026-09-20 per `06-risks-legal.md`'s Fashion Days conflict-of-interest
-  review (previously blocked). Content is static/curated, not generated per-request, so it stays
-  stable for search engines.
+- ✅ **SEO landing pages, shipped 2026-09-20, broadened same day:** `/what-to-wear/[slug]` — 9
+  statically generated, hand-curated guides across two categories: Wedding Guest (beach,
+  black-tie, garden, vineyard, fall, winter) and Everyday Occasions (job interview, first date,
+  summer festival) — grouped on the index page. Plus `robots.txt`, `sitemap.xml`, and JSON-LD
+  Article schema per guide. Public and indexed — cleared 2026-09-20 per `06-risks-legal.md`'s
+  Fashion Days conflict-of-interest review (previously blocked). Content is static/curated, not
+  generated per-request, so it stays stable for search engines. Broadened beyond wedding-only the
+  same day it shipped, once it became clear "wedding" was meant as one example occasion, not the
+  whole scope — see `08-changelog.md`.
 
 **Exit criteria:** A real user can describe a wedding, get a genuinely useful outfit
 recommendation mixing closet + shoppable items, and click through to buy. Private beta only.

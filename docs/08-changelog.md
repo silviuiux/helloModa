@@ -4,6 +4,34 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Broadened SEO guides beyond weddings
+
+Direct follow-up to a real inconsistency: while pitching Awin advertisers on helloModa as "an AI
+stylist for any occasion," the public site itself (`/what-to-wear`) was 100% wedding content —
+the messaging and the site didn't match, which a reviewer could easily notice. Fixed by actually
+broadening the content, not just the pitch:
+
+- 3 new guides (`src/data/guides.js`): Job Interview, First Date, Summer Festival — same depth
+  and specificity as the wedding guides (for her / for him / fabric & color / context notes /
+  what to avoid), not a thinner template. 9 guides total now, all statically generated.
+- Added a `category` field ("Wedding Guest" / "Everyday Occasions") to every guide; the index
+  page (`/what-to-wear/page.jsx`) now groups by category instead of one flat grid.
+- Renamed the `weatherNotes` field to `contextNotes` across all 9 guides and the detail page's
+  "Weather notes" section header to "Weather & setting notes" — the field covers actual weather
+  for outdoor wedding occasions but venue/culture-reading advice for interviews and dates, so the
+  old name stopped fitting once the content wasn't wedding-only.
+- Updated the index page's title/description/OG metadata and intro copy to drop wedding-specific
+  framing ("Wedding Guest Style Guides" → "Style Guides"), and swapped the copy's own example
+  from two wedding types to a wedding vs. job-interview contrast, so the page's own text
+  demonstrates the broader scope rather than just asserting it.
+- Cross-link list at the bottom of each guide ("Other occasions") intentionally stays a flat mix
+  across categories — good for internal linking/SEO — only the index page groups.
+- Verified: all 9 routes prerender and return 200, index page renders the two category sections
+  correctly, the new guides' "Weather & setting notes" section reads naturally despite the field
+  rename.
+
+---
+
 ## 2026-09-20 — SEO landing pages: "What to Wear to a [X] Wedding"
 
 Per direct request, with a real blocker surfaced and cleared first: `docs/06-risks-legal.md`

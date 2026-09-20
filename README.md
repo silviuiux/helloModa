@@ -29,11 +29,12 @@ real product catalog yet (Awin integration,
 Awin-catalog matching, usable today against the closet. Not yet wired into the chat/
 recommendation flow itself.
 
-**SEO landing pages are live and public** — `/what-to-wear` and 6 statically generated
-`/what-to-wear/[slug]` guides ("What to Wear to a [X] Wedding": beach, black-tie, garden,
-vineyard, fall, winter), the one deliberate exception to the app's invite-only auth gate.
-Cleared 2026-09-20 per `docs/06-risks-legal.md`'s Fashion Days conflict-of-interest review
-(previously blocked, see that doc's changelog note).
+**SEO landing pages are live and public** — `/what-to-wear` and 9 statically generated
+`/what-to-wear/[slug]` guides, grouped into Wedding Guest (beach, black-tie, garden, vineyard,
+fall, winter) and Everyday Occasions (job interview, first date, summer festival) — the one
+deliberate exception to the app's invite-only auth gate. Cleared 2026-09-20 per
+`docs/06-risks-legal.md`'s Fashion Days conflict-of-interest review (previously blocked, see
+that doc's changelog note).
 
 **Error monitoring (Sentry) + product analytics (PostHog) are wired** — the
 last Phase 0 exit criterion, done 2026-09-20. Both are safe no-ops until you

@@ -62,7 +62,7 @@ export default function GuidePage({ params }) {
         <Section title="For her">{guide.forHer}</Section>
         <Section title="For him">{guide.forHim}</Section>
         <Section title="Fabric & color">{guide.fabricAndColor}</Section>
-        <Section title="Weather notes">{guide.weatherNotes}</Section>
+        <Section title="Weather & setting notes">{guide.contextNotes}</Section>
 
         <section>
           <h2 className="font-display text-[20px] font-medium text-ink">What to avoid</h2>
