@@ -8,6 +8,11 @@ phase ships, plus the product decisions that follow from staying low-profile unt
 Your day job is UX work at Fashion Days, part of the eMAG ecosystem — genuinely useful domain
 knowledge, but also the thing most likely to create a real conflict.
 
+**✅ Contract review done, risk accepted — 2026-09-20.** The specific "no indexed SEO pages"
+constraint below is lifted as of that date (see `08-changelog.md`); public SEO landing pages can
+ship. The eMAG/Fashion Days affiliate non-integration and the no-proprietary-data rules below
+still stand — narrower and unrelated to this review.
+
 **Action needed before any public step (this blocks Phase 5, not Phase 0–4 private build):**
 - Read your actual employment contract for non-compete, moonlighting-disclosure, and IP-
   assignment clauses. "IP assignment" clauses in particular can sometimes claim work-adjacent

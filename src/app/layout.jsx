@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import "./globals.css";
 import PostHogPageview from "../components/PostHogPageview.jsx";
+import { SITE_URL } from "../lib/siteConfig.js";
 
 export const metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "helloModa — AI stylist",
   description:
     "helloModa — a conversational AI stylist that turns mood, occasion, wardrobe and budget into curated outfit direction. Part of helloCorp.",

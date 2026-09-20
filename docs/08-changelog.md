@@ -4,6 +4,40 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — SEO landing pages: "What to Wear to a [X] Wedding"
+
+Per direct request, with a real blocker surfaced and cleared first: `docs/06-risks-legal.md`
+explicitly listed "no indexed SEO landing pages" as part of the low-profile posture pending a
+Fashion Days employment-contract conflict-of-interest review. Confirmed with Silviu that the
+review is done and the risk is accepted before building anything — updated that doc to record it
+rather than silently proceeding.
+
+- 6 hand-curated guides (`src/data/guides.js`): beach, black-tie, garden, vineyard, fall, and
+  winter weddings — real, distinct, specific content per occasion (for her / for him / fabric &
+  color / weather notes / what to avoid), not a templated fill-in-the-blank, to avoid the thin-
+  content trap that actively hurts SEO. Static data, not generated per-request, so search engines
+  see stable content.
+- `/what-to-wear` (index) and `/what-to-wear/[slug]` (detail, `generateStaticParams` — all 6
+  prerendered at build time), sharing a new lightweight `GuideLayout.jsx` — deliberately not
+  `AppShell`, no bottom bar or auth-only chrome, just a header (logo + "Try helloModa" CTA) and
+  footer. Each detail page has real `generateMetadata` (title/description/canonical/OG) and a
+  JSON-LD `Article` schema block.
+- `src/app/robots.js` / `sitemap.js` (Next's file-convention routes): only `/what-to-wear` is
+  allowed/listed — everything else stays disallowed, since the rest of the app is the
+  authenticated private beta, not meant to be indexed.
+- `middleware.js`'s auth gate now explicitly exempts `/what-to-wear`, `/robots.txt`, and
+  `/sitemap.xml` — without this they'd 307-redirect to `/login` like every other route, silently
+  breaking indexing.
+- New `src/lib/siteConfig.js` (`SITE_URL`, defaults to `hellomoda.shop`) — also wired into root
+  `layout.jsx`'s `metadataBase` (was missing before this, so any relative OG/canonical URLs
+  anywhere in the app would have resolved incorrectly).
+- Verified locally: all 6 guide routes 200, unknown slug 404s, `robots.txt`/`sitemap.xml` 200 and
+  correctly scoped, unauthenticated root still redirects (307) — the exemption is scoped
+  correctly, not an accidental full auth bypass. Real search-engine indexing obviously can't be
+  verified here; that's on actual deployment + Google Search Console over time.
+
+---
+
 ## 2026-09-20 — CLIP embedding + wardrobe similarity matching infrastructure
 
 Prompted by "how do we find matching pieces for a suggested outfit" — the real answer (a synced

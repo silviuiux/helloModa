@@ -29,6 +29,12 @@ real product catalog yet (Awin integration,
 Awin-catalog matching, usable today against the closet. Not yet wired into the chat/
 recommendation flow itself.
 
+**SEO landing pages are live and public** — `/what-to-wear` and 6 statically generated
+`/what-to-wear/[slug]` guides ("What to Wear to a [X] Wedding": beach, black-tie, garden,
+vineyard, fall, winter), the one deliberate exception to the app's invite-only auth gate.
+Cleared 2026-09-20 per `docs/06-risks-legal.md`'s Fashion Days conflict-of-interest review
+(previously blocked, see that doc's changelog note).
+
 **Error monitoring (Sentry) + product analytics (PostHog) are wired** — the
 last Phase 0 exit criterion, done 2026-09-20. Both are safe no-ops until you
 set `NEXT_PUBLIC_SENTRY_DSN` / `NEXT_PUBLIC_POSTHOG_KEY` (`.env.local.example`);
@@ -108,6 +114,9 @@ src/
     auth/callback/route.js      PKCE "code" exchange (OAuth, future)
     auth/confirm/route.js       "token_hash" confirmation (signup email link)
     profile/page.jsx            protected profile route — loads + signs the avatar
+    what-to-wear/page.jsx       public SEO guides index (not auth-gated)
+    what-to-wear/[slug]/page.jsx public SEO guide detail, statically generated
+    robots.js / sitemap.js      public-route-only crawl rules (Next file conventions)
     api/chat/route.js           real chat: Claude call, structured output, DB persistence
     api/wardrobe/tag/route.js   vision call: photo -> name/category/color/brand
     api/wardrobe/backfill-embeddings/route.js  one-off: embeds pre-existing wardrobe items
@@ -132,9 +141,12 @@ src/
     wardrobeMatching.js           pgvector similarity search over the caller's own wardrobe
     imageResize.js               client-side photo downscale before tag/upload
     analytics.js                 PostHog init + track()/identifyUser(), safe no-op without a key
+    siteConfig.js                 SITE_URL — metadataBase, robots.js, sitemap.js, JSON-LD
     look.js                     stylist piece -> wardrobe item shape (save-to-closet)
     iconMap.jsx                 garment-icon resolver
-  data/seed.js                  static reference data (wardrobe categories)
+  data/
+    seed.js                      static reference data (wardrobe categories)
+    guides.js                     the 6 SEO guides' content — add an object here to add a guide
   components/
     BottomBar.jsx                every control, one bar: home/new-chat, chat/wardrobe
                                  toggle, composer, history, share, account -> profile link (docs/09)
@@ -153,6 +165,8 @@ src/
       AddItemModal.jsx            add a piece — photo picker + AI tagging, or manual fields
     profile/
       ProfileForm.jsx              username/gender/avatar/measurements/sizes/style/brands
+    guides/
+      GuideLayout.jsx               shared chrome for /what-to-wear pages (not AppShell)
 ```
 
 ## Design language
@@ -163,5 +177,6 @@ helloCorp's DNA.
 
 ## Next ideas (Phase 1+, see `docs/03-roadmap.md`)
 
-Awin signup + affiliate product matching for "shop" suggestions · calendar
-sync · digital avatar · circular marketplace.
+Awin signup + affiliate product matching for "shop" suggestions ·
+"upload your invitation" dress-code parsing · calendar sync · digital
+avatar · circular marketplace.

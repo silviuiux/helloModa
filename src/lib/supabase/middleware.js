@@ -3,9 +3,11 @@ import { NextResponse } from "next/server";
 
 // Refreshes the Supabase auth session on every request and gates access to the
 // app behind a signed-in user — helloModa is invite-only/private-beta for now
-// (see docs/06-risks-legal.md — low-profile posture pending the Fashion Days
-// conflict-of-interest review). Public sign-up stays disabled in the Supabase
-// Auth dashboard; users are invited manually until Phase 5.
+// (see docs/06-risks-legal.md). Public sign-up stays disabled in the Supabase
+// Auth dashboard; users are invited manually until Phase 5. The `/what-to-wear`
+// SEO guides plus robots.txt/sitemap.xml are the one deliberate exception —
+// public marketing pages, cleared 2026-09-20 (docs/06-risks-legal.md), not an
+// oversight.
 export async function updateSession(request) {
   let response = NextResponse.next({ request });
 
@@ -47,8 +49,10 @@ export async function updateSession(request) {
   const path = request.nextUrl.pathname;
   const isAuthRoute =
     path.startsWith("/login") || path.startsWith("/register") || path.startsWith("/auth");
+  const isPublicMarketingRoute =
+    path.startsWith("/what-to-wear") || path === "/robots.txt" || path === "/sitemap.xml";
 
-  if (!user && !isAuthRoute) {
+  if (!user && !isAuthRoute && !isPublicMarketingRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
