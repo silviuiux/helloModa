@@ -30,11 +30,18 @@ last Phase 0 exit criterion, done 2026-09-20. Both are safe no-ops until you
 set `NEXT_PUBLIC_SENTRY_DSN` / `NEXT_PUBLIC_POSTHOG_KEY` (`.env.local.example`);
 see `src/lib/analytics.js` and `src/instrumentation.js`.
 
+**Phase 2 image generation is real** — `POST /api/generate-image` calls
+Replicate (`black-forest-labs/flux-dev`) with the stylist's `heroPrompt` and
+caches the result in the private `generated-looks` Storage bucket. Requires
+`REPLICATE_API_TOKEN` set (server-only) — see `.env.local.example`.
+`OutfitHero.jsx` fires the call itself right after a turn renders, showing a
+"Generating…" state in between.
+
 **Conversation UX, redesigned 2026-09-19** per `docs/09-conversation-design.md`
 (the maintained rules doc — read it before changing chat behavior/layout):
 one outfit direction per turn (title + narrative + hero visual side by side,
-no container chrome — hero visual is currently a styled placeholder, real
-image generation is a deliberate later step), the underlying product cards
+no container chrome — hero visual is now a real generated image, see above),
+the underlying product cards
 collapsed by default behind "Find items for this outfit", AI-authored
 quick-reply chips, a welcome screen with example occasion cards before the
 first message, and every control (nav, composer, history, share, account)
@@ -75,6 +82,7 @@ Open the printed localhost URL. Unauthenticated requests redirect to `/login`
 - Fonts (Fraunces / Inter / IBM Plex Mono) load from Google Fonts in `src/app/layout.jsx`.
 - **Sentry** (error monitoring) + **PostHog** (product analytics) — see `src/instrumentation.js`,
   `src/instrumentation-client.js`, `sentry.server.config.js`, `sentry.edge.config.js`.
+- **Replicate** (`black-forest-labs/flux-dev`) for real outfit-image generation — `src/lib/imageGen.js`.
 
 Full reasoning for these choices: `docs/02-tech-stack.md`.
 
@@ -98,6 +106,7 @@ src/
     profile/page.jsx            protected profile route — loads + signs the avatar
     api/chat/route.js           real chat: Claude call, structured output, DB persistence
     api/wardrobe/tag/route.js   vision call: photo -> name/category/color/brand
+    api/generate-image/route.js Replicate call: heroPrompt -> real outfit image, cached + signed
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
     profile.js                  Server Action: update profile (fields + avatar path)
@@ -112,6 +121,8 @@ src/
     wardrobeTagger.js           Zod schema + system prompt for photo -> attributes
     wardrobeImages.js           signs `wardrobe-photos` Storage paths into short-lived URLs
     profileImages.js            signs `avatars` Storage paths into short-lived URLs
+    lookImages.js                signs `generated-looks` Storage paths into short-lived URLs
+    imageGen.js                  Replicate call: heroPrompt -> generated outfit image (Blob)
     imageResize.js               client-side photo downscale before tag/upload
     analytics.js                 PostHog init + track()/identifyUser(), safe no-op without a key
     look.js                     stylist piece -> wardrobe item shape (save-to-closet)
@@ -127,7 +138,7 @@ src/
       EmptyState.jsx             welcome screen: greeting, occasion cards, example prompts
       ChatView.jsx                message list only — sending lives in AppShell now
       MessageBubble.jsx           one turn: title, narrative, hero, quick replies, toolbar
-      OutfitHero.jsx               placeholder outfit-in-scene visual (real image-gen: later)
+      OutfitHero.jsx               real generated outfit-in-scene image (calls /api/generate-image itself)
       RecommendationCards.jsx     product grid, revealed via "Find items for this outfit"
     wardrobe/
       WardrobeView.jsx            grid, search, category filters
@@ -145,6 +156,5 @@ helloCorp's DNA.
 
 ## Next ideas (Phase 1+, see `docs/03-roadmap.md`)
 
-Awin signup + affiliate product matching for "shop" suggestions · outfit
-preview render (SDXL, Phase 2) · calendar sync · digital avatar · circular
-marketplace.
+Awin signup + affiliate product matching for "shop" suggestions · calendar
+sync · digital avatar · circular marketplace.

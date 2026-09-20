@@ -243,6 +243,8 @@ export async function POST(request) {
       title: parsed.title,
       narrative: parsed.narrative,
       heroPrompt: parsed.heroPrompt,
+      recommendationId: recommendationRow.id,
+      generatedImageUrl: null,
       quickReplies: parsed.quickReplies,
       pieces: uiPieces,
     },

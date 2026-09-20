@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { signLookImageUrl } from "@/lib/lookImages";
 
 const CATEGORY_TO_TYPE = {
   Tops: "top",
@@ -46,7 +47,7 @@ export async function getConversationMessages(conversationId) {
 
   const { data: recs, error: recsError } = await supabase
     .from("outfit_recommendations")
-    .select("id, message_id, title, hero_prompt, quick_replies")
+    .select("id, message_id, title, hero_prompt, quick_replies, generated_image_url")
     .in("message_id", assistantIds);
   if (recsError) throw new Error(recsError.message);
 
@@ -63,7 +64,7 @@ export async function getConversationMessages(conversationId) {
     items = data || [];
   }
 
-  return messages.map((m) => {
+  return Promise.all(messages.map(async (m) => {
     if (m.role === "user") {
       return { id: m.id, role: "user", text: m.content };
     }
@@ -100,8 +101,10 @@ export async function getConversationMessages(conversationId) {
       title: rec?.title || null,
       narrative: m.content,
       heroPrompt: rec?.hero_prompt || null,
+      recommendationId: rec?.id || null,
+      generatedImageUrl: rec?.generated_image_url ? await signLookImageUrl(supabase, rec.generated_image_url) : null,
       quickReplies: rec?.quick_replies || [],
       pieces,
     };
-  });
+  }));
 }

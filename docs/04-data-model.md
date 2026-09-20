@@ -53,7 +53,9 @@ outfit_recommendations
   title                    text   -- short evocative phrase, e.g. "Vineyard wedding" (docs/09-conversation-design.md)
   hero_prompt              text   -- image-gen prompt, written now, used once Phase 2 wires up real generation
   quick_replies            jsonb  -- AI-authored follow-up chips for this turn, e.g. ["Show me something more casual"]
-  generated_image_url             -- Phase 2, nullable until then
+  generated_image_url             -- Supabase Storage path, `generated-looks` bucket (private,
+                                      signed URL via src/lib/lookImages.js); null until
+                                      POST /api/generate-image populates it (Phase 2)
   occasion                text
   weather_context         jsonb
   followup_question       text   -- superseded by quick_replies; unused going forward, kept for now

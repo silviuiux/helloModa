@@ -4,6 +4,49 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Real outfit image generation (Replicate) — Phase 2
+
+Per direct request ("let's go with Replicate," token already in hand). `docs/02-tech-stack.md`
+had flagged fal.ai as the soft default from earlier research, but Replicate was chosen directly
+rather than re-litigating that — both use the same async job pattern, so it isn't a hard commit:
+
+- `src/lib/imageGen.js`: `generateOutfitImage(prompt)` calls Replicate
+  (`black-forest-labs/flux-dev`) with the stylist's `heroPrompt` plus a fixed "editorial fashion
+  photography, natural lighting, photorealistic" suffix, `aspect_ratio: "4:5"` to match
+  `OutfitHero`'s frame, returns a jpeg Blob. Model is a one-line swap if Flux's output quality
+  disappoints on real prompts.
+- New private Storage bucket `generated-looks` (owner-scoped RLS, same pattern as
+  `wardrobe-photos`/`avatars`), path `{user_id}/{recommendation_id}.jpg`. Generated images are
+  re-hosted here rather than linked directly to Replicate's delivery URL, which isn't permanent.
+- New `POST /api/generate-image` route: takes `{ recommendationId }`, relies on the existing RLS
+  policy (owner via message → conversation) to reject anyone else's recommendation rather than
+  hand-rolling an ownership check, generates + uploads + writes
+  `outfit_recommendations.generated_image_url`, returns a signed URL. **Idempotent** — a
+  recommendation that already has a generated image just returns its signed URL instead of
+  paying for a second generation.
+- **Called client-side, not behind a background-job worker.** The roadmap originally said
+  "behind the background job worker," but there's no Trigger.dev/Inngest in this project yet
+  (still just a Phase 0 stack pick, never wired up) — and Replicate's Node SDK already blocks
+  until the prediction finishes (~5-10s for Flux), which fits inside one Vercel function call.
+  `OutfitHero.jsx` fires the request itself right after a chat turn renders (title/narrative show
+  instantly from the existing chat response; the hero image swaps in after, with a
+  "Generating…" badge in between) — meets the roadmap's "good loading state" exit criterion
+  without adding a queue/worker for a single call per turn. Revisit only if latency, Vercel
+  timeouts, or volume make that not hold up.
+- `getConversationMessages` (`src/actions/conversations.js`) now also loads and signs
+  `generated_image_url`, so revisiting an old turn — including ones from before this shipped —
+  loads the cached image if one exists, or triggers generation on demand if not (same
+  `OutfitHero` code path either way, no special-casing "old" vs "new" turns).
+- QA note: this sandbox's proxy blocks `api.replicate.com` outright (same class of limitation as
+  Supabase — see the wardrobe-photo-upload entry), so a real generation call couldn't be verified
+  end-to-end here. Verified instead via a temporary preview route (removed after): the
+  "Generating…" state renders correctly, and a failed call (401 in the unauthenticated harness —
+  the middleware matcher covers `/api/*`, same as the existing chat/wardrobe-tag routes) falls
+  back cleanly to the placeholder rather than breaking the turn. Real generation needs
+  `REPLICATE_API_TOKEN` set in Vercel and a live spot-check once deployed.
+
+---
+
 ## 2026-09-20 — Sentry (error monitoring) + PostHog (product analytics) wired
 
 A Phase 0 exit criterion ("Wire Sentry + PostHog," `docs/03-roadmap.md`) that had slipped —

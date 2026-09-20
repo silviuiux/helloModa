@@ -20,7 +20,11 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   return (
     <div className="animate-fade-up space-y-6">
       <div className="grid gap-8 sm:grid-cols-2 sm:items-start">
-        <OutfitHero />
+        <OutfitHero
+          recommendationId={message.recommendationId}
+          heroPrompt={message.heroPrompt}
+          generatedImageUrl={message.generatedImageUrl}
+        />
         <div className="flex flex-col">
           {message.title && (
             <h2 className="font-script text-[52px] leading-[0.9] text-ink sm:text-[60px]">

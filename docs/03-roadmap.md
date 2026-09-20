@@ -53,11 +53,19 @@ recommendation mixing closet + shoppable items, and click through to buy. Privat
 ## Phase 2 — Generative Visualization (4–6 weeks)
 **Goal:** The "Magic Mirror" — photorealistic visualization, the plan's headline differentiator.
 
-- Integrate hosted SDXL (fal.ai/Replicate) behind the background job worker; generate the
-  outfit-in-context image (e.g. "at a winery") from the LLM's outfit description.
-- Cache/store generated images in Supabase Storage; show a loading state in chat while the job runs.
-- A/B the actual visual quality and generation latency before investing further — this is the
-  highest-cost-per-interaction feature, validate it earns its keep.
+- ✅ **Real image generation, shipped 2026-09-20:** `POST /api/generate-image` calls Replicate
+  (`black-forest-labs/flux-dev`) with the stylist's `heroPrompt`, generating the outfit-in-context
+  image; cached in the private `generated-looks` Storage bucket (`outfit_recommendations.
+  generated_image_url`), served via signed URL. Called client-side right after a chat turn
+  renders (`OutfitHero.jsx`) rather than behind a separate background-job worker — Replicate's
+  Node SDK blocks until the prediction finishes (~5-10s for Flux), which fits inside one request
+  without needing Trigger.dev/Inngest yet; revisit only if generation latency or Vercel function
+  timeouts become a real problem at higher volume. The text reply still renders instantly — the
+  image fills in after, with a "Generating…" state — matching the exit criteria below without a
+  bigger infra lift.
+- Not yet done: the A/B on visual quality/latency/cost against real usage (needs actual traffic
+  through it first) and a per-generation cost-tracking log (`07-costs-budget.md`) — do this once
+  `REPLICATE_API_TOKEN` is live in production and turns are actually flowing through it.
 
 **Exit criteria:** Outfit recommendations come with a generated visual, generated in an
 acceptable time (target: under ~15s perceived latency with a good loading state), at a

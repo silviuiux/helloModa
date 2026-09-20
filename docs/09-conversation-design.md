@@ -27,12 +27,15 @@ interchangeable product cards. A turn has:
    out **beside** the title/narrative in a two-column split (`sm:grid-cols-2`
    in `MessageBubble.jsx`) rather than stacked above the text — image left,
    content right, matching the reference mockups. Collapses to a single
-   stacked column below the `sm` breakpoint. **Currently a styled
-   illustrated placeholder** (`OutfitHero.jsx`), not a real photorealistic
-   render — real image generation (SDXL via a hosted provider) is a
-   deliberately separate next step, not bundled into this layout change.
-   Swapping the placeholder for a real generated image later should only
-   mean changing what `OutfitHero` renders, not the surrounding turn shape.
+   stacked column below the `sm` breakpoint. **Real photorealistic
+   generation, shipped 2026-09-20** (`OutfitHero.jsx` → `POST
+   /api/generate-image` → Replicate, `src/lib/imageGen.js`) — the turn's
+   title/narrative/pieces render immediately from the chat response, then
+   `OutfitHero` fires the generation call itself and swaps its illustrated
+   placeholder (`GarmentArt`) for the real image once it lands, showing a
+   "Generating…" badge in between. Generated images are cached (Storage +
+   `outfit_recommendations.generated_image_url`), so revisiting a turn or an
+   older conversation never re-generates — it just loads the cached one.
    The turn itself has **no container/card chrome** — the image and text sit
    directly on the page background, not inside a bordered/glass box. Applies
    to the revealed "Find items" grid too: flat images with a caption below,
