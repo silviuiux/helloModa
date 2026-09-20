@@ -4,6 +4,34 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Soft-to-white feathered margins on generated images
+
+Per direct request: generated images shouldn't reach the photo edge, like an unfinished
+watercolor painting with white margins. Text-prompt wording alone is unreliable for a
+compositional instruction like "leave the edges blank" (diffusion models are trained to fill the
+whole frame), so this is a **deterministic post-processing step**, not a prompt hope:
+
+- `applyWatercolorMargin()` in `src/lib/imageGen.js` (new `sharp` dependency — already present
+  transitively via Next.js, so no real new weight) feathers the generated image's edges to
+  transparent using a radial-gradient SVG mask (`dest-in` blend), then composites the result onto
+  solid white. Every generated image gets this, unconditionally — not dependent on the model's
+  compliance.
+- Also added a light prompt-side complement to `STYLE_DIRECTIVE` ("generous empty space toward
+  the edges... the subject sits within the frame, not cropped by it") so the model itself tends
+  to leave the frame edges sparser, which the feather then blends more naturally.
+- **Bug caught and fixed during verification:** the first version dropped the alpha channel
+  when the intermediate faded buffer round-tripped through `.toBuffer()` without an explicit
+  format — sharp silently fell back to the source's jpeg encoding (jpeg has no alpha), flattening
+  the "transparent" edges to **black** instead of leaving them to composite onto white. Fixed by
+  encoding that intermediate step as `.png()` explicitly. Caught by testing the actual
+  `applyWatercolorMargin` function locally against a synthetic test image (this sandbox can't
+  reach `api.replicate.com` to test a real generation end-to-end, but the post-processing step is
+  pure image manipulation and testable in isolation) — the bug would otherwise have shipped
+  silently, since a JPEG's default flatten-to-black looks like "a bug" but not an obviously wrong
+  one without a side-by-side check.
+
+---
+
 ## 2026-09-20 — House visual style for generated images: watercolor + realistic detail
 
 Per direct request. `src/lib/imageGen.js` now appends a `STYLE_DIRECTIVE` string to every
