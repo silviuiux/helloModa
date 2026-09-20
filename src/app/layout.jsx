@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import "./globals.css";
+import PostHogPageview from "../components/PostHogPageview.jsx";
 
 export const metadata = {
   title: "helloModa — AI stylist",
@@ -25,7 +27,12 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Suspense fallback={null}>
+          <PostHogPageview />
+        </Suspense>
+        {children}
+      </body>
     </html>
   );
 }

@@ -38,6 +38,7 @@ export default async function HomePage() {
   return (
     <AppShell
       initialWardrobe={wardrobeWithImages}
+      userId={user?.id}
       userEmail={user?.email}
       userDisplayName={profile?.display_name}
       initialConversations={conversations}

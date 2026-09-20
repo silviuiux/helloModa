@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Sparkle } from "@/components/Icons.jsx";
 import SocialButtons from "@/components/auth/SocialButtons.jsx";
 import { registerWithInvite } from "@/actions/auth";
+import { track } from "@/lib/analytics";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -30,11 +31,13 @@ export default function RegisterPage() {
 
     if (result.needsConfirmation) {
       // Email confirmation is on — wait for the user to click the link.
+      track("sign_up_submitted", { needs_confirmation: true });
       setStatus("confirm");
       return;
     }
 
     // Email confirmation is off — the action already set the session cookie.
+    track("sign_up_submitted", { needs_confirmation: false });
     router.push("/");
     router.refresh();
   }

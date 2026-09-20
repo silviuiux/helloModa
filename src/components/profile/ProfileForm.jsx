@@ -6,6 +6,7 @@ import { Home, Plus, X, Check } from "../Icons.jsx";
 import { resizeImageFile } from "../../lib/imageResize.js";
 import { createClient } from "../../lib/supabase/client.js";
 import { updateProfile } from "../../actions/profile.js";
+import { track } from "../../lib/analytics.js";
 
 const GENDER_OPTIONS = ["Woman", "Man", "Non-binary", "Prefer not to say"];
 const STYLE_SUGGESTIONS = [
@@ -92,6 +93,10 @@ export default function ProfileForm({ profile, avatarUrl, userEmail }) {
         styleTraits,
         favoriteBrands,
         avoidBrands,
+      });
+      track("profile_saved", {
+        has_avatar: Boolean(avatarPreview),
+        style_trait_count: styleTraits.length,
       });
       setStatus("saved");
       setTimeout(() => setStatus("idle"), 2000);

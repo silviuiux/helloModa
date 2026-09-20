@@ -4,6 +4,41 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — Sentry (error monitoring) + PostHog (product analytics) wired
+
+A Phase 0 exit criterion ("Wire Sentry + PostHog," `docs/03-roadmap.md`) that had slipped —
+neither was in the code until now, so the only way to learn about a production bug was a user
+complaining, and there was zero usage data:
+
+- **Sentry** (`@sentry/nextjs`): `sentry.server.config.js` / `sentry.edge.config.js` /
+  `src/instrumentation-client.js`, loaded via `src/instrumentation.js`'s `register()` per
+  runtime. `onRequestError` reports framework-level errors that escape a route's own try/catch;
+  `src/app/global-error.jsx` catches anything that escapes the whole app shell and shows a
+  minimal fallback instead of a blank page. The existing `catch` blocks in
+  `api/chat/route.js` and `api/wardrobe/tag/route.js` now also call `Sentry.captureException`
+  alongside their `console.error` (the graceful JSON error response to the user is unchanged —
+  this only adds visibility). `next.config.js` wraps the config with `withSentryConfig` for
+  source-map upload, which silently no-ops without `SENTRY_ORG`/`SENTRY_PROJECT`/
+  `SENTRY_AUTH_TOKEN` set (build-time only, e.g. in Vercel).
+- **PostHog** (`posthog-js`): `src/lib/analytics.js` inits once client-side and exports
+  `track()`/`identifyUser()` — both safe no-ops until `NEXT_PUBLIC_POSTHOG_KEY` is set, same
+  pattern as `ANTHROPIC_API_KEY`. `PostHogPageview.jsx` captures pageviews manually (App Router
+  client navigations aren't full page loads, so `capture_pageview` is off). Instrumented the
+  funnel that actually matters for the "describe an occasion → get styled" wedge, not just
+  pageviews: `sign_up_submitted` (`register/page.jsx`), `chat_message_sent` and
+  `wardrobe_item_added` (`AppShell.jsx`), `profile_saved` (`ProfileForm.jsx`). `AppShell.jsx`
+  identifies the signed-in user (`userId` now passed down from `page.jsx`) on mount so events
+  tie back to a real person, not an anonymous session.
+- Both are genuinely inert with no keys configured — verified via a clean `npm run build` and a
+  `npm run dev` smoke test (login page 200, unauthenticated root still redirects) with
+  `NEXT_PUBLIC_SENTRY_DSN`/`NEXT_PUBLIC_POSTHOG_KEY` unset locally. Real event delivery couldn't
+  be verified end-to-end here — no Sentry/PostHog project exists yet — spot-check once real keys
+  are set (in Vercel, and locally if you want dev-time events too).
+- First Load JS grew meaningfully (`/` went from ~185 kB to ~341 kB) — both SDKs are client
+  bundles. Worth watching if it becomes a real perceived-load issue, not a concern yet.
+
+---
+
 ## 2026-09-20 — Profile page (username, gender, avatar, measurements, sizes, style preferences, brands)
 
 Per direct request, scoped down from a broader "full profile" list (colors-to-avoid, budget

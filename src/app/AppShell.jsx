@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
 import { addWardrobeItem, toggleWardrobeFavorite, removeWardrobeItem } from "@/actions/wardrobe";
 import { getConversationMessages } from "@/actions/conversations";
 import { signOut } from "@/actions/auth";
+import { identifyUser, track } from "@/lib/analytics";
 
 const ICON_BY_CATEGORY = {
   Tops: "shirt",
@@ -35,6 +36,7 @@ function dbRowToItem(row) {
 
 export default function AppShell({
   initialWardrobe,
+  userId,
   userEmail,
   userDisplayName,
   initialConversations,
@@ -49,6 +51,10 @@ export default function AppShell({
   const [thinking, setThinking] = useState(false);
   const [isSwitching, startSwitching] = useTransition();
 
+  useEffect(() => {
+    if (userId) identifyUser(userId, { email: userEmail });
+  }, [userId, userEmail]);
+
   async function handleAdd(item) {
     const tempId = item.id;
     setWardrobe((prev) => [item, ...prev]);
@@ -62,6 +68,7 @@ export default function AppShell({
         imagePath: item.imagePath,
       });
       setWardrobe((prev) => prev.map((w) => (w.id === tempId ? dbRowToItem(saved) : w)));
+      track("wardrobe_item_added", { category: item.category, has_photo: Boolean(item.imagePath) });
     } catch (err) {
       console.error("Failed to save wardrobe item:", err);
       setWardrobe((prev) => prev.filter((w) => w.id !== tempId));
@@ -144,6 +151,7 @@ export default function AppShell({
       }
 
       setMessages((prev) => [...prev.filter((m) => m.id !== tempId), data.userMessage, data.message]);
+      track("chat_message_sent", { is_new_conversation: !activeConversationId });
 
       if (!activeConversationId && data.conversationId) {
         setActiveConversationId(data.conversationId);

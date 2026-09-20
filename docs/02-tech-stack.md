@@ -20,8 +20,8 @@ builder, $100s–$1000s/month budget, ship fast, minimize number of systems to o
 | Payments | **Stripe** | Subscriptions (helloModa Pro) now; Stripe Connect for marketplace payouts in Phase 4 | — |
 | Affiliate tracking | Network-dependent (see `05-integrations-affiliates.md`) | — | — |
 | Hosting | **Vercel** (Next.js) + **Supabase Cloud** | Zero-ops for both, EU region available for GDPR | Self-managed (Docker on a VPS) — more control, much more ops burden solo |
-| Analytics | **PostHog** (cloud, free tier) | Product analytics + feature flags + session replay in one tool, generous free tier | — |
-| Error monitoring | **Sentry** | Standard, free tier sufficient early | — |
+| Analytics | **PostHog** (cloud, free tier) — ✅ wired 2026-09-20, needs `NEXT_PUBLIC_POSTHOG_KEY` | Product analytics + feature flags + session replay in one tool, generous free tier | — |
+| Error monitoring | **Sentry** — ✅ wired 2026-09-20, needs `NEXT_PUBLIC_SENTRY_DSN` | Standard, free tier sufficient early | — |
 | Calendar integration | Google Calendar API + Apple's EventKit/CalDAV (Phase 3 feature) | Matches business plan's "Calendar Sync" feature | — |
 
 ## Local dev

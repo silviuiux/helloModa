@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { createClient } from "@/lib/supabase/server";
@@ -139,6 +140,7 @@ export async function POST(request) {
     parsed = response.parsed_output;
   } catch (err) {
     console.error("Claude request failed:", err);
+    Sentry.captureException(err);
     if (err instanceof Anthropic.AuthenticationError) {
       return NextResponse.json(
         { error: "Stylist AI isn't configured (missing/invalid API key)." },

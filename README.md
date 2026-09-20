@@ -25,6 +25,11 @@ are honest AI guesses with no fabricated price/retailer, since there's no
 real product catalog yet (Awin integration,
 `docs/05-integrations-affiliates.md`, not started).
 
+**Error monitoring (Sentry) + product analytics (PostHog) are wired** — the
+last Phase 0 exit criterion, done 2026-09-20. Both are safe no-ops until you
+set `NEXT_PUBLIC_SENTRY_DSN` / `NEXT_PUBLIC_POSTHOG_KEY` (`.env.local.example`);
+see `src/lib/analytics.js` and `src/instrumentation.js`.
+
 **Conversation UX, redesigned 2026-09-19** per `docs/09-conversation-design.md`
 (the maintained rules doc — read it before changing chat behavior/layout):
 one outfit direction per turn (title + narrative + hero visual side by side,
@@ -68,6 +73,8 @@ Open the printed localhost URL. Unauthenticated requests redirect to `/login`
 - **Supabase** — Postgres + Auth + Storage + `pgvector`, EU region (Frankfurt).
 - **Tailwind CSS** — design tokens live in `tailwind.config.js`.
 - Fonts (Fraunces / Inter / IBM Plex Mono) load from Google Fonts in `src/app/layout.jsx`.
+- **Sentry** (error monitoring) + **PostHog** (product analytics) — see `src/instrumentation.js`,
+  `src/instrumentation-client.js`, `sentry.server.config.js`, `sentry.edge.config.js`.
 
 Full reasoning for these choices: `docs/02-tech-stack.md`.
 
@@ -75,9 +82,12 @@ Full reasoning for these choices: `docs/02-tech-stack.md`.
 
 ```
 src/
+  instrumentation.js            loads Sentry per runtime; reports framework-level request errors
+  instrumentation-client.js     client-side Sentry init
   middleware.js                session refresh + invite-only auth gate
   app/
-    layout.jsx                 root layout, fonts, metadata
+    layout.jsx                 root layout, fonts, metadata, PostHogPageview
+    global-error.jsx            catches errors escaping the whole app shell, reports to Sentry
     globals.css                Tailwind + glass/HUD surface styles
     page.jsx                   protected home route — fetches wardrobe + conversation list
     AppShell.jsx                app shell, view routing, wardrobe + conversation state (client)
@@ -103,12 +113,14 @@ src/
     wardrobeImages.js           signs `wardrobe-photos` Storage paths into short-lived URLs
     profileImages.js            signs `avatars` Storage paths into short-lived URLs
     imageResize.js               client-side photo downscale before tag/upload
+    analytics.js                 PostHog init + track()/identifyUser(), safe no-op without a key
     look.js                     stylist piece -> wardrobe item shape (save-to-closet)
     iconMap.jsx                 garment-icon resolver
   data/seed.js                  static reference data (wardrobe categories)
   components/
     BottomBar.jsx                every control, one bar: home/new-chat, chat/wardrobe
                                  toggle, composer, history, share, account -> profile link (docs/09)
+    PostHogPageview.jsx          manual pageview capture (App Router nav isn't a full page load)
     Icons.jsx                   inline stroke icon set (no deps)
     auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/

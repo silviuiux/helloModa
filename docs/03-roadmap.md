@@ -14,7 +14,9 @@ effort; treat them as order-of-magnitude, not commitments.
   (`04-data-model.md`), wire up Supabase Auth (email + Google OAuth).
 - Deploy to Vercel behind a password gate or invite-only allowlist (low-profile posture —
   see `06-risks-legal.md`).
-- Wire Sentry + PostHog.
+- ✅ **Sentry + PostHog wired, 2026-09-20** (belatedly — this was a Phase 0 exit criterion that
+  had slipped): error monitoring and product analytics are in code and safe-no-op until real
+  project keys are set (`.env.local.example`). See the 2026-09-20 changelog entry.
 
 **Exit criteria:** You can sign up, log in, and see an empty wardrobe/chat shell running on
 real infra, privately.
