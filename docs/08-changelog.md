@@ -4,6 +4,19 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-20 — House visual style for generated images: watercolor + realistic detail
+
+Per direct request. `src/lib/imageGen.js` now appends a `STYLE_DIRECTIVE` string to every
+`heroPrompt` before it goes to Replicate — soft watercolor washes and paper texture in the scene
+and background, but the outfit itself (fabric, folds, fit) and the face/hands stay crisp and
+realistically detailed. Chose prompt-only styling over a watercolor-tuned LoRA for now — zero new
+infra, one string to edit and redeploy if the wording doesn't hold the look consistently across
+generations; the LoRA route is documented as the upgrade path in `docs/02-tech-stack.md` if
+prompt-only proves too inconsistent once you see real output (this sandbox can't reach
+`api.replicate.com` to preview it — spot-check once `REPLICATE_API_TOKEN` is live).
+
+---
+
 ## 2026-09-20 — Real outfit image generation (Replicate) — Phase 2
 
 Per direct request ("let's go with Replicate," token already in hand). `docs/02-tech-stack.md`
