@@ -17,9 +17,9 @@ both fixed in `src/lib/imageGen.js`:
 - Wording strengthened to explicitly say "NOT a photograph" up front — Flux's photorealism bias
   is strong enough that a soft "rendered as..." framing wasn't enough to override it.
 
-Not yet re-verified against a real generation (this sandbox still can't reach
-`api.replicate.com`) — next real generation is the actual test of whether this fixes it. If it
-still doesn't hold, the LoRA route documented in `02-tech-stack.md` is the next step up.
+**Verified against a real generation 2026-09-20 and accepted as-is** — still fairly subtle
+watercolor quality, but judged good enough; no further prompt tuning or LoRA needed for now.
+Revisit `STYLE_DIRECTIVE` again only if that judgment changes later.
 
 ---
 
