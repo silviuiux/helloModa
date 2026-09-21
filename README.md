@@ -20,7 +20,9 @@ category/color/brand, still editable; stored in the private `wardrobe-photos`
 Storage bucket). **Profile is real** (`/profile` — username, gender, avatar,
 measurements, sizes, style preferences, favorite/avoid brands) and actually
 feeds the stylist prompt (`formatProfileForPrompt`, `src/lib/stylist.js`),
-not just storage. "Shop" suggestions in chat
+not just storage. **`/outfits` is real** — past conversations as expandable rows (cover image =
+the conversation's most recent generated look, expand for its pieces), reached from the History
+dropdown's "View all outfits" link (`BottomBar.jsx`). "Shop" suggestions in chat
 are honest AI guesses with no fabricated price/retailer, since there's no
 real product catalog yet (Awin integration,
 `docs/05-integrations-affiliates.md`, on hold). **Wardrobe items are CLIP-embedded**
@@ -122,6 +124,8 @@ src/
     auth/callback/route.js      PKCE "code" exchange (OAuth, future)
     auth/confirm/route.js       "token_hash" confirmation (signup email link)
     profile/page.jsx            protected profile route — loads + signs the avatar
+    outfits/page.jsx             protected outfit-history route — past conversations as
+                                 expandable rows, cover image = last generated image per chat
     what-to-wear/page.jsx       public SEO guides index (not auth-gated)
     what-to-wear/[slug]/page.jsx public SEO guide detail, statically generated
     robots.js / sitemap.js      public-route-only crawl rules (Next file conventions)
@@ -132,7 +136,8 @@ src/
   actions/
     wardrobe.js                 Server Actions: add/toggle-favorite/remove wardrobe items
     profile.js                  Server Action: update profile (fields + avatar path)
-    conversations.js            Server Actions: list conversations, load a conversation's messages
+    conversations.js            Server Actions: list conversations, load a conversation's messages,
+                                 summarize each into an /outfits row (listOutfitHistory)
     auth.js                     Server Action: sign out
   lib/
     supabase/client.js          browser Supabase client
@@ -166,14 +171,19 @@ src/
       EmptyState.jsx             welcome screen: greeting, occasion cards, example prompts
       ChatView.jsx                message list only — sending lives in AppShell now
       MessageBubble.jsx           one turn: title, narrative, hero, quick replies, toolbar
-      OutfitHero.jsx               real generated outfit-in-scene image (calls /api/generate-image itself)
-      RecommendationCards.jsx     product grid, revealed via "Find items for this outfit"
+      OutfitHero.jsx               presentational hero image (GarmentArt fallback); generation
+                                   itself is src/lib/useOutfitImage.js, called from MessageBubble
+      RecommendationCards.jsx     product grid, revealed via "Find items for this outfit" —
+                                   also reused by outfits/OutfitHistoryRow.jsx
     wardrobe/
       WardrobeView.jsx            grid, search, category filters
       WardrobeItemCard.jsx        item tile (favorite / remove)
       AddItemModal.jsx            add a piece — photo picker + AI tagging, or manual fields
     profile/
       ProfileForm.jsx              username/gender/avatar/measurements/sizes/style/brands
+    outfits/
+      OutfitHistoryList.jsx        /outfits page shell — header, per-row local "saved" state
+      OutfitHistoryRow.jsx         one past conversation: cover image, title, expand for pieces
     guides/
       GuideLayout.jsx               shared chrome for /what-to-wear pages (not AppShell)
       GuideHeroImage.jsx             real generated image, falls back to GarmentArt illustration

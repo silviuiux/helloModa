@@ -4,6 +4,34 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — New `/outfits` page: past conversations as a cover-image list
+
+Per a supplied mockup ("myOutfit"): a dedicated page for browsing past conversations, each
+shown as a row — cover image, title, short narrative, expand for the outfit's pieces — instead
+of only being reachable through the small conversation-switcher dropdown.
+
+- `listOutfitHistory()` (`src/actions/conversations.js`) — one row per conversation, summarized
+  by its **most recent** `outfit_recommendation` (the one whose `generated_image_url` becomes
+  the row's cover photo). Extracted the item-mapping logic `getConversationMessages` already had
+  into a shared `mapRecommendationItem()` helper rather than duplicating it. A conversation with
+  no recommendation yet (abandoned before a reply landed) is skipped — nothing to show.
+- `src/app/outfits/page.jsx` + `src/components/outfits/{OutfitHistoryList,OutfitHistoryRow}.jsx`
+  — a standalone protected route (same pattern as `/profile`, not part of `AppShell`'s view
+  switching). Cover image uses the same `rounded-bubble`/3:2 language as the chat hero image,
+  since it's literally the same generated asset. Expanding a row reuses `RecommendationCards.jsx`
+  as-is for the pieces grid — same component chat already uses behind "Find Outfit."
+- **Saving a piece to wardrobe from this page is session-only feedback**, not a real toggle
+  against existing wardrobe state (this route has no shared client wardrobe state to check
+  against, unlike `AppShell`) — clicking the heart fires `addWardrobeItem()` and flips local
+  state optimistically. Mirrors a simplification the chat view already had (`ChatView.jsx`'s
+  `savedIds`, scoped to one session), not a new inconsistency.
+- **Entry point**: a "View all outfits" link inside the existing History dropdown
+  (`BottomBar.jsx`) rather than a new bottom-bar icon — the bar's icon budget is already
+  documented as tight (`docs/09-conversation-design.md`), and this keeps the change reversible/
+  low-risk. Worth revisiting if this page turns out to want more prominent placement.
+
+---
+
 ## 2026-09-21 — Large top whitespace above the greeting
 
 `EmptyState.jsx`'s top padding changed from `py-10 sm:py-16` (~40-64px) to `pt-[33vh]` (top only —

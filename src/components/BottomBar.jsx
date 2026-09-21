@@ -118,6 +118,14 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
               ))
             )}
           </div>
+          <Link
+            href="/outfits"
+            onClick={close}
+            className="mt-1 flex w-full items-center gap-1.5 rounded-xl px-3 py-2.5 text-left text-[13px] text-muted transition-colors hover:bg-white/60 hover:text-ink"
+          >
+            <Hanger size={14} />
+            View all outfits
+          </Link>
         </>
       )}
     </Dropdown>
