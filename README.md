@@ -9,6 +9,14 @@ Start at `docs/00-overview.md`.
 
 ## Status
 
+**`/` now has a real public marketing landing page** (`src/app/LandingPage.jsx`, signed-out
+visitors only — signed-in users still land straight in the real app at the same path). Hero,
+"how it works," an interactive scripted chat demo (`LandingChatDemo.jsx` — a real turn's exact
+copy, replayed client-side with no `/api/chat` or Replicate calls, safe and free for anonymous
+traffic), a feature grid, and a CTA to `/register`. Scroll-reveal via a hand-rolled
+`IntersectionObserver` wrapper (`landing/Reveal.jsx`), not a new animation dependency. `/`, and
+only the exact root, is now crawlable too (`robots.js`, `sitemap.js`).
+
 Phase 0 (Foundations) done; Phase 1 (`docs/03-roadmap.md`) underway. Real
 Next.js + Supabase infra: auth, database, RLS. **Chat is real** — `POST
 /api/chat` calls Claude (`claude-opus-5`) with structured output, persisted
@@ -117,7 +125,10 @@ src/
     layout.jsx                 root layout, fonts, metadata, PostHogPageview
     global-error.jsx            catches errors escaping the whole app shell, reports to Sentry
     globals.css                Tailwind + glass/HUD surface styles
-    page.jsx                   protected home route — fetches wardrobe + conversation list
+    page.jsx                   "/" — signed-out: renders LandingPage.jsx; signed-in: the real
+                                 app, fetches wardrobe + conversation list
+    LandingPage.jsx              public marketing page (signed-out visitors only) — hero, how-it-
+                                 works, an interactive scripted chat demo, feature grid, CTA
     AppShell.jsx                app shell, view routing, wardrobe + conversation state (client)
     login/page.jsx              email + password sign-in
     register/page.jsx           email + password sign-up
@@ -191,6 +202,9 @@ src/
       GuideLayout.jsx               shared chrome for /what-to-wear pages (not AppShell)
       GuideHeroImage.jsx             real generated image, falls back to GarmentArt illustration
       GuideShowcase.jsx              "See it in helloModa" — styled like a real chat turn
+    landing/
+      Reveal.jsx                    hand-rolled IntersectionObserver scroll-reveal (no new dep)
+      LandingChatDemo.jsx            scripted chat replay (no real API calls) for LandingPage.jsx
 ```
 
 ## Design language

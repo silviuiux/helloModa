@@ -49,8 +49,16 @@ export async function updateSession(request) {
   const path = request.nextUrl.pathname;
   const isAuthRoute =
     path.startsWith("/login") || path.startsWith("/register") || path.startsWith("/auth");
+  // "/" is public too, 2026-09-21 — a signed-out visit renders the marketing
+  // LandingPage (src/app/page.jsx branches on `user`) instead of bouncing to
+  // /login; a signed-in visit still renders the real app at the same path,
+  // unchanged. Scoped to exactly "/" (not startsWith) so nothing else on
+  // the authenticated app leaks out.
   const isPublicMarketingRoute =
-    path.startsWith("/what-to-wear") || path === "/robots.txt" || path === "/sitemap.xml";
+    path.startsWith("/what-to-wear") ||
+    path === "/robots.txt" ||
+    path === "/sitemap.xml" ||
+    path === "/";
   // Cron-triggered API routes carry no user session by nature (Vercel Cron
   // doesn't send cookies) and do their own auth via a bearer secret checked
   // inside the route itself (see src/app/api/cron/*/route.js) — redirecting

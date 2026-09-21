@@ -2,15 +2,22 @@ import { createClient } from "@/lib/supabase/server";
 import { listConversations } from "@/actions/conversations";
 import { signWardrobeItems } from "@/lib/wardrobeImages";
 import AppShell from "./AppShell.jsx";
+import LandingPage from "./LandingPage.jsx";
 
-// Auth is already enforced by middleware (src/middleware.js) — an unauthenticated
-// request never reaches here. This just loads the signed-in user's real data.
+// "/" is public now (src/lib/supabase/middleware.js, 2026-09-21) — a
+// signed-out visit renders the marketing LandingPage instead of being
+// redirected to /login. A signed-in visit still gets the real app below,
+// unchanged.
 export default async function HomePage() {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    return <LandingPage />;
+  }
 
   const { data: wardrobe, error } = await supabase
     .from("wardrobe_items")

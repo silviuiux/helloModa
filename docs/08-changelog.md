@@ -4,6 +4,52 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Public marketing landing page at "/"
+
+Per direct request: a real landing page for signed-out visitors, in the same visual language as
+the app, with an interactive demo and scroll animations — not just the invite-only login wall
+that used to be the first thing anyone unauthenticated saw at every route.
+
+**Two decisions confirmed before building, both taken as given**:
+1. **Routing stays minimal-touch**: `/` is the only thing that changes. Signed-out → the new
+   `LandingPage.jsx`. Signed-in → the exact same real app as before, same path, nothing moved.
+   No new `/app` route, no changed Home-icon link, no touched post-login redirect.
+2. **The embedded chat demo is scripted, not live**: zero real API calls, zero cost per
+   pageview, no new unauthenticated surface on `/api/chat` — given the app's invite-only/
+   private-beta posture (`docs/06-risks-legal.md`), letting anonymous visitors trigger real
+   Claude + Replicate calls was a real risk, not a detail.
+
+**What shipped**:
+- `src/lib/supabase/middleware.js` — `/` added to the public-route allowlist (exact match, not
+  `startsWith`, so no authenticated sub-path leaks through). `src/app/page.jsx` now branches:
+  no `user` → `<LandingPage />`; otherwise the existing wardrobe/conversation-loading logic,
+  unchanged.
+- `src/app/LandingPage.jsx` — hero (script-font headline, dual CTA), a 3-step "how it works"
+  using `GarmentArt` illustrations, the live demo section, a 4-item feature grid, closing CTA,
+  footer matching `GuideLayout.jsx`'s existing public-page chrome.
+- `src/components/landing/LandingChatDemo.jsx` — reuses the real `MessageBubble.jsx` component
+  (not a mockup of it) with scripted turn data, so the demo looks exactly like the product.
+  Visitor taps an occasion chip → a real user bubble appears → `ThinkingLine` for ~1.1s → the
+  scripted AI turn renders. A turn with no `recommendationId`/`heroPrompt` never triggers
+  `useOutfitImage`'s fetch, so this is genuinely inert, not just rate-limited — verified by
+  reading the hook, not assumed. "Rooftop after dark" copy is lifted near-verbatim from a real
+  turn the product actually generated (screenshot supplied same day); the second script written
+  to match that voice, not invented from nothing.
+- `src/components/landing/Reveal.jsx` — scroll-reveal via `IntersectionObserver` + the existing
+  `animate-fade-up` keyframe (`tailwind.config.js`), not a new animation dependency — matches
+  this codebase's established no-dependency-UI preference. Respects `prefers-reduced-motion`
+  (skips the animation, shows immediately, rather than forcing motion on someone who opted out).
+- `robots.js`/`sitemap.js` updated — `/` (exact root, `"/$"` anchor, not a blanket allow) is now
+  crawlable and in the sitemap alongside `/what-to-wear`; every authenticated route stays
+  disallowed exactly as before.
+- **Verified live, not just built**: since `/` is genuinely public now, this was the first UI
+  change all session actually screenshot-testable end-to-end in this sandbox (no invite-only
+  gate in the way) — confirmed the redirect no longer fires (`200`, not `302` to `/login`), the
+  demo's tap-to-reply interaction actually works, and the GarmentArt fallback renders correctly
+  for the (not-yet-generated) demo images.
+
+---
+
 ## 2026-09-21 — Smooth-scroll the chat thread instead of snapping
 
 `ChatView.jsx`'s auto-scroll-to-bottom (`el.scrollTop = el.scrollHeight`, instant) read as a
