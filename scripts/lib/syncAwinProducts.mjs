@@ -5,6 +5,7 @@
 // every advertiser, since Awin's "Create-a-Feed" output columns are the same
 // shape regardless of merchant.
 
+import { gunzipSync } from "node:zlib";
 import { createClient } from "@supabase/supabase-js";
 import { embedImageUrl, embedText } from "../../src/lib/embeddings.js";
 
@@ -118,7 +119,23 @@ export async function syncAwinProducts({ retailer, feedUrl, limit }) {
   console.log(`[${retailer}] fetching feed...`);
   const res = await fetch(feedUrl);
   if (!res.ok) throw new Error(`Feed fetch failed: ${res.status} ${res.statusText}`);
-  const text = await res.text();
+  const buffer = Buffer.from(await res.arrayBuffer());
+
+  // Awin's Create-a-Feed always compresses (gzip or zip, no "none" option).
+  // fetch() doesn't auto-decompress this — it's a downloadable file, not
+  // HTTP transport-encoding — so detect it ourselves via the gzip magic
+  // bytes (1f 8b) rather than trusting the compression setting was gzip.
+  // Zip isn't handled (multi-entry archive, needs a real zip lib) — if the
+  // feed was generated with zip compression, regenerate it with gzip.
+  const isGzip = buffer.length > 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
+  const isZip = buffer.length > 2 && buffer[0] === 0x50 && buffer[1] === 0x4b;
+  if (isZip) {
+    throw new Error(
+      "Feed is zip-compressed, which this script doesn't unpack — regenerate the feed in " +
+        "Awin's Create-a-Feed tool with Compression Type set to gzip instead."
+    );
+  }
+  const text = (isGzip ? gunzipSync(buffer) : buffer).toString("utf8");
 
   let rows = parseDelimited(text);
   if (limit) rows = rows.slice(0, limit);
