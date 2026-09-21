@@ -20,6 +20,7 @@ export default function ChatView({
   userDisplayName,
 }) {
   const scrollRef = useRef(null);
+  const prevCountRef = useRef(0);
 
   const savedIds = new Set(
     wardrobe
@@ -27,9 +28,19 @@ export default function ChatView({
       .map((it) => it.id.slice("saved-".length))
   );
 
+  // Smooth-animate the common case (a message or the thinking indicator was
+  // just added/removed during a live session — exactly one at a time), but
+  // jump instantly when a whole conversation loads at once (switching in
+  // BottomBar's history dropdown, or via /outfits — see
+  // ConversationFromQuery.jsx): animating a long scroll through history
+  // someone didn't just write would look worse, not better. Direct request
+  // 2026-09-21 — the instant jump on every send/reply read as jarring.
   useEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    const isBulkLoad = Math.abs(messages.length - prevCountRef.current) > 1;
+    prevCountRef.current = messages.length;
+    el.scrollTo({ top: el.scrollHeight, behavior: isBulkLoad ? "auto" : "smooth" });
   }, [messages, thinking]);
 
   function handleToggleSave(piece) {

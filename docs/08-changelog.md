@@ -4,6 +4,19 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Smooth-scroll the chat thread instead of snapping
+
+`ChatView.jsx`'s auto-scroll-to-bottom (`el.scrollTop = el.scrollHeight`, instant) read as a
+jarring jump every time a message sent or a reply landed. Switched to `el.scrollTo({ ...,
+behavior: "smooth" })`, but only for the live case — a new `prevCountRef` distinguishes "one
+message/thinking-indicator just changed during this session" (smooth) from "a whole
+conversation just loaded at once" (`isBulkLoad`, `Math.abs(messages.length -
+prevCountRef.current) > 1` — history-dropdown switch or `/outfits` deep link via
+`ConversationFromQuery.jsx`), which still jumps instantly — animating a long scroll through
+history someone didn't just write would look worse, not better, not what was asked for.
+
+---
+
 ## 2026-09-21 — Occasion carousel: 20 cards, real-image pipeline, full-bleed sizing
 
 Expanded the home-screen carousel from 7 hardcoded cards to **20**, moved into
