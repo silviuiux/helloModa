@@ -27,8 +27,10 @@ the `/what-to-wear` guides already have:
 - **Full-bleed carousel row + bigger cards**: the cards row is no longer wrapped in
   `EmptyState.jsx`'s `max-w-content` container (that still wraps the greeting text and the
   example-prompt chips) — it's a full-width sibling instead, so scrolling reveals cards
-  edge-to-edge rather than stopping at the centered content column. Card width is `44vw`
-  (`100/2.25`), sized so roughly 2.25 cards fit the viewport width — both direct requests.
+  edge-to-edge rather than stopping at the centered content column. Card width corrected
+  same-day: "2.25 cards" meant filling `max-w-content` (1160px) specifically, not the full
+  viewport — `(1160px - 16px gap) / 2.25 ≈ 508px` fixed width at `sm`+, `78vw` below it (a fixed
+  508px card would dwarf a phone screen; single-dominant-card reads better there anyway).
 
 ---
 
