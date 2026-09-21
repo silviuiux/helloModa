@@ -4,6 +4,43 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Chat turn redesign: layout, corner language, aspect ratio, script font
+
+Per a supplied mockup, reworked `MessageBubble.jsx`'s AI-turn layout and the visual language
+around it:
+
+- **Layout**: title + narrative now render full-width at the top of a turn (previously
+  side-by-side with the hero image), followed by the hero image + a right-aligned actions
+  column (thumbs up/down, "Retry", "Find Outfit") once ready, then quick-reply chips.
+- **New "thinking" behavior**: image generation used to show its own "Generating…" badge inside
+  a placeholder box. Split image-generation state out of `OutfitHero.jsx` into a new hook,
+  `src/lib/useOutfitImage.js` — `MessageBubble` now shows the existing `ThinkingLine` (cycling
+  fashion-flavored phrases) as its own line while the image is in flight, and only reveals the
+  image + actions row once generation settles (ready or failed). `OutfitHero.jsx` is now purely
+  presentational (just `imageUrl` in, `<img>` or the `GarmentArt` fallback out).
+- **Hero image aspect ratio**: `4:5` (portrait) → `3:2` (landscape), matching the mockup.
+  Scoped to the chat hero image only — wardrobe/recommendation-card tiles and the `/what-to-wear`
+  guide images keep their existing ratios, different content, not shown in the mockup.
+- **Corner language — new `rounded-bubble` token** (`tailwind.config.js`,
+  `border-radius: 128px 128px 128px 0px`): every corner rounded except bottom-left, which stays
+  square as a chat-bubble "tail." At typical element sizes 128px exceeds half the box, so it
+  just reads as fully rounded on the open corners. Applied to the user message bubble, the hero
+  image, the Retry/Find Outfit buttons, and quick-reply chips — scoped to the chat turn itself,
+  not applied sitewide (wardrobe cards, guides, auth pages, etc. keep their existing radii;
+  wasn't asked for and risks an unreviewed visual change everywhere).
+- **Script font swap**: Bonheur Royale → **Mr De Haviland**, changed once in
+  `tailwind.config.js`'s `fontFamily.script` (+ the Google Fonts `<link>` in `layout.jsx`) so
+  every existing `font-script` usage — chat turn titles, `ThinkingLine`, the `/what-to-wear`
+  guide pull-quotes and showcase heading — picks it up automatically, no per-component edits.
+- Added `ThumbsUp`/`ThumbsDown` to `Icons.jsx` (previously only a `Heart` "Love" icon existed,
+  used for a different purpose — saving to wardrobe — elsewhere in the app).
+- **Not visually verified end-to-end**: this sandbox can't reach Google Fonts (egress policy) or
+  sign in past the invite-only gate, so the actual rendered chat turn — including whether Mr De
+  Haviland loads correctly — needs a real check once deployed, not just taken on faith from the
+  build passing.
+
+---
+
 ## 2026-09-21 — Fixed: invite-only auth gate was swallowing the cron route
 
 Caught immediately while testing the cron endpoint above with a live curl: the

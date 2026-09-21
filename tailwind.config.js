@@ -32,7 +32,7 @@ export default {
       },
       fontFamily: {
         display: ['Fraunces', 'Iowan Old Style', 'Georgia', 'serif'],
-        script: ['"Bonheur Royale"', 'cursive'],
+        script: ['"Mr De Haviland"', 'cursive'],
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
@@ -46,6 +46,12 @@ export default {
       borderRadius: {
         xl2: "20px",
         xl3: "28px",
+        // Chat "speech bubble" corner: rounded everywhere except the
+        // bottom-left, which stays square as a tail/anchor point. Used on
+        // chat bubbles, the outfit hero photo, and in-chat buttons/chips —
+        // at typical element sizes 128px is larger than half the box, so it
+        // just reads as "fully rounded" on the three open corners.
+        bubble: "128px 128px 128px 0px",
       },
       boxShadow: {
         panel: "0 1px 2px rgba(43,40,64,0.04), 0 18px 44px -22px rgba(43,40,64,0.26)",

@@ -125,6 +125,20 @@ export const Check = (p) => (
   </Svg>
 );
 
+export const ThumbsUp = (p) => (
+  <Svg {...p}>
+    <path d="M8 20V10l4.5-6.2c.6-.8 1.9-.3 1.9.7v4h5a2 2 0 0 1 1.9 2.7l-2.4 7a2 2 0 0 1-1.9 1.3H8Z" />
+    <path d="M8 10H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" />
+  </Svg>
+);
+
+export const ThumbsDown = (p) => (
+  <Svg {...p}>
+    <path d="M16 4v10l-4.5 6.2c-.6.8-1.9.3-1.9-.7v-4h-5a2 2 0 0 1-1.9-2.7l2.4-7A2 2 0 0 1 6.9 4H16Z" />
+    <path d="M16 14h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3" />
+  </Svg>
+);
+
 export const Refresh = (p) => (
   <Svg {...p}>
     <path d="M5 8.5h5v-5" />
