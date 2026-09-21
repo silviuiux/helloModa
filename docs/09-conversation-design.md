@@ -15,10 +15,15 @@ interchangeable product cards. A turn has:
 
 1. **Title** — a short (1–4 word) evocative phrase, e.g. "Vineyard wedding,"
    "Chic direction," "West coast ease." Rendered in a script/handwritten
-   display face (`font-script`, currently **Mr De Haviland**, free on Google
-   Fonts, swapped 2026-09-21 from an earlier Bonheur Royale stand-in by
-   direct request — swap the `script` token in `tailwind.config.js` again if
-   the brand face ever changes), large, as the turn's visual anchor. This is
+   display face (`font-script`, currently **Yuyu Short**, free on Google
+   Fonts — swapped 2026-09-21, twice: Bonheur Royale → Mr De Haviland →
+   Yuyu Short, each by direct request; swap the `script` token in
+   `tailwind.config.js` again if the brand face changes further). **Yuyu
+   Short's lowercase glyphs render as slim uppercase-style caps** (it's
+   designed that way, not a bug) — worth a visual check against real
+   lowercase titles like "vineyard wedding" once deployed, since this
+   project's copy is lowercase-first. Large, as the turn's visual anchor.
+   This is
    the *only* place the script face is used now — the "thinking" line
    (below) was moved to the body font 2026-09-21, since a cursive face reads
    badly at small status-text sizes.

@@ -4,6 +4,19 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Script font: Mr De Haviland → Yuyu Short
+
+Another direct swap of the `script` token (`tailwind.config.js` + the Google Fonts `<link>` in
+`layout.jsx`) — third one today (Bonheur Royale → Mr De Haviland → Yuyu Short). Confirmed via
+web search that Yuyu Short is a real, free Google Font (this sandbox can't reach fonts.google.com
+directly to verify visually) since a wrong/typo'd family name would silently fall back to the
+generic `cursive` browser default with no error. **Worth a visual check once deployed**: Yuyu
+Short's lowercase glyphs render as slim uppercase-style caps by design, and this project's
+titles are lowercase-first ("vineyard wedding," "hello, Horia") — may or may not read the way
+it's intended at a glance.
+
+---
+
 ## 2026-09-21 — Persistent hero + reversed chat bubble convention
 
 Per a supplied mockup, two more changes to the chat experience (`docs/09-conversation-design.md`
