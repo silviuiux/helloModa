@@ -9,13 +9,21 @@ Start at `docs/00-overview.md`.
 
 ## Status
 
-**`/` now has a real public marketing landing page** (`src/app/LandingPage.jsx`, signed-out
-visitors only — signed-in users still land straight in the real app at the same path). Hero,
-"how it works," an interactive scripted chat demo (`LandingChatDemo.jsx` — a real turn's exact
-copy, replayed client-side with no `/api/chat` or Replicate calls, safe and free for anonymous
-traffic), a feature grid, and a CTA to `/register`. Scroll-reveal via a hand-rolled
-`IntersectionObserver` wrapper (`landing/Reveal.jsx`), not a new animation dependency. `/`, and
-only the exact root, is now crawlable too (`robots.js`, `sitemap.js`).
+**`/` is a real public marketing landing page** (`src/app/LandingPage.jsx`, signed-out visitors
+only — signed-in users still land straight in the real app at the same path). Editorial
+scrollytelling: an asymmetric product-forward hero, a trust band of true product facts, and a
+**pinned five-step stage** (`landing/StickyStage.jsx`) where the product stays fixed and the
+surface itself changes as you scroll — occasion → closet → look → gap → history. Plus a
+full-bleed marquee of the real 20 occasions, craft "specimen" cards, an interactive scripted
+chat demo (`LandingChatDemo.jsx` — real turn copy, replayed client-side with no `/api/chat` or
+Replicate calls, so it's free and safe for anonymous traffic), and one primary CTA per viewport.
+All motion is hand-rolled `IntersectionObserver`/rAF (`landing/Reveal.jsx`,
+`lib/useScrollProgress.js`) — no animation dependency. `/`, and only the exact root, is
+crawlable (`robots.js`, `sitemap.js`).
+
+Large image slots use `landing/EditorialPlate.jsx`: real generated photography when
+`public/occasions/{slug}-hero.jpg` exists, otherwise a composed colour-story plate — so the page
+looks finished today and upgrades itself the moment `scripts/generate-occasion-images.mjs` runs.
 
 Phase 0 (Foundations) done; Phase 1 (`docs/03-roadmap.md`) underway. Real
 Next.js + Supabase infra: auth, database, RLS. **Chat is real** — `POST
@@ -204,6 +212,11 @@ src/
       GuideShowcase.jsx              "See it in helloModa" — styled like a real chat turn
     landing/
       Reveal.jsx                    hand-rolled IntersectionObserver scroll-reveal (no new dep)
+      StickyStage.jsx                scrollytelling centrepiece — pinned product, 5 scroll steps
+      StageVisuals.jsx               the 5 scenes that play inside the pinned stage
+      EditorialPlate.jsx             hero-scale image slot: real photo, else a composed plate
+      OccasionMarquee.jsx            full-bleed marquee of the real 20 occasions
+      DetailHighlights.jsx           craft specimens (corner geometry, type, fallback, style)
       LandingChatDemo.jsx            scripted chat replay (no real API calls) for LandingPage.jsx
 ```
 

@@ -74,10 +74,17 @@ export default {
           "70%": { boxShadow: "0 0 0 7px rgba(25,163,107,0)" },
           "100%": { boxShadow: "0 0 0 0 rgba(25,163,107,0)" },
         },
+        // Landing-page occasion marquee — the track renders its children
+        // twice, so -50% lands exactly on the seam and loops invisibly.
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.5s cubic-bezier(0.2,0.7,0.2,1) both",
         "pulse-dot": "pulse_dot 2.4s infinite",
+        marquee: "marquee 90s linear infinite",
       },
     },
   },

@@ -85,20 +85,27 @@ const ALIAS = {
   jewelry: "accessory",
 };
 
-export default function GarmentArt({ type = "top", className = "" }) {
+// `bare` drops the gradient plate and light spot and renders only the
+// silhouette, for callers that supply their own background — see
+// landing/EditorialPlate.jsx, which layers several silhouettes over one
+// shared colour story. `strength` scales the ink so a silhouette can read
+// at hero scale without being repainted.
+export default function GarmentArt({ type = "top", className = "", bare = false, strength = 1 }) {
   const key = SHAPES[type] ? type : ALIAS[type] || "top";
   const [a, b] = GRADIENTS[key] || GRADIENTS.top;
 
   return (
     <div
       className={`relative h-full w-full overflow-hidden ${className}`}
-      style={{ background: `linear-gradient(150deg, ${a} 0%, ${b} 100%)` }}
+      style={bare ? undefined : { background: `linear-gradient(150deg, ${a} 0%, ${b} 100%)` }}
     >
-      {/* soft light spot for depth */}
-      <div
-        className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full opacity-50"
-        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)" }}
-      />
+      {!bare && (
+        /* soft light spot for depth */
+        <div
+          className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full opacity-50"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)" }}
+        />
+      )}
       <svg
         viewBox="0 0 120 160"
         className="absolute inset-0 m-auto h-[78%] w-[78%]"
@@ -107,15 +114,15 @@ export default function GarmentArt({ type = "top", className = "" }) {
       >
         <g
           style={{
-            fill: "rgba(70,66,96,0.14)",
+            fill: `rgba(70,66,96,${0.14 * strength})`,
           }}
         >
           {SHAPES[key]}
         </g>
         <style>{`
-          svg .stroke{ fill:none; stroke:rgba(70,66,96,0.22); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+          svg .stroke{ fill:none; stroke:rgba(70,66,96,${0.22 * strength}); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
           svg .nofill{ fill:none; }
-          svg .dot{ fill:rgba(70,66,96,0.24); }
+          svg .dot{ fill:rgba(70,66,96,${0.24 * strength}); }
         `}</style>
       </svg>
     </div>

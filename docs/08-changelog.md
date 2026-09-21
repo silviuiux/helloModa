@@ -4,6 +4,71 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Landing page redesign: editorial scrollytelling
+
+Second pass at `/`, replacing the centre-stacked first version. Brief: clean, modern,
+scroll-driven, editorial, big pictures, attention-to-detail highlights, SaaS conversion best
+practice.
+
+**Direction.** "Editorial atelier" — helloModa's own light/warm/lavender identity and script
+display face, composed with editorial-spread discipline. The `silviu-taste` skill was loaded and
+is dark-first, anti-purple-gradient and anti-script-font, which is the exact inverse of this
+brand; it allows light as a deliberate editorial exception and script "where the project demands
+it," which this one does (three separate font directives today). So the *palette and voice* stayed
+helloModa's and the *structure* came from the skill: typographic authority, monospaced data
+labels, asymmetric splits instead of centre stacks, uneven bento spans, 140px+ section rhythm,
+glass materiality, IntersectionObserver motion rather than an animation library.
+
+**Conversion structure**, grounded in current practice rather than memory (one web search, see
+that turn): exactly one primary action per viewport — the secondary path is a text link, not a
+competing button, which the first version got wrong; trust signals before the first feature; real
+product UI rather than illustration; one story unfolding on scroll instead of unrelated sections.
+The trust band is four *true* product facts (20 occasions, one look per turn, EU/Frankfurt, no
+invented prices) — no fabricated logos, testimonials or metrics, because there aren't any.
+
+**New pieces:**
+- `src/lib/useScrollProgress.js` — rAF-throttled 0..1 progress of an element through the
+  viewport, the engine for the pinned section.
+- `landing/StickyStage.jsx` — the centrepiece. A five-step narrative (occasion → closet → look →
+  gap → history) where the product stays pinned and the *surface itself changes* per step.
+  Desktop pins; below `sm` it degrades to a stacked sequence, since pinned scrollytelling fights
+  a phone's scroll. Both branches render from one `STEPS` array so the story can't drift.
+- `landing/StageVisuals.jsx` — the five scenes, mirroring real product surfaces.
+- `landing/EditorialPlate.jsx` — **the fix for the "big pictures" problem.** `GarmentArt` was
+  drawn for small square cards; blown up to a hero slot it letterboxes one faint silhouette into
+  an effectively empty gradient, which was exactly what the first screenshot showed. Large slots
+  now get a composed plate: a real colour story, overlapping silhouettes at editorial scale,
+  light blooms, grain, swatches. Openly illustration rather than a fake photo, and it swaps
+  itself for real photography the moment `public/occasions/{slug}-hero.jpg` exists.
+- `landing/OccasionMarquee.jsx` — full-bleed, driven by the real `occasions` dataset so it can't
+  drift from what the product actually covers.
+- `landing/DetailHighlights.jsx` — the "attention to details" ask, as *specimens rather than
+  bullets*: the corner geometry demoed with two real bubbles and annotation rules, the three type
+  faces shown side by side, the real fallback tiles, the house-style directive.
+- `GarmentArt.jsx` gained `bare` + `strength` props so `EditorialPlate` could layer silhouettes
+  over a shared background — a small real API instead of reaching into its internals with an
+  arbitrary-variant CSS hack, which would have broken silently the next time that component moved.
+
+**Three real bugs caught by actually looking at it, not by the build passing:**
+1. `overflow-x-hidden` on the page root **silently broke `position: sticky`** — it makes the
+   element a scroll container, so the pinned stage just scrolled away and left ~4000px of empty
+   page. Now `overflow-x-clip`, which contains the hero's overhanging bubble without creating a
+   scroll box.
+2. The 128px `rounded-bubble` corner was applied to 150–210px tiles, where it stops reading as a
+   corner and collapses the tile into a blob. Small tiles now use `rounded-xl2`, which is also
+   what the real `WardrobeItemCard`/`RecommendationCards` use — so this is more faithful, not
+   less. The marquee tiles went to 300px so the real corner reads properly.
+3. Below `sm` the frame's 128px corner curved through the scene labels; the frame drops to
+   `rounded-xl3` there.
+
+**Process note:** running `npm run build` while `next dev` was live clobbered the shared `.next`
+and produced a 137,000px-tall garbage render, and separately a stale `next-server` from earlier
+was squatting port 3000 while dev sat on 3001 — so several "verification" screenshots were of a
+dead server. Both are the same trap this changelog already flagged once. Build with dev stopped;
+check the port the dev server actually printed.
+
+---
+
 ## 2026-09-21 — Public marketing landing page at "/"
 
 Per direct request: a real landing page for signed-out visitors, in the same visual language as
