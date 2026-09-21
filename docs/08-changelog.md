@@ -4,6 +4,34 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Occasion carousel: 20 cards, real-image pipeline, full-bleed sizing
+
+Expanded the home-screen carousel from 7 hardcoded cards to **20**, moved into
+`src/data/occasions.js` (same pattern as `src/data/guides.js` — `heroImagePrompt` per entry,
+picked up by a new generation script) and wired up the same real-image-with-fallback pipeline
+the `/what-to-wear` guides already have:
+
+- **`src/components/ImageWithFallback.jsx`** — extracted the hydration-race-safe image/fallback
+  logic `GuideHeroImage.jsx` already had (deferring `src` to a client-only effect — see that
+  file's original comment for why) into a shared component, so it's not reinvented a third time.
+  `GuideHeroImage.jsx` now just wraps it; `EmptyState.jsx`'s cards use it directly.
+- **`scripts/generate-occasion-images.mjs`** — near-identical to `generate-guide-images.mjs`,
+  reads `occasions.js`, writes `public/occasions/{slug}-hero.jpg`. Not run here (same Replicate
+  reachability limits as the guide-image script) — the user runs it locally.
+- **Caught while wiring this up**: `generateOutfitImage()` (`src/lib/imageGen.js`) had a
+  **hardcoded `aspect_ratio: "3:2"`** left over from fixing the chat-hero-image crop mismatch
+  the same day — every caller got landscape, including the *portrait* guide-image script, which
+  would have silently cropped the next `--force` regeneration. Fixed by making `aspectRatio` a
+  required parameter instead of a hardcoded value: `/api/generate-image` passes `"3:2"`,
+  `generate-guide-images.mjs` and the new `generate-occasion-images.mjs` pass `"4:5"`.
+- **Full-bleed carousel row + bigger cards**: the cards row is no longer wrapped in
+  `EmptyState.jsx`'s `max-w-content` container (that still wraps the greeting text and the
+  example-prompt chips) — it's a full-width sibling instead, so scrolling reveals cards
+  edge-to-edge rather than stopping at the centered content column. Card width is `44vw`
+  (`100/2.25`), sized so roughly 2.25 cards fit the viewport width — both direct requests.
+
+---
+
 ## 2026-09-21 — History icon: hover previews, click opens /outfits; cards deep-link into chat
 
 Three follow-ups to yesterday's `/outfits` page, all direct requests:

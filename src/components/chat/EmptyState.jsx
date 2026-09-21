@@ -2,50 +2,8 @@
 
 import { useState } from "react";
 import GarmentArt from "../GarmentArt.jsx";
-
-// Occasion examples tied to the actual GTM wedge (business plan's "Wedding
-// Guest" launch niche + adjacent high-intent moments) — not arbitrary demo
-// content. See docs/09-conversation-design.md. 7 candidates, shuffled on
-// each mount (see shuffle() below) so returning users don't see the same
-// static 3 every time, shown in a horizontally-scrollable carousel rather
-// than a wrapped grid so all 7 stay reachable regardless of viewport width.
-const OCCASION_CARDS = [
-  {
-    type: "dress",
-    label: "Wedding guest",
-    prompt: "I'm attending a vineyard wedding in June — smart casual, outdoors.",
-  },
-  {
-    type: "outerwear",
-    label: "Black-tie event",
-    prompt: "I have a black-tie gala this weekend, help me find something.",
-  },
-  {
-    type: "bottoms",
-    label: "Big interview",
-    prompt: "I have a first-round interview at a tech company next week.",
-  },
-  {
-    type: "top",
-    label: "First date",
-    prompt: "First date this Friday — something comfortable but considered.",
-  },
-  {
-    type: "accessory",
-    label: "Summer festival",
-    prompt: "Heading to an outdoor music festival this summer, need an outfit.",
-  },
-  {
-    type: "shoe",
-    label: "Weekend brunch",
-    prompt: "Casual brunch with old friends this weekend — comfortable but put-together.",
-  },
-  {
-    type: "bag",
-    label: "Weekend trip",
-    prompt: "Packing for a long weekend trip — versatile pieces that mix and match.",
-  },
-];
+import ImageWithFallback from "../ImageWithFallback.jsx";
+import { occasions } from "../../data/occasions.js";
 
 const EXAMPLE_PROMPTS = [
   "What should I wear to a black-tie gala?",
@@ -75,27 +33,40 @@ function shuffle(arr) {
 
 export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
   const name = userDisplayName || firstNameFromEmail(userEmail);
-  // Lazy initializer — shuffles once per mount, not on every render.
-  const [cards] = useState(() => shuffle(OCCASION_CARDS));
+  // Lazy initializer — shuffles once per mount, not on every render. All 20
+  // occasions (src/data/occasions.js) render, just reordered, same as the
+  // original 7-card version — the carousel scrolls, nothing is dropped.
+  const [cards] = useState(() => shuffle(occasions));
 
   return (
-    <div className="mx-auto flex w-full max-w-content flex-col items-center px-4 pb-10 pt-[33vh] text-center sm:px-6 sm:pb-16">
-      <h1 className="font-script text-[48px] leading-[0.9] text-ink sm:text-[64px]">
-        hello{name ? `, ${name}` : ""}
-      </h1>
-      <p className="mt-2 text-[14px] font-medium text-accent-deep">this is helloModa</p>
-      <p className="mt-1 max-w-sm text-[14px] leading-relaxed text-muted">
-        Describe an occasion, and I'll style a look from your closet — plus what to add.
-      </p>
+    <div className="flex w-full flex-col items-center pb-10 pt-[33vh] text-center sm:pb-16">
+      <div className="mx-auto w-full max-w-content px-4 sm:px-6">
+        <h1 className="font-script text-[48px] leading-[0.9] text-ink sm:text-[64px]">
+          hello{name ? `, ${name}` : ""}
+        </h1>
+        <p className="mt-2 text-[14px] font-medium text-accent-deep">this is helloModa</p>
+        <p className="mx-auto mt-1 max-w-sm text-[14px] leading-relaxed text-muted">
+          Describe an occasion, and I'll style a look from your closet — plus what to add.
+        </p>
+      </div>
 
-      <div className="scroll-area mt-9 flex w-full gap-3 overflow-x-auto px-1 pb-2">
+      {/* Deliberately full-bleed — not wrapped in max-w-content like the
+          rest of this component, so scrolling reveals cards edge-to-edge
+          instead of stopping at the centered content column. Sized so
+          ~2.25 cards fit the viewport width (direct request 2026-09-21). */}
+      <div className="scroll-area mt-9 flex w-full gap-4 overflow-x-auto py-2 pl-4 pr-4 sm:pl-6 sm:pr-6">
         {cards.map((c) => (
           <button
-            key={c.label}
+            key={c.slug}
             onClick={() => onPrompt(c.prompt)}
-            className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-0.5 sm:w-[260px]"
+            className="group relative aspect-[4/5] w-[44vw] shrink-0 overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-0.5"
           >
-            <GarmentArt type={c.type} />
+            <ImageWithFallback
+              src={`/occasions/${c.slug}-hero.jpg`}
+              alt=""
+              className="h-full w-full object-cover"
+              fallback={<GarmentArt type={c.type} />}
+            />
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
               style={{ background: "linear-gradient(to top, rgba(255,255,255,0.9), transparent)" }}
@@ -107,7 +78,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
         ))}
       </div>
 
-      <div className="mt-32 flex w-full flex-wrap justify-center gap-2">
+      <div className="mx-auto mt-32 flex w-full max-w-content flex-wrap justify-center gap-2 px-4 sm:px-6">
         {EXAMPLE_PROMPTS.map((p) => (
           <button
             key={p}

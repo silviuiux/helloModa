@@ -29,18 +29,24 @@ const STYLE_DIRECTIVE =
   "with careful, realistic detail — as if a highly skilled watercolor artist painted from a " +
   "real photograph. Editorial fashion illustration, elegant, soft natural light.";
 
-// Returns a Buffer (jpeg) of the generated image, or throws.
-export async function generateOutfitImage(prompt) {
+// Returns a Buffer (jpeg) of the generated image, or throws. `aspectRatio`
+// MUST match the display container's actual crop — a mismatch gets
+// object-cover-cropped and can cut the subject off (caught 2026-09-21, the
+// chat hero image briefly hardcoded "3:2" here for every caller, silently
+// setting up the same bug for the then-portrait guide-image script next
+// time it ran). Callers: /api/generate-image passes "3:2" (MessageBubble.jsx's
+// side-by-side turn layout), scripts/generate-guide-images.mjs and
+// scripts/generate-occasion-images.mjs pass "4:5" (their portrait cards).
+export async function generateOutfitImage(prompt, aspectRatio) {
+  if (!aspectRatio) {
+    throw new Error("generateOutfitImage requires an aspectRatio matching the display crop.");
+  }
   const replicate = new Replicate(); // reads REPLICATE_API_TOKEN from env
 
   const [output] = await replicate.run(MODEL, {
     input: {
       prompt: `${STYLE_DIRECTIVE} Scene: ${prompt}`,
-      // Landscape, matching the chat turn's side-by-side layout
-      // (MessageBubble.jsx) — must match the display crop, or a portrait
-      // composition gets object-cover-cropped into a wide box and cuts the
-      // subject off (caught 2026-09-21 after briefly mismatching the two).
-      aspect_ratio: "3:2",
+      aspect_ratio: aspectRatio,
       output_format: "jpg",
       num_outputs: 1,
     },

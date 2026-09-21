@@ -52,7 +52,7 @@ for (const guide of guides) {
   }
   process.stdout.write(`gen   ${guide.slug} ... `);
   try {
-    const buffer = await generateOutfitImage(guide.heroImagePrompt);
+    const buffer = await generateOutfitImage(guide.heroImagePrompt, "4:5");
     writeFileSync(outPath, buffer);
     console.log("done");
   } catch (err) {

@@ -52,7 +52,7 @@ export async function POST(request) {
 
   let imagePath;
   try {
-    const blob = await generateOutfitImage(recommendation.hero_prompt);
+    const blob = await generateOutfitImage(recommendation.hero_prompt, "3:2");
     imagePath = `${user.id}/${recommendationId}.jpg`;
     const { error: uploadError } = await supabase.storage
       .from("generated-looks")

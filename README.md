@@ -160,12 +160,15 @@ src/
     iconMap.jsx                 garment-icon resolver
   data/
     seed.js                      static reference data (wardrobe categories)
-    guides.js                     the 6 SEO guides' content — add an object here to add a guide
+    guides.js                     the 9 SEO guides' content — add an object here to add a guide
+    occasions.js                  the 20 home-screen carousel cards — same pattern as guides.js
   components/
     BottomBar.jsx                every control, one bar: home/new-chat, chat/wardrobe
                                  toggle, composer, history, share, account -> profile link (docs/09)
     PostHogPageview.jsx          manual pageview capture (App Router nav isn't a full page load)
     Icons.jsx                   inline stroke icon set (no deps)
+    ImageWithFallback.jsx        real image w/ illustrated fallback, hydration-race-safe —
+                                 shared by guides/GuideHeroImage.jsx and chat/EmptyState.jsx
     auth/SocialButtons.jsx      inert Google/Apple/Facebook/X placeholders
     chat/
       EmptyState.jsx             welcome screen: greeting, occasion cards, example prompts
