@@ -4,6 +4,36 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Awin product catalog sync, live for Italist
+
+Italist (first approved Awin advertiser) turned the `05-integrations-affiliates.md` ingestion
+plan into real code:
+
+- `scripts/lib/syncAwinProducts.mjs` — shared pipeline: fetch an Awin datafeed (comma/tab
+  auto-detected, hand-rolled parser handling quoted fields — no new dependency), upsert into
+  `products` on `(retailer, external_id)`, then CLIP-embed (`src/lib/embeddings.js`) whatever's
+  missing an embedding. `scripts/sync-products-italist.mjs` is the thin per-retailer entry
+  point (`AWIN_ITALIST_FEED_URL`); the next approved advertiser is a copy of that file with a
+  new retailer slug, no changes to the shared logic.
+- Added the `products_embedding_hnsw_idx` index and a `match_products()` Postgres function
+  (mirrors `match_wardrobe_items`, same pgvector cosine-distance pattern, `products`' RLS is
+  already public-read so no auth needed) plus its JS wrapper `src/lib/productMatching.js`. The
+  `(retailer, external_id)` unique constraint the data-model doc already described turned out to
+  already exist on the table.
+- Script writes with the Supabase **service role** key (bypasses RLS — this runs outside any
+  user session, same reasoning as any scheduled ingestion job), so `SUPABASE_SERVICE_ROLE_KEY`
+  is now a required env var for it specifically; treat it and the Awin feed URL (which embeds
+  your publisher auth token) as credentials, same as the Replicate token — don't paste either
+  into chat or commit them.
+- **Deliberately not wired into `/api/chat` yet.** "Shop" suggestions still show honest AI
+  guesses with no real link. Wiring real Italist hits into recommendation slots (via
+  `matchProducts()`, above some similarity threshold, falling back to the AI guess) is worth
+  doing once the feed's actually been synced once and spot-checked — not blind, and it's a
+  separate product decision (when to trust a match enough to show a real price/link) from the
+  plumbing itself.
+
+---
+
 ## 2026-09-21 — Randomized, expanded occasion carousel on the welcome screen
 
 `EmptyState.jsx`'s image occasion cards (the ones tied to the actual GTM wedge, not the

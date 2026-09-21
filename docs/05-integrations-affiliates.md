@@ -39,15 +39,39 @@ generalists above; verify directly rather than assuming Awin/Rakuten coverage.
    doesn't carry.
 4. Leave 2Performant/eMAG alone until the conflict-of-interest review is done.
 
-## Ingestion pipeline (once a network is chosen)
+## Ingestion pipeline — live for Italist, 2026-09-21
 
-1. Scheduled job (nightly, via the background worker) pulls the affiliate feed for onboarded
-   retailers.
-2. Normalize into the `products` table schema (`04-data-model.md`): brand, name, category,
-   price, currency, product URL (with affiliate tracking params preserved), image URL.
-3. Generate a CLIP embedding for each product image, store in `products.embedding`.
-4. On outfit recommendation, match against this cached table via pgvector — never call the
-   affiliate API live in the chat request path.
+Italist approved the Awin partnership; this is the first real advertiser, so the pipeline
+described below is now real code, not just a plan.
+
+1. `scripts/sync-products-italist.mjs` (thin per-retailer entry point) calls the shared
+   `scripts/lib/syncAwinProducts.mjs`, which fetches the Awin datafeed (`AWIN_ITALIST_FEED_URL`
+   — Awin dashboard -> Italist advertiser page -> Datafeeds, or `productdata.awin.com`'s
+   "Create-a-Feed" tool), parses it (comma or tab, auto-detected; a few common Awin column-name
+   aliases per field since publishers can rename columns in Create-a-Feed), and upserts into
+   `products` on `(retailer, external_id)` — brand, name, category, price, currency,
+   `product_url` (the `aw_deep_link`, untouched — this *is* the affiliate tracking link), image
+   URL. Run manually for now: `node scripts/sync-products-italist.mjs`; a nightly
+   cron/scheduled-job wrapper is the natural next step once this has run cleanly a few times.
+2. Same script then embeds any product missing `embedding` (CLIP via `src/lib/embeddings.js`,
+   same 768-dim space as `wardrobe_items`) — the slow, costly part, so re-syncs only embed
+   new/changed rows, not the whole catalog every time.
+3. `match_products()` (Postgres function, pgvector cosine distance, mirrors the existing
+   `match_wardrobe_items`) and its JS wrapper `src/lib/productMatching.js` do the actual
+   matching — same pattern as `wardrobeMatching.js`, just over the `products` table instead of
+   a user's closet. `products` RLS is public-read, so no auth is required to query it.
+4. **Not yet wired into `/api/chat`** — that's a deliberate follow-up, not part of this
+   scaffold: today's "shop" suggestions are still honest AI text guesses (no real link). Wiring
+   means, per outfit slot, calling `matchProducts()` and preferring a real hit above some
+   similarity threshold over the AI guess, populating `outfit_recommendation_items.product_id`
+   instead of `suggested_brand`/`suggested_name`. Worth doing once Italist's catalog has
+   actually been synced and spot-checked for match quality, not blind.
+5. Adding the next approved advertiser (once one comes in) is a copy of
+   `scripts/sync-products-italist.mjs` with a new retailer slug and feed env var — the shared
+   logic in `syncAwinProducts.mjs` doesn't change.
+
+Never call the affiliate API live in the chat request path — `products` is always a cache,
+synced ahead of time, per the original plan below.
 
 ## Commission/link handling
 

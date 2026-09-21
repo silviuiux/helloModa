@@ -27,7 +27,11 @@ real product catalog yet (Awin integration,
 (`src/lib/embeddings.js`, `wardrobe_items.embedding`) with a pgvector similarity search
 (`match_wardrobe_items()`, `src/lib/wardrobeMatching.js`) — shared infra for the eventual
 Awin-catalog matching, usable today against the closet. Not yet wired into the chat/
-recommendation flow itself.
+recommendation flow itself. **The Awin catalog side is real too, for Italist** (first approved
+advertiser, 2026-09-21) — `scripts/sync-products-italist.mjs` syncs its product feed into
+`products` and embeds it, `match_products()`/`src/lib/productMatching.js` finds real catalog
+hits the same way. Not yet wired into `/api/chat`'s "shop" suggestions (see
+`docs/05-integrations-affiliates.md`).
 
 **SEO landing pages are live and public** — `/what-to-wear` and 9 statically generated
 `/what-to-wear/[slug]` guides, grouped into Wedding Guest (beach, black-tie, garden, vineyard,
@@ -143,6 +147,7 @@ src/
     imageGen.js                  Replicate call: heroPrompt -> generated outfit image (Blob)
     embeddings.js                 CLIP text/image embeddings via Replicate (shared vector space)
     wardrobeMatching.js           pgvector similarity search over the caller's own wardrobe
+    productMatching.js             pgvector similarity search over the synced affiliate catalog
     imageResize.js               client-side photo downscale before tag/upload
     analytics.js                 PostHog init + track()/identifyUser(), safe no-op without a key
     siteConfig.js                 SITE_URL — metadataBase, robots.js, sitemap.js, JSON-LD

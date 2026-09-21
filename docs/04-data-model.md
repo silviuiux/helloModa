@@ -138,8 +138,9 @@ marketplace_transactions            -- Phase 4
   compared with the same `pgvector` cosine-distance query. The `wardrobe_items` half of this
   (embedding pipeline + `match_wardrobe_items()` similarity search, `src/lib/wardrobeMatching.js`)
   shipped 2026-09-20 — that's the mechanism behind "Shop Your Closet." The `products` half (CV
-  product matching, Phase 3) is blocked on the Awin catalog pipeline (`05-integrations-
-  affiliates.md`, currently on hold) — same embedding infra, just no data yet.
+  product matching, Phase 3) now has a real ingestion path too, live for Italist since
+  2026-09-21 (`05-integrations-affiliates.md`, `scripts/sync-products-italist.mjs`,
+  `match_products()` / `src/lib/productMatching.js`) — not yet wired into chat recommendations.
 - `outfit_recommendation_items.role` lets the UI distinguish "hero piece" vs "layer" vs
   "accessory," matching the business plan's outfit-narration style ("Start with the trousers
   as the anchor...").
