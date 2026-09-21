@@ -5,8 +5,9 @@ import ThinkingLine from "./ThinkingLine.jsx";
 import { cardToWardrobeItem } from "../../lib/look.js";
 
 // See docs/09-conversation-design.md: one outfit direction per turn, no
-// containers, generous spacing. The composer lives in BottomBar.jsx now —
-// this component only displays messages; sending is owned by AppShell.
+// containers, generous spacing, EmptyState as a persistent hero (not just
+// an empty-state). The composer lives in BottomBar.jsx now — this
+// component only displays messages; sending is owned by AppShell.
 export default function ChatView({
   wardrobe = [],
   onWardrobeAdd,
@@ -43,10 +44,14 @@ export default function ChatView({
 
   return (
     <div ref={scrollRef} className="scroll-area min-h-0 flex-1 overflow-y-auto">
-      {!hasMessages ? (
-        <EmptyState userEmail={userEmail} userDisplayName={userDisplayName} onPrompt={onQuickReply} />
-      ) : (
-        <div className="mx-auto w-full max-w-content space-y-10 px-4 py-8 sm:px-6 sm:py-12">
+      {/* Always mounted, not just on the true empty state — "the hero of
+          each conversation" per direct request 2026-09-21: greeting,
+          occasion cards, and example prompts stay reachable by scrolling up
+          even mid-conversation, instead of disappearing after the first
+          message. */}
+      <EmptyState userEmail={userEmail} userDisplayName={userDisplayName} onPrompt={onQuickReply} />
+      {hasMessages && (
+        <div className="mx-auto w-full max-w-content space-y-10 px-4 pb-8 sm:px-6 sm:pb-12">
           {messages.map((m) => (
             <MessageBubble
               key={m.id}

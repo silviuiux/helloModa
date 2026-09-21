@@ -15,10 +15,28 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   });
 
   if (isUser) {
+    // Always left-aligned, filled purple, square bottom-left corner — the
+    // opposite side/style from the assistant's text replies below, so the
+    // two are visually distinct without needing avatars or labels.
     return (
       <div className="animate-fade-up">
-        <div className="ml-auto max-w-md rounded-bubble border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
+        <div className="max-w-md rounded-bubble border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.text}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // A text-only assistant turn (no outfit direction — currently just the
+  // network/API error fallbacks in AppShell.jsx) gets the mirrored
+  // outlined bubble instead of the full image+title+narrative layout below,
+  // which would otherwise render an empty hero-image placeholder for what's
+  // really just an error message.
+  if (!message.title && !message.heroPrompt) {
+    return (
+      <div className="animate-fade-up flex justify-end">
+        <div className="max-w-md rounded-bubble-reply border border-accent-soft bg-white/50 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
+          <p className="text-[15px] leading-relaxed text-ink">{message.narrative}</p>
         </div>
       </div>
     );

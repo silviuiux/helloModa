@@ -48,10 +48,15 @@ export default {
         xl3: "28px",
         // Chat "speech bubble" corner: rounded everywhere except the
         // bottom-left, which stays square as a tail/anchor point. Used on
-        // chat bubbles, the outfit hero photo, and in-chat buttons/chips —
-        // at typical element sizes 128px is larger than half the box, so it
-        // just reads as "fully rounded" on the three open corners.
+        // the user's message bubble (always left-aligned), the outfit hero
+        // photo, and in-chat buttons/chips — at typical element sizes 128px
+        // is larger than half the box, so it just reads as "fully rounded"
+        // on the three open corners.
         bubble: "128px 128px 128px 0px",
+        // Same idea, mirrored: square top-right instead. Used on the
+        // assistant's text-reply bubble (always right-aligned) so its tail
+        // points the opposite way from the user's.
+        "bubble-reply": "128px 0px 128px 128px",
       },
       boxShadow: {
         panel: "0 1px 2px rgba(43,40,64,0.04), 0 18px 44px -22px rgba(43,40,64,0.26)",

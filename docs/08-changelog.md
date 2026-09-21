@@ -4,6 +4,29 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Persistent hero + reversed chat bubble convention
+
+Per a supplied mockup, two more changes to the chat experience (`docs/09-conversation-design.md`
+updated to match, since it went stale across today's earlier redesigns too — brought the whole
+doc current in this pass, not just these two items):
+
+- **`EmptyState` is now a persistent hero**, always mounted at the top of `ChatView.jsx` instead
+  of being swapped out once a conversation has messages. Scrolling up during any conversation —
+  new or old — reaches the greeting/occasion-cards/example-chips header again. Direct request:
+  "the first fold elements would still be available after prompting — basically the hero of each
+  conversation."
+- **Chat bubble sides reversed from convention**: the user's message bubble is now always
+  **left-aligned** (was right-aligned), filled purple, square bottom-left corner
+  (`rounded-bubble`, unchanged token). A new mirrored token, **`rounded-bubble-reply`** (square
+  top-right instead), is used for a text-only assistant reply, always **right-aligned**,
+  outlined instead of filled. Today that only fires for the network/API error fallbacks in
+  `AppShell.jsx` — real stylist turns always have a title+heroPrompt (required by
+  `stylist.js`'s schema) so they keep the existing two-column image+text layout, never this
+  bubble. Confirmed scope directly rather than guessing: this reversal is deliberate brand
+  identity, not a bug to "fix" back to the usual convention later.
+
+---
+
 ## 2026-09-21 — Fixed generation/display aspect-ratio mismatch; layout follow-up
 
 Follow-up to the same-day chat redesign below, after visual feedback that the landscape crop
