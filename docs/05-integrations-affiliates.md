@@ -51,8 +51,15 @@ described below is now real code, not just a plan.
    aliases per field since publishers can rename columns in Create-a-Feed), and upserts into
    `products` on `(retailer, external_id)` — brand, name, category, price, currency,
    `product_url` (the `aw_deep_link`, untouched — this *is* the affiliate tracking link), image
-   URL. Run manually for now: `node scripts/sync-products-italist.mjs`; a nightly
-   cron/scheduled-job wrapper is the natural next step once this has run cleanly a few times.
+   URL. Run manually: `node scripts/sync-products-italist.mjs`.
+   **Also runs on a schedule**: `GET /api/cron/sync-products-italist`
+   (`src/app/api/cron/sync-products-italist/route.js`) wraps the same `syncAwinProducts()` call
+   for Vercel Cron (`vercel.json`'s `crons`, currently nightly at 03:00 UTC). Guarded by
+   `CRON_SECRET` — Vercel signs its cron requests with `Authorization: Bearer $CRON_SECRET`
+   automatically once that env var is set in the Vercel project, so the route 401s anyone else
+   hitting the URL. `AWIN_ITALIST_FEED_URL` and `SUPABASE_SERVICE_ROLE_KEY` need to be set in
+   Vercel too (not just local `.env.local`) for the cron path to work — the manual script and
+   the cron route are the same code, just two different triggers.
 2. Same script then embeds any product missing `embedding` (CLIP via `src/lib/embeddings.js`,
    same 768-dim space as `wardrobe_items`) — the slow, costly part, so re-syncs only embed
    new/changed rows, not the whole catalog every time.

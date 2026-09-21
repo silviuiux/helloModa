@@ -4,6 +4,20 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Nightly Vercel Cron trigger for the Italist product sync
+
+Follow-up to the same-day Awin scaffold below: `GET /api/cron/sync-products-italist`
+(`src/app/api/cron/sync-products-italist/route.js`) wraps `syncAwinProducts()` for Vercel Cron
+(`vercel.json`, nightly at 03:00 UTC) so the catalog sync doesn't depend on someone remembering
+to run the script by hand. Guarded by `CRON_SECRET` (Vercel signs cron requests with
+`Authorization: Bearer $CRON_SECRET` automatically once set) so the endpoint can't be hit
+externally to burn Replicate credits. Requires `AWIN_ITALIST_FEED_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` to also be set as real env vars in the Vercel project (not just
+`.env.local`) — the manual script and this route share the exact same sync logic, just two
+different triggers for it.
+
+---
+
 ## 2026-09-21 — Awin product catalog sync, live for Italist
 
 Italist (first approved Awin advertiser) turned the `05-integrations-affiliates.md` ingestion
