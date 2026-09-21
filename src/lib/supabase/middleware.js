@@ -51,8 +51,14 @@ export async function updateSession(request) {
     path.startsWith("/login") || path.startsWith("/register") || path.startsWith("/auth");
   const isPublicMarketingRoute =
     path.startsWith("/what-to-wear") || path === "/robots.txt" || path === "/sitemap.xml";
+  // Cron-triggered API routes carry no user session by nature (Vercel Cron
+  // doesn't send cookies) and do their own auth via a bearer secret checked
+  // inside the route itself (see src/app/api/cron/*/route.js) — redirecting
+  // them to /login here would 302 both curl and the real Vercel Cron
+  // trigger away from the route entirely, never reaching that check.
+  const isCronRoute = path.startsWith("/api/cron/");
 
-  if (!user && !isAuthRoute && !isPublicMarketingRoute) {
+  if (!user && !isAuthRoute && !isPublicMarketingRoute && !isCronRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
