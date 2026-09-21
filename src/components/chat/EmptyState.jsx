@@ -53,18 +53,22 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
       {/* Deliberately full-bleed — not wrapped in max-w-content like the
           rest of this component, so scrolling reveals cards edge-to-edge
           instead of stopping at the centered content column, continuing
-          past it rather than clipping there. Card width is sized against
-          `max-w-content` (1160px, tailwind.config.js) — not the viewport —
-          so ~2.25 cards fill *that* column's width specifically, direct
-          request 2026-09-21: (1160px - 16px gap) / 2.25 ≈ 508px. Smaller,
-          viewport-relative below `sm` (a fixed 508px card would dwarf a
-          phone screen) where a single dominant card reads better anyway. */}
+          past it rather than clipping there. The first card still starts
+          flush with the 1160px container's left edge, matching the
+          header/chips above — pl-4/sm:pl-6 here mirrors their px-4/sm:px-6
+          exactly. Card width is sized against `max-w-content` (1160px,
+          tailwind.config.js) — not the viewport — so ~2.25 cards fill
+          *that* column's width specifically: (1160px - 16px gap) / 2.25 ≈
+          508px. 1:1 aspect ratio and 16px (gap-4) between cards, both
+          direct requests 2026-09-21. Smaller, viewport-relative below `sm`
+          (a fixed 508px card would dwarf a phone screen) where a single
+          dominant card reads better anyway. */}
       <div className="scroll-area mt-9 flex w-full gap-4 overflow-x-auto py-2 pl-4 pr-4 sm:pl-6 sm:pr-6">
         {cards.map((c) => (
           <button
             key={c.slug}
             onClick={() => onPrompt(c.prompt)}
-            className="group relative aspect-[4/5] w-[78vw] shrink-0 overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-0.5 sm:w-[508px]"
+            className="group relative aspect-square w-[78vw] shrink-0 overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-0.5 sm:w-[508px]"
           >
             <ImageWithFallback
               src={`/occasions/${c.slug}-hero.jpg`}

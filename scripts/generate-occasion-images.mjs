@@ -54,8 +54,10 @@ for (const occasion of occasions) {
   }
   process.stdout.write(`gen   ${occasion.slug} ... `);
   try {
-    // "4:5" — matches the card's portrait aspect-[4/5] in EmptyState.jsx.
-    const buffer = await generateOutfitImage(occasion.heroImagePrompt, "4:5");
+    // "1:1" — matches the card's aspect-square in EmptyState.jsx. Keep
+    // these in sync (see imageGen.js's generateOutfitImage comment) — a
+    // mismatch gets object-cover-cropped and can cut the subject off.
+    const buffer = await generateOutfitImage(occasion.heroImagePrompt, "1:1");
     writeFileSync(outPath, buffer);
     console.log("done");
   } catch (err) {

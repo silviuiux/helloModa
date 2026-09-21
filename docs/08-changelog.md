@@ -30,7 +30,10 @@ the `/what-to-wear` guides already have:
   edge-to-edge rather than stopping at the centered content column. Card width corrected
   same-day: "2.25 cards" meant filling `max-w-content` (1160px) specifically, not the full
   viewport — `(1160px - 16px gap) / 2.25 ≈ 508px` fixed width at `sm`+, `78vw` below it (a fixed
-  508px card would dwarf a phone screen; single-dominant-card reads better there anyway).
+  508px card would dwarf a phone screen; single-dominant-card reads better there anyway). Aspect
+  ratio changed again same-day, portrait `4:5` → **`1:1`** square, and `generate-occasion-
+  images.mjs` updated to request `"1:1"` from Flux to match (same crop-mismatch risk as the
+  guide-image aspect-ratio bug above if these two ever drift apart).
 
 ---
 
