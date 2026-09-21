@@ -118,6 +118,17 @@ conversation, new or old, always reaches it again:
 - A second scrollable row of example prompt chips below the cards. Tapping
   either a card or a chip sends that prompt as the next message in whatever
   conversation is currently open — it does not start a new one.
+- Greeting headline uses the same `font-script` face as turn titles (Yuyu
+  Short as of 2026-09-21, previously `font-display`).
+
+**Vertical rhythm**: generous spacing between top-level sections — 128px
+(`mt-32`/`space-y-32`/`pt-32`, Tailwind's default `32` spacing step, no
+custom token needed) between the occasion cards and the example-prompt
+chips, between the hero and the message thread, and between each top-level
+message turn in the thread. Established 2026-09-21, direct request — stays
+tighter *within* a turn's own text stack (title/narrative/actions) or
+within the hero's logo lockup (greeting/tagline/description), which read as
+one cohesive unit, not "elements" in the sweeping sense this rule means.
 
 ## Layout: no top bar either — everything lives in one bottom bar
 

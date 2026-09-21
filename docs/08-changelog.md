@@ -4,6 +4,23 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Generous vertical rhythm (128px) + greeting uses the script font
+
+Per direct feedback on the live site: spacing between top-level sections felt cramped.
+
+- **128px vertical rhythm** (`mt-32`/`space-y-32`/`pt-32` — Tailwind's default `32` step already
+  equals 8rem/128px, no custom token needed) between: `EmptyState`'s occasion cards and its
+  example-prompt chips row, the hero and the message thread, and each top-level message turn in
+  `ChatView.jsx`. Deliberately *not* applied inside a turn's own text stack (title → narrative →
+  actions) or the hero's tight logo lockup (greeting → tagline → description) — those read as one
+  cohesive block, not separate "elements."
+- **`EmptyState`'s greeting headline** ("hello, Silviu") switched from `font-display` (Fraunces)
+  to `font-script` (Yuyu Short) — now matches the script face used for every turn's title,
+  bumped to `text-[48px] sm:text-[64px]` since a script face reads smaller than a serif at the
+  same pixel size.
+
+---
+
 ## 2026-09-21 — Script font: Mr De Haviland → Yuyu Short
 
 Another direct swap of the `script` token (`tailwind.config.js` + the Google Fonts `<link>` in
