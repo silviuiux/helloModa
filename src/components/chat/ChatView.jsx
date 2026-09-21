@@ -51,7 +51,7 @@ export default function ChatView({
           message. */}
       <EmptyState userEmail={userEmail} userDisplayName={userDisplayName} onPrompt={onQuickReply} />
       {hasMessages && (
-        <div className="mx-auto w-full max-w-content space-y-32 px-4 pb-8 pt-32 sm:px-6 sm:pb-12">
+        <div className="mx-auto w-full max-w-content space-y-32 px-4 pb-[33vh] pt-32 sm:px-6">
           {messages.map((m) => (
             <MessageBubble
               key={m.id}

@@ -4,6 +4,15 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Bottom whitespace to match the top
+
+`ChatView.jsx`'s message thread container's bottom padding changed from `pb-8 sm:pb-12` to
+`pb-[33vh]`, matching `EmptyState.jsx`'s `pt-[33vh]` — the last message in a conversation now
+sits with the same generous breathing room below it that the greeting has above it, instead of
+crowding the bottom bar.
+
+---
+
 ## 2026-09-21 — New `/outfits` page: past conversations as a cover-image list
 
 Per a supplied mockup ("myOutfit"): a dedicated page for browsing past conversations, each
