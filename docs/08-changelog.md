@@ -4,6 +4,19 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Randomized, expanded occasion carousel on the welcome screen
+
+`EmptyState.jsx`'s image occasion cards (the ones tied to the actual GTM wedge, not the
+text-only example chips below them) grew from a static 3 to 7, covering the launch niche plus
+adjacent high-intent moments (wedding guest, black-tie, interview, first date, summer festival,
+brunch, weekend trip). Shuffled once per mount (Fisher-Yates, not `sort(() => Math.random() -
+0.5)` which is known to skew) so returning users don't see the same 3 every visit, and shown in
+a horizontal-scroll carousel (`overflow-x-auto` + `shrink-0`, reusing the existing `.scroll-area`
+scrollbar styling) instead of a wrapped grid so all 7 stay reachable on narrow viewports. The
+4 text-only `EXAMPLE_PROMPTS` chips were left untouched — out of scope per the request.
+
+---
+
 ## 2026-09-20 — Editorial redesign of the /what-to-wear guides
 
 Per direct request: same helloModa look and feel (warm lavender-gray canvas, glass panels,

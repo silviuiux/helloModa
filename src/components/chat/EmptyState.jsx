@@ -1,8 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import GarmentArt from "../GarmentArt.jsx";
 
 // Occasion examples tied to the actual GTM wedge (business plan's "Wedding
 // Guest" launch niche + adjacent high-intent moments) — not arbitrary demo
-// content. See docs/09-conversation-design.md.
+// content. See docs/09-conversation-design.md. 7 candidates, shuffled on
+// each mount (see shuffle() below) so returning users don't see the same
+// static 3 every time, shown in a horizontally-scrollable carousel rather
+// than a wrapped grid so all 7 stay reachable regardless of viewport width.
 const OCCASION_CARDS = [
   {
     type: "dress",
@@ -11,13 +17,33 @@ const OCCASION_CARDS = [
   },
   {
     type: "outerwear",
+    label: "Black-tie event",
+    prompt: "I have a black-tie gala this weekend, help me find something.",
+  },
+  {
+    type: "bottoms",
     label: "Big interview",
     prompt: "I have a first-round interview at a tech company next week.",
   },
   {
     type: "top",
+    label: "First date",
+    prompt: "First date this Friday — something comfortable but considered.",
+  },
+  {
+    type: "accessory",
+    label: "Summer festival",
+    prompt: "Heading to an outdoor music festival this summer, need an outfit.",
+  },
+  {
+    type: "shoe",
     label: "Weekend brunch",
     prompt: "Casual brunch with old friends this weekend — comfortable but put-together.",
+  },
+  {
+    type: "bag",
+    label: "Weekend trip",
+    prompt: "Packing for a long weekend trip — versatile pieces that mix and match.",
   },
 ];
 
@@ -36,8 +62,21 @@ function firstNameFromEmail(email) {
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }
 
+// Fisher-Yates — plain array.sort(() => Math.random() - 0.5) skews order in
+// practice, this doesn't.
+function shuffle(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
   const name = userDisplayName || firstNameFromEmail(userEmail);
+  // Lazy initializer — shuffles once per mount, not on every render.
+  const [cards] = useState(() => shuffle(OCCASION_CARDS));
 
   return (
     <div className="mx-auto flex w-full max-w-content flex-col items-center px-4 py-10 text-center sm:px-6 sm:py-16">
@@ -49,8 +88,8 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
         Describe an occasion, and I'll style a look from your closet — plus what to add.
       </p>
 
-      <div className="mt-9 flex w-full flex-wrap justify-center gap-3">
-        {OCCASION_CARDS.map((c) => (
+      <div className="scroll-area mt-9 flex w-full gap-3 overflow-x-auto px-1 pb-2">
+        {cards.map((c) => (
           <button
             key={c.label}
             onClick={() => onPrompt(c.prompt)}
