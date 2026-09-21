@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
 import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
+import ConversationFromQuery from "@/components/ConversationFromQuery.jsx";
 import { addWardrobeItem, toggleWardrobeFavorite, removeWardrobeItem } from "@/actions/wardrobe";
 import { getConversationMessages } from "@/actions/conversations";
 import { signOut } from "@/actions/auth";
@@ -183,6 +184,9 @@ export default function AppShell({
         background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
       }}
     >
+      <Suspense fallback={null}>
+        <ConversationFromQuery onConversationId={handleSelectConversation} />
+      </Suspense>
       <main className="relative flex min-h-0 flex-1 flex-col">
         {view === "chat" ? (
           <ChatView

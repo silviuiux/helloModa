@@ -63,32 +63,50 @@ function Dropdown({ trigger, children, align = "left" }) {
   );
 }
 
+// Hovering the icon previews the quick-switch list (same panel the old
+// click-to-toggle version showed); clicking it navigates straight to the
+// full /outfits history page instead of toggling the panel. Direct request
+// 2026-09-21 — a deliberate split of "peek" (hover) vs "go there" (click),
+// not the generic click-toggle Dropdown other menus use.
 function ConversationMenu({ conversations, activeConversationId, onSelect, onNewChat }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function onDocClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
   return (
-    <Dropdown
-      trigger={(toggle, open) => (
-        <button
-          onClick={toggle}
-          aria-label="Conversation history"
-          className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors ${
-            open ? "bg-white/70 text-ink" : "glass-circle text-muted hover:text-ink"
-          }`}
-        >
-          <History size={18} />
-          {conversations.length > 0 && (
-            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent-deep px-1 text-[9.5px] font-medium text-white">
-              {conversations.length > 99 ? "99+" : conversations.length}
-            </span>
-          )}
-        </button>
-      )}
+    <div
+      className="relative"
+      ref={ref}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
     >
-      {(close) => (
-        <>
+      <Link
+        href="/outfits"
+        aria-label="Outfit history"
+        className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors ${
+          open ? "bg-white/70 text-ink" : "glass-circle text-muted hover:text-ink"
+        }`}
+      >
+        <History size={18} />
+        {conversations.length > 0 && (
+          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent-deep px-1 text-[9.5px] font-medium text-white">
+            {conversations.length > 99 ? "99+" : conversations.length}
+          </span>
+        )}
+      </Link>
+      {open && (
+        <div className="glass absolute bottom-full left-0 z-30 mb-2 w-72 rounded-xl2 p-2 shadow-lift">
           <button
             onClick={() => {
               onNewChat();
-              close();
+              setOpen(false);
             }}
             className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[13.5px] font-medium text-accent-deep hover:bg-accent-tint/60"
           >
@@ -104,7 +122,7 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
                   key={c.id}
                   onClick={() => {
                     onSelect(c.id);
-                    close();
+                    setOpen(false);
                   }}
                   className={`w-full truncate rounded-xl px-3 py-2 text-left text-[13px] transition-colors ${
                     c.id === activeConversationId
@@ -118,17 +136,9 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
               ))
             )}
           </div>
-          <Link
-            href="/outfits"
-            onClick={close}
-            className="mt-1 flex w-full items-center gap-1.5 rounded-xl px-3 py-2.5 text-left text-[13px] text-muted transition-colors hover:bg-white/60 hover:text-ink"
-          >
-            <Hanger size={14} />
-            View all outfits
-          </Link>
-        </>
+        </div>
       )}
-    </Dropdown>
+    </div>
   );
 }
 

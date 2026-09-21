@@ -93,7 +93,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
           <button
             key={c.label}
             onClick={() => onPrompt(c.prompt)}
-            className="group relative aspect-[4/5] w-40 shrink-0 overflow-hidden rounded-xl2 shadow-soft transition-transform hover:-translate-y-0.5 sm:w-52"
+            className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-0.5 sm:w-[260px]"
           >
             <GarmentArt type={c.type} />
             <div

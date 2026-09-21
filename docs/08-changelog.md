@@ -4,6 +4,28 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — History icon: hover previews, click opens /outfits; cards deep-link into chat
+
+Three follow-ups to yesterday's `/outfits` page, all direct requests:
+
+- **`BottomBar.jsx`'s `ConversationMenu`** no longer toggles its quick-switch panel on click.
+  It's now a real `Link` to `/outfits` (click navigates there directly), with the same panel
+  shown on hover (`onMouseEnter`/`onMouseLeave`) instead — "peek" vs. "go there," not the
+  generic click-toggle `Dropdown` other bar menus use. The "View all outfits" link added
+  yesterday is gone — redundant now that the icon itself does that.
+- **`/outfits` rows now continue the conversation.** Clicking a row's cover image or title
+  navigates to `/?conversation=<id>` — a new `ConversationFromQuery.jsx` (mirrors
+  `PostHogPageview.jsx`'s `useSearchParams`-in-its-own-`Suspense` pattern) reads that param once,
+  hands it to `AppShell`'s existing `handleSelectConversation`, and cleans the URL via
+  `router.replace("/")` so a refresh doesn't re-trigger it. The chevron is now a separate control
+  (`stopPropagation` isn't even needed — it's a sibling, not nested inside the link) that still
+  expands the pieces preview in place, so browsing doesn't require leaving the page.
+- **`EmptyState.jsx`'s occasion cards, ~25% bigger** (`w-[200px] sm:w-[260px]`, was
+  `w-40 sm:w-52`) and switched from `rounded-xl2` to `rounded-bubble` — same corner language as
+  the chat hero image and the `/outfits` cover photos now.
+
+---
+
 ## 2026-09-21 — Bottom whitespace to match the top
 
 `ChatView.jsx`'s message thread container's bottom padding changed from `pb-8 sm:pb-12` to
