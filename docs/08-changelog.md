@@ -4,6 +4,19 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Fixed: invite-only auth gate was swallowing the cron route
+
+Caught immediately while testing the cron endpoint above with a live curl: the
+`src/lib/supabase/middleware.js` invite-only redirect runs on every request except a short
+allowlist (`/login`, `/register`, `/auth`, `/what-to-wear`, robots/sitemap) — `/api/cron/*`
+wasn't on it, so an unauthenticated request (curl, and critically the real Vercel Cron trigger
+itself, which never carries a user session) got silently 302'd to `/login` before the route's
+own `CRON_SECRET` check ever ran. Fixed by exempting `/api/cron/` from that redirect — the
+route still does its own bearer-token auth, so this doesn't weaken anything, it just lets a
+self-authenticating route be reached at all.
+
+---
+
 ## 2026-09-21 — Nightly Vercel Cron trigger for the Italist product sync
 
 Follow-up to the same-day Awin scaffold below: `GET /api/cron/sync-products-italist`
