@@ -26,61 +26,57 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
 
   return (
     <div className="animate-fade-up space-y-6">
-      {message.title && (
-        <h2 className="font-script text-[52px] leading-[0.9] text-ink sm:text-[60px]">
-          {message.title}
-        </h2>
-      )}
-      {message.narrative && (
-        <p className="max-w-2xl text-[16px] leading-relaxed text-ink">{message.narrative}</p>
-      )}
-
-      {!settled ? (
-        <ThinkingLine />
-      ) : (
-        <>
-          <div className="grid gap-6 sm:grid-cols-[1.3fr,1fr] sm:items-end">
-            <OutfitHero imageUrl={imageUrl} />
-            <div className="flex flex-col items-start gap-4 sm:items-end">
-              <div className="flex items-center gap-1 text-faint">
-                <ToolbarBtn icon={ThumbsUp} label="Good match" />
-                <ToolbarBtn icon={ThumbsDown} label="Not for me" />
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                <button className="rounded-bubble border border-line px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:border-accent-soft hover:text-ink">
-                  Retry
-                </button>
-                {message.pieces?.length > 0 && (
-                  <button
-                    onClick={() => setShowPieces((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-bubble bg-accent px-5 py-2 text-[11px] font-medium uppercase tracking-label text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
-                  >
-                    <Hanger size={13} />
-                    {showPieces ? "Hide Items" : "Find Outfit"}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {showPieces && (
-            <RecommendationCards cards={message.pieces} onToggleSave={onToggleSave} savedIds={savedIds} />
+      <div className="grid gap-8 sm:grid-cols-2 sm:items-start">
+        <OutfitHero imageUrl={imageUrl} />
+        <div className="flex flex-col">
+          {message.title && (
+            <h2 className="font-script text-[52px] leading-[0.9] text-ink sm:text-[60px]">
+              {message.title}
+            </h2>
+          )}
+          {message.narrative && (
+            <p className="mt-4 text-[16px] leading-relaxed text-ink">{message.narrative}</p>
           )}
 
-          {message.quickReplies?.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {message.quickReplies.map((q) => (
+          {!settled ? (
+            <ThinkingLine />
+          ) : (
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <ToolbarBtn icon={ThumbsUp} label="Good match" />
+              <ToolbarBtn icon={ThumbsDown} label="Not for me" />
+              <button className="rounded-bubble border border-line px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:border-accent-soft hover:text-ink">
+                Retry
+              </button>
+              {message.pieces?.length > 0 && (
                 <button
-                  key={q}
-                  onClick={() => onQuickReply?.(q)}
-                  className="glass-soft rounded-bubble px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep"
+                  onClick={() => setShowPieces((v) => !v)}
+                  className="flex items-center gap-1.5 rounded-bubble bg-accent px-5 py-2 text-[11px] font-medium uppercase tracking-label text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
                 >
-                  {q}
+                  <Hanger size={13} />
+                  {showPieces ? "Hide Items" : "Find Outfit"}
                 </button>
-              ))}
+              )}
             </div>
           )}
-        </>
+        </div>
+      </div>
+
+      {settled && showPieces && (
+        <RecommendationCards cards={message.pieces} onToggleSave={onToggleSave} savedIds={savedIds} />
+      )}
+
+      {settled && message.quickReplies?.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {message.quickReplies.map((q) => (
+            <button
+              key={q}
+              onClick={() => onQuickReply?.(q)}
+              className="glass-soft rounded-bubble px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -90,7 +86,7 @@ function ToolbarBtn({ icon: Icon, label }) {
   return (
     <button
       aria-label={label}
-      className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-white/60 hover:text-accent-deep"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-faint transition-colors hover:bg-white/60 hover:text-accent-deep"
     >
       <Icon size={16} />
     </button>

@@ -4,6 +4,27 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Fixed generation/display aspect-ratio mismatch; layout follow-up
+
+Follow-up to the same-day chat redesign below, after visual feedback that the landscape crop
+was cutting off the generated character:
+
+- **Root cause**: `src/lib/imageGen.js` was still requesting `aspect_ratio: "4:5"` (portrait)
+  from Replicate/Flux while the new display container was `3:2` (landscape) — `object-cover`
+  was cropping a tall portrait composition into a wide box, chopping the figure. Fixed by
+  requesting `3:2` from Flux directly, so the composition is actually framed for landscape
+  (full figure fits) instead of relying on CSS to salvage a mismatched source image.
+- **Layout**: moved title + narrative back to sit beside the image (two-column, image left/text
+  right) rather than full-width above it — closer to the pre-mockup layout, now with the
+  "thinking" state living in the text column instead of gating the whole row.
+- **Actions row**: thumbs up/down, Retry, and Find Outfit now render as one inline row instead
+  of a stacked thumbs-row + buttons-row.
+- **`ThinkingLine`**: dropped the script font (`Mr De Haviland` reads badly at status-text
+  sizes) for the same body font/size as the narrative paragraph — used in both its `ChatView`
+  placement (whole-turn wait) and its new placement inside `MessageBubble` (image-only wait).
+
+---
+
 ## 2026-09-21 — Chat turn redesign: layout, corner language, aspect ratio, script font
 
 Per a supplied mockup, reworked `MessageBubble.jsx`'s AI-turn layout and the visual language

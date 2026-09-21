@@ -36,7 +36,11 @@ export async function generateOutfitImage(prompt) {
   const [output] = await replicate.run(MODEL, {
     input: {
       prompt: `${STYLE_DIRECTIVE} Scene: ${prompt}`,
-      aspect_ratio: "4:5",
+      // Landscape, matching the chat turn's side-by-side layout
+      // (MessageBubble.jsx) — must match the display crop, or a portrait
+      // composition gets object-cover-cropped into a wide box and cuts the
+      // subject off (caught 2026-09-21 after briefly mismatching the two).
+      aspect_ratio: "3:2",
       output_format: "jpg",
       num_outputs: 1,
     },

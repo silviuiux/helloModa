@@ -42,7 +42,7 @@ export default function ThinkingLine() {
   return (
     <p
       key={index}
-      className="animate-fade-up font-script text-[26px] text-accent-deep"
+      className="animate-fade-up mt-4 text-[15px] leading-relaxed text-accent-deep"
       aria-live="polite"
     >
       {PHRASES[index]}…
