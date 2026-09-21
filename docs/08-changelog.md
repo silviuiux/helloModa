@@ -4,6 +4,17 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-21 — Large top whitespace above the greeting
+
+`EmptyState.jsx`'s top padding changed from `py-10 sm:py-16` (~40-64px) to `pt-[33vh]` (top only —
+bottom padding unchanged) so "hello, …" sits roughly a third of the way down the viewport instead
+of flush against the top, easier for the eye to land on first. Direct request. Uses `vh` against
+the full browser viewport, not the scroll container specifically (which is shorter by
+`BottomBar`'s height) — close enough to the intent, not worth the complexity of measuring the
+container itself for this.
+
+---
+
 ## 2026-09-21 — Generous vertical rhythm (128px) + greeting uses the script font
 
 Per direct feedback on the live site: spacing between top-level sections felt cramped.

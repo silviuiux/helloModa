@@ -79,7 +79,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt }) {
   const [cards] = useState(() => shuffle(OCCASION_CARDS));
 
   return (
-    <div className="mx-auto flex w-full max-w-content flex-col items-center px-4 py-10 text-center sm:px-6 sm:py-16">
+    <div className="mx-auto flex w-full max-w-content flex-col items-center px-4 pb-10 pt-[33vh] text-center sm:px-6 sm:pb-16">
       <h1 className="font-script text-[48px] leading-[0.9] text-ink sm:text-[64px]">
         hello{name ? `, ${name}` : ""}
       </h1>
