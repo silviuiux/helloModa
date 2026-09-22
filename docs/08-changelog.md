@@ -4,6 +4,39 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Fix: CLIP embeddings never worked (blocks Awin product linking)
+
+The Awin product links in recommendations never appeared, so I checked the live database:
+
+| | Total | Embedded |
+|---|---|---|
+| Italist products | 25,100 | 0 |
+| Wardrobe items | 8 | 0 |
+| Recommendation pieces matched to a product | — | 0 (none ever) |
+
+The nightly cron does run: every product has `last_synced_at` of 03:00 UTC today. The feed
+import works; the embedding step fails for every item.
+
+**Likely root cause.** `src/lib/embeddings.js` called `replicate.run("krthr/clip-embeddings")`
+without a version. With no version, the Replicate client posts to
+`/models/{owner}/{name}/predictions`, and Replicate serves that endpoint only for its official
+models. `krthr/clip-embeddings` is a community model. The image models (flux) are official,
+which is why generation worked while embeddings didn't.
+
+**Fix.** CLIP is now always called with a pinned `owner/name:version`. The version comes from
+the `REPLICATE_CLIP_VERSION` env var when set; otherwise the model's latest version is looked
+up once per server instance. A mocked Replicate API confirms the routing: one model lookup,
+then version-pinned `/predictions` calls.
+
+**Also.** `syncAwinProducts` now throws when every embedding in a run fails, so the cron
+returns 500 and Sentry gets the first error. It used to report `ok` with `embedded=0` every
+night.
+
+**Not verified.** The sandbox can't reach Replicate, so this hasn't run against the real API
+yet. The next step is to run it for real after the deploy.
+
+---
+
 ## 2026-09-22 — Orb clip fix, organic detail pass, full copy rewrite
 
 Direct request, three parts. First, the orb blob turned into a square after its first state

@@ -202,6 +202,7 @@ export async function syncAwinProducts({
 
   let embedded = 0;
   let failed = 0;
+  let firstError = null;
   await mapWithConcurrency(unembedded || [], embedConcurrency, async (product) => {
     try {
       const embedding = product.image_url
@@ -215,10 +216,19 @@ export async function syncAwinProducts({
       embedded++;
     } catch (err) {
       console.error(`  embedding failed for product ${product.id}:`, err.message);
+      firstError ??= err.message;
       failed++;
     }
   });
 
   console.log(`[${retailer}] done. upserted=${records.length} embedded=${embedded} failed=${failed}`);
-  return { upserted: records.length, embedded, failed };
+  // Per-product failures are tolerated (one bad image URL shouldn't sink the
+  // run), but a run where *nothing* embedded is a broken pipeline, not bad
+  // luck — throw so the cron route returns 500 and Sentry sees it, instead
+  // of reporting ok:true every night (how the 2026-09-22 Replicate
+  // model-ref bug went unnoticed; see src/lib/embeddings.js).
+  if (failed > 0 && embedded === 0) {
+    throw new Error(`All ${failed} embeddings failed. First error: ${firstError}`);
+  }
+  return { upserted: records.length, embedded, failed, firstError };
 }
