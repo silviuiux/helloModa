@@ -36,6 +36,12 @@ wardrobe_items
   is_favorite             bool
   available_for_rent      bool  default false   -- Phase 4
   available_for_sale      bool  default false   -- Phase 4
+  price_cents              int  nullable -- optional, user-entered; powers closet analytics
+                                    (wardrobe value + cost-per-wear), added 2026-09-22
+  wear_count                int  default 0  -- manual "worn today" log, incremented via the
+                                    increment_wardrobe_wear() SQL function (atomic, RLS-scoped),
+                                    not a direct UPDATE — see src/actions/wardrobe.js
+  last_worn_at        timestamptz nullable -- set alongside wear_count on each log
   created_at
 
 conversations

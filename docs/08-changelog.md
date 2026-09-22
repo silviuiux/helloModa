@@ -4,6 +4,45 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Closet analytics: cost-per-wear + wardrobe value
+
+Next roadmap item after the Style Journal (`03-roadmap.md` Phase 3). The roadmap called this
+"straightforward once wardrobe data exists" — turned out `wardrobe_items` had neither a purchase
+price nor any wear-tracking, so this needed a small schema migration first, not just UI.
+
+- **Migration `wardrobe_closet_analytics`** (applied directly via Supabase, no local migration
+  files in this repo) adds `price_cents` (nullable, user-entered), `wear_count` (int, default 0),
+  and `last_worn_at` (nullable timestamp) to `wardrobe_items`. Also adds
+  `increment_wardrobe_wear(item_id)`, a SQL function that atomically bumps `wear_count` and sets
+  `last_worn_at`, scoped to the caller's own rows (`user_id = auth.uid()`, and it still runs
+  under the caller's RLS as `SECURITY INVOKER`) — a plain read-then-write `UPDATE` from the
+  server action would have the same effect most of the time but could drop a wear on a double-tap.
+- **Wear tracking is two signals, not one** (direct decision this session): a **manual** "Log a
+  wear" tap on each card (`WardrobeItemCard.jsx`, calls `logWardrobeItemWear` →
+  `increment_wardrobe_wear`) drives the actual cost-per-wear number, since it's the only one that
+  means "actually worn." Alongside it, a **"styled Nx"** chip shows how many times that piece has
+  been included in a chat outfit recommendation (`getStyledCounts` in `actions/wardrobe.js`,
+  counting `outfit_recommendation_items` rows) — zero extra effort, but explicitly a *softer*
+  signal ("styled" isn't "worn") and never mixed into the cost-per-wear math itself.
+- **`AddItemModal.jsx`** gets an optional "Purchase price" field; **`WardrobeItemCard.jsx`** gets
+  an inline price editor too (click the price, or "+ Add price") since most existing pieces were
+  added before this field existed and back-filling one at a time from the grid is easier than a
+  bulk-edit screen for a first version.
+- **New `ClosetStats.jsx`** — a summary strip at the top of the Wardrobe view: total wardrobe
+  value (sum of priced items), average cost-per-wear (across pieces with both a price and at
+  least one logged wear), and a "never logged worn" count as a light declutter signal. Every
+  number degrades to "—" with an explanatory hint instead of a wrong calculation when the
+  underlying price/wear data isn't there yet — true for most of the 8 real items in the database
+  today, so this is deliberately not zero-state-hostile.
+
+Not screenshot-verified in this sandbox — the Wardrobe view sits behind the same invite-only auth
+gate as the rest of the signed-in app. `npm run build` passes with no errors; the migration and
+its function grants were checked directly against the live Supabase project (`has_function_
+privilege` confirms `authenticated` can call `increment_wardrobe_wear`, and the existing
+`wardrobe_items: owner only` RLS policy already covers `UPDATE`).
+
+---
+
 ## 2026-09-22 — Style Journal: /outfits redesigned into "Vibe Cards"
 
 Picked up the next roadmap item (`03-roadmap.md` Phase 3): "Style Journal ('Vibe Cards') —

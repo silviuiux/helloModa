@@ -5,7 +5,13 @@ import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
 import ConversationFromQuery from "@/components/ConversationFromQuery.jsx";
-import { addWardrobeItem, toggleWardrobeFavorite, removeWardrobeItem } from "@/actions/wardrobe";
+import {
+  addWardrobeItem,
+  toggleWardrobeFavorite,
+  removeWardrobeItem,
+  setWardrobeItemPrice,
+  logWardrobeItemWear,
+} from "@/actions/wardrobe";
 import { getConversationMessages } from "@/actions/conversations";
 import { signOut } from "@/actions/auth";
 import { identifyUser, track } from "@/lib/analytics";
@@ -32,6 +38,9 @@ function dbRowToItem(row) {
     tags: row.tags || [],
     fav: row.is_favorite,
     image: row.image_signed_url || null,
+    priceCents: row.price_cents ?? null,
+    wearCount: row.wear_count ?? 0,
+    lastWornAt: row.last_worn_at || null,
   };
 }
 
@@ -67,6 +76,7 @@ export default function AppShell({
         color: item.color,
         tags: item.tags,
         imagePath: item.imagePath,
+        priceCents: item.priceCents,
       });
       setWardrobe((prev) => prev.map((w) => (w.id === tempId ? dbRowToItem(saved) : w)));
       track("wardrobe_item_added", { category: item.category, has_photo: Boolean(item.imagePath) });
@@ -91,6 +101,39 @@ export default function AppShell({
     } catch (err) {
       console.error("Failed to update favorite:", err);
       setWardrobe((prev) => prev.map((it) => (it.id === id ? { ...it, fav: !nextFav } : it)));
+    }
+  }
+
+  async function setPrice(id, priceCents) {
+    const current = wardrobe.find((it) => it.id === id);
+    if (!current) return;
+    const previous = current.priceCents;
+    setWardrobe((prev) => prev.map((it) => (it.id === id ? { ...it, priceCents } : it)));
+    try {
+      await setWardrobeItemPrice(id, priceCents);
+    } catch (err) {
+      console.error("Failed to update price:", err);
+      setWardrobe((prev) => prev.map((it) => (it.id === id ? { ...it, priceCents: previous } : it)));
+    }
+  }
+
+  async function logWear(id) {
+    const current = wardrobe.find((it) => it.id === id);
+    if (!current) return;
+    const now = new Date().toISOString();
+    setWardrobe((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, wearCount: it.wearCount + 1, lastWornAt: now } : it))
+    );
+    try {
+      await logWardrobeItemWear(id);
+      track("wardrobe_item_worn", { category: current.category });
+    } catch (err) {
+      console.error("Failed to log wear:", err);
+      setWardrobe((prev) =>
+        prev.map((it) =>
+          it.id === id ? { ...it, wearCount: current.wearCount, lastWornAt: current.lastWornAt } : it
+        )
+      );
     }
   }
 
@@ -206,6 +249,8 @@ export default function AppShell({
             onAdd={handleAdd}
             onToggleFav={toggleFav}
             onRemove={removeItem}
+            onSetPrice={setPrice}
+            onLogWear={logWear}
           />
         )}
       </main>

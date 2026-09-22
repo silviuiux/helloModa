@@ -20,6 +20,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("Tops");
   const [color, setColor] = useState(swatches[0]);
+  const [price, setPrice] = useState("");
   const [photoBlob, setPhotoBlob] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -36,6 +37,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
     setBrand("");
     setCategory("Tops");
     setColor(swatches[0]);
+    setPrice("");
     setPhotoBlob(null);
     setPreviewUrl(null);
     setPhotoError(null);
@@ -114,6 +116,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
       fav: false,
       image: previewUrl,
       imagePath,
+      priceCents: Number.isFinite(parseFloat(price)) && price.trim() ? Math.round(parseFloat(price) * 100) : null,
     });
     resetForm();
     onClose();
@@ -207,6 +210,20 @@ export default function AddItemModal({ open, onClose, onAdd }) {
                 />
               ))}
             </div>
+          </Field>
+
+          <Field label="Purchase price (optional)">
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="e.g. 89.00"
+              className="input"
+            />
+            <p className="mt-1 text-[11.5px] text-faint">Powers cost-per-wear on this piece — skip it, add it anytime.</p>
           </Field>
         </div>
 

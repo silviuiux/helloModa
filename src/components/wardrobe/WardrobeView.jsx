@@ -1,17 +1,36 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Plus, Hanger } from "../Icons.jsx";
 import WardrobeItemCard from "./WardrobeItemCard.jsx";
 import AddItemModal from "./AddItemModal.jsx";
+import ClosetStats from "./ClosetStats.jsx";
+import { getStyledCounts } from "../../actions/wardrobe.js";
 import { wardrobeCategories } from "../../data/seed.js";
 
-export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
+export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSetPrice, onLogWear }) {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [favOnly, setFavOnly] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [styledCounts, setStyledCounts] = useState({});
+
+  // Lazy, one-shot: only needed for the "styled Nx" chip, not the core grid,
+  // so it shouldn't hold up first paint or re-run on every filter change.
+  useEffect(() => {
+    const ids = items.map((it) => it.id);
+    if (!ids.length) return;
+    getStyledCounts(ids)
+      .then(setStyledCounts)
+      .catch((err) => console.error("Failed to load styled counts:", err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
+
+  const itemsWithStats = useMemo(
+    () => items.map((it) => ({ ...it, styledCount: styledCounts[it.id] || 0 })),
+    [items, styledCounts]
+  );
 
   const filtered = useMemo(() => {
-    return items.filter((it) => {
+    return itemsWithStats.filter((it) => {
       const inCat = category === "All" || it.category === category;
       const inFav = !favOnly || it.fav;
       const inQuery =
@@ -20,7 +39,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
         it.brand.toLowerCase().includes(query.toLowerCase());
       return inCat && inFav && inQuery;
     });
-  }, [items, category, favOnly, query]);
+  }, [itemsWithStats, category, favOnly, query]);
 
   const countFor = (c) =>
     c === "All" ? items.length : items.filter((it) => it.category === c).length;
@@ -57,6 +76,8 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
           </button>
         </div>
       </header>
+
+      <ClosetStats items={items} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 border-b border-white/40 px-6 py-3.5 sm:px-8">
@@ -120,6 +141,8 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove }) {
                 item={it}
                 onToggleFav={onToggleFav}
                 onRemove={onRemove}
+                onSetPrice={onSetPrice}
+                onLogWear={onLogWear}
               />
             ))}
           </div>

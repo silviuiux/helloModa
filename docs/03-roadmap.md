@@ -97,7 +97,10 @@ plus retention features.
   is rendered on (start basic — this is a GDPR-sensitive feature, see risks doc, don't over-build
   before the legal/consent flow is right).
 - Calendar sync (Google first) + proactive nudges (needs a scheduled job, not just reactive chat).
-- Closet analytics: cost-per-wear, wardrobe value — straightforward once wardrobe data exists.
+- ✅ **Closet analytics, shipped 2026-09-22:** cost-per-wear and wardrobe value on the Wardrobe
+  view — turned out to need two new `wardrobe_items` columns first (`price_cents`, `wear_count`),
+  not just UI on data that already existed, since neither a purchase price nor a wear log existed
+  in the schema before this.
 - ✅ **Style Journal ("Vibe Cards"), shipped 2026-09-22:** `/outfits` (existing "Outfit history"
   list) redesigned into an editorial card grid grouped by month, reusing `conversations.title`
   (already the field this was meant to power, per `04-data-model.md`) and `created_at` — no new
