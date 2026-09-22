@@ -60,19 +60,39 @@ described below is now real code, not just a plan.
    hitting the URL. `AWIN_ITALIST_FEED_URL` and `SUPABASE_SERVICE_ROLE_KEY` need to be set in
    Vercel too (not just local `.env.local`) for the cron path to work — the manual script and
    the cron route are the same code, just two different triggers.
-2. Same script then embeds any product missing `embedding` (CLIP via `src/lib/embeddings.js`,
-   same 768-dim space as `wardrobe_items`) — the slow, costly part, so re-syncs only embed
-   new/changed rows, not the whole catalog every time.
+2. Same script then embeds up to `embedLimit` products missing `embedding` (CLIP via
+   `src/lib/embeddings.js`, same 768-dim space as `wardrobe_items`) — the slow, costly part, run
+   with bounded concurrency (`embedConcurrency`, default 8) so it actually finishes within a
+   serverless function's time limit rather than one call at a time. **Defaults are 400
+   products/8 concurrent per run** — tuned 2026-09-22 after finding, checked directly against
+   Supabase, that the Italist sync had upserted all 25,100 products but embedded **zero** of
+   them, almost certainly because the previous fully-sequential loop never got close to finishing
+   inside the cron route's 300s `maxDuration` before being killed. At 400/run that's still ~63
+   nightly cron runs to clear a backlog this size — for an initial full backfill, run
+   `node scripts/sync-products-italist.mjs --embed-limit 20000` (or similar) manually instead;
+   there's no serverless time cap outside Vercel, and the select-`is(embedding, null)` pattern
+   means a long manual run and nightly cron never redo each other's work.
 3. `match_products()` (Postgres function, pgvector cosine distance, mirrors the existing
    `match_wardrobe_items`) and its JS wrapper `src/lib/productMatching.js` do the actual
    matching — same pattern as `wardrobeMatching.js`, just over the `products` table instead of
    a user's closet. `products` RLS is public-read, so no auth is required to query it.
-4. **Not yet wired into `/api/chat`** — that's a deliberate follow-up, not part of this
-   scaffold: today's "shop" suggestions are still honest AI text guesses (no real link). Wiring
-   means, per outfit slot, calling `matchProducts()` and preferring a real hit above some
-   similarity threshold over the AI guess, populating `outfit_recommendation_items.product_id`
-   instead of `suggested_brand`/`suggested_name`. Worth doing once Italist's catalog has
-   actually been synced and spot-checked for match quality, not blind.
+   **Deliberately not filtered by category** (`matchProducts()`'s optional `category` param is
+   unused by the chat wiring below) — checked directly against Italist's real synced data and its
+   `category` values are the retailer's own taxonomy strings ("Sneakers", "Shirts", "Clothing
+   Accessories"), not this app's top/bottoms/dress/outerwear/shoe/bag/accessory enum, so filtering
+   on it would just silently exclude every real product. That mismatch will only get messier
+   across different retailers' own category schemes, so semantic similarity on the description
+   alone is the more durable filter — worth revisiting only if/when there's a reason to build a
+   real per-retailer category mapping.
+4. **✅ Wired into `/api/chat`, 2026-09-22.** Each "shop" piece the stylist suggests gets one
+   `matchProducts()` lookup (top-1, no category filter, similarity threshold
+   `PRODUCT_MATCH_MIN_SIMILARITY = 0.26` in `src/app/api/chat/route.js` — picked without real
+   match data to calibrate against, since production has no populated embeddings yet; revisit
+   once it does). A hit above threshold sets `outfit_recommendation_items.product_id` and the
+   card shows a real photo, price, and an outbound affiliate link (`RecommendationCards.jsx`);
+   below threshold (or the lookup errors) falls back to today's honest AI text guess, unchanged.
+   Functionally dormant in production until the embedding backlog above is actually cleared —
+   the code path is correct and ready, there's simply nothing to match against yet.
 5. Adding the next approved advertiser (once one comes in) is a copy of
    `scripts/sync-products-italist.mjs` with a new retailer slug and feed env var — the shared
    logic in `syncAwinProducts.mjs` doesn't change.

@@ -40,12 +40,14 @@ high-intent niche, matching the business plan's Phase 1 GTM.
   editable, brand only ever set from a visible logo. Background removal is
   deliberately deferred (needs a separate paid service, not required for a
   usable loop).
-- Outfit recommendations: resolve today's "shop" suggestions to real affiliate products from the
-  cached catalog (`05-integrations-affiliates.md`) via text/category match once Awin is live —
-  no image generation or CV matching yet, keep this phase cheap and fast. (Image generation
-  ended up shipping anyway, Phase 2, see below — this bullet's "no CV matching yet" still holds:
-  ✅ the shared CLIP-embedding/pgvector-matching infra shipped 2026-09-20, scoped to the wardrobe
-  only since Awin itself is still on hold — see Phase 3's embedding bullet.)
+- ✅ **Outfit recommendations resolved to real catalog products, wired 2026-09-22:** "shop"
+  suggestions now get one CLIP-similarity lookup against the Awin/Italist catalog
+  (`05-integrations-affiliates.md`) before falling back to an AI text guess — ended up being
+  semantic-embedding match, not text/category match as originally planned here, since Italist's
+  real category strings don't line up with this app's own category enum (see that doc for the
+  detail). **Functionally dormant in production for now**: the Italist catalog synced 25,100
+  products but none have embeddings populated yet — that backlog needs clearing before any real
+  match can happen, unrelated to whether the wiring itself is correct.
 - "Upload your invitation" tool: parse a wedding invitation image/text for dress code cues (can
   reuse the same vision-model call as closet tagging).
 - ✅ **SEO landing pages, shipped 2026-09-20, broadened same day:** `/what-to-wear/[slug]` — 9

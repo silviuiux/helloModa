@@ -101,10 +101,14 @@ outfit_recommendation_items
   id (uuid, pk)
   recommendation_id (fk -> outfit_recommendations)
   wardrobe_item_id (fk -> wardrobe_items, nullable)   -- set if sourced from closet
-  product_id (fk -> products, nullable)                -- set if matched to real catalog (Phase 3)
-  suggested_brand         text   -- set instead, when this is a pure AI suggestion not yet
-  suggested_name          text   -- matched to a real product (Phase 1 reality: no catalog
-  suggested_category      text   -- exists yet — see 05-integrations-affiliates.md)
+  product_id (fk -> products, nullable)                -- ✅ actually populated now, 2026-09-22:
+                                    /api/chat matches each "shop" suggestion against the Awin
+                                    catalog and sets this above a similarity threshold — see
+                                    05-integrations-affiliates.md. Still often null in practice
+                                    (no match, or below threshold), same fallback as before.
+  suggested_brand         text   -- set instead, when this is a pure AI suggestion not
+  suggested_name          text   -- matched to a real product — see 05-integrations-
+  suggested_category      text   -- affiliates.md for when that actually happens
   role                    text   -- e.g. 'hero', 'layer', 'accessory'
   -- No longer requires wardrobe_item_id OR product_id to be set (the original
   -- constraint) — a row can have all three source fields null-but-suggested_*,

@@ -4,6 +4,55 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Wire Awin product matching into chat, fix the embedding backlog
+
+Picked back up `05-integrations-affiliates.md`'s explicitly-flagged follow-up: "Not yet wired
+into `/api/chat`." Checked the real state of things directly against Supabase before writing any
+code, and found two problems worth fixing alongside the wiring itself, not after:
+
+- **The Italist catalog had zero embedded products.** 25,100 rows synced, 0 with `embedding` set
+  — matching was never going to find anything regardless of how the chat side was wired. Root
+  cause, from reading `syncAwinProducts.mjs`: the embed step was a fully sequential loop, one
+  Replicate call at a time, against a cron route capped at `maxDuration = 300`. At that catalog
+  size that loop was never going to finish inside one invocation. Fixed: bounded + concurrent
+  (`embedLimit` default 400, `embedConcurrency` default 8, `mapWithConcurrency` — no new
+  dependency), resumable across runs since it always re-queries `embedding is null`. For clearing
+  the existing 25,100-row backlog, documented running the manual script once with a large
+  `--embed-limit` (no serverless time cap outside Vercel) rather than waiting ~63 nights on cron
+  alone.
+- **`products.category` doesn't mean what the chat side would have assumed.** Checked the real
+  synced values: `"Sneakers"` (21,171 of 25,100 rows — this catalog is overwhelmingly shoes),
+  `"Shirts"`, `"Clothing Accessories"`, not this app's `top`/`bottoms`/`dress`/... enum. Filtering
+  `matchProducts()` by category using the app's own type values would have silently returned
+  nothing, ever. Left the category filter unused for chat matching — semantic similarity on the
+  description is the only filter that survives different retailers having different taxonomies.
+
+With that groundwork actually checked, wired the matching itself:
+
+- **`/api/chat/route.js`**: every "shop"-sourced piece the stylist suggests now gets one
+  `matchProducts()` lookup (top-1 hit, `PRODUCT_MATCH_MIN_SIMILARITY = 0.26` — picked without real
+  match data to calibrate against, flagged in-code to revisit once the embedding backlog clears
+  and there's something to eyeball). A hit above threshold sets
+  `outfit_recommendation_items.product_id` instead of the `suggested_*` text fields; below
+  threshold, or the lookup errors, falls straight back to today's honest AI guess — never a live
+  retailer API call in the request path, still just the pre-synced `products` cache.
+- **`actions/conversations.js`**: `mapRecommendationItem` (shared by chat history reload and
+  `/outfits`) gets a third branch alongside wardrobe-sourced and AI-guess pieces, resolving a
+  `product_id` back into the same card shape.
+- **`RecommendationCards.jsx`**: a matched real product now shows its actual photo
+  (`ImageWithFallback`, same graceful-degradation pattern as everywhere else in this app) and
+  price, and the photo links out to the real `product_url` — the Awin deep link, carried through
+  completely unmodified — in a new tab (`rel="noopener nofollow sponsored"`). Everything else
+  (closet pieces, unmatched AI guesses) renders exactly as before.
+
+Net effect right now: correct, tested-as-much-as-this-sandbox-allows code that will start
+resolving real products the moment the embedding backlog above actually clears in production —
+not before. `npm run build` passes with no errors; `matchProducts()`/`embedText()` ultimately call
+Replicate, which this sandbox still can't reach, so the match path itself is unverified against a
+live call, same caveat as every other Replicate-backed feature in this log.
+
+---
+
 ## 2026-09-22 — Chat hero image: back to portrait
 
 Direct request. The chat hero image (`OutfitHero.jsx`) went portrait `4:5` → landscape `3:2` on

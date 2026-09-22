@@ -14,7 +14,12 @@ const CATEGORY_TO_TYPE = {
 };
 
 // Shared by getConversationMessages and listOutfitHistory — one
-// outfit_recommendation_items row -> the card shape RecommendationCards.jsx expects.
+// outfit_recommendation_items row -> the card shape RecommendationCards.jsx
+// expects. `products` (real Awin-matched pieces, docs/05-integrations-
+// affiliates.md) don't carry this app's own top/bottoms/dress/... type —
+// their `category` is the retailer's own taxonomy string ("Sneakers",
+// "Shirts") — so `type` here is only a GarmentArt-fallback hint for the
+// rare case a matched product has no image, not used for filtering.
 function mapRecommendationItem(it) {
   if (it.wardrobe_items) {
     return {
@@ -25,6 +30,21 @@ function mapRecommendationItem(it) {
       price: null,
       retailer: "Closet",
       source: "closet",
+    };
+  }
+  if (it.products) {
+    return {
+      id: it.id,
+      brand: it.products.brand,
+      name: it.products.name,
+      type: "top",
+      price: it.products.price_cents != null ? it.products.price_cents / 100 : null,
+      currency: it.products.currency || "EUR",
+      retailer: it.products.retailer,
+      source: "shop",
+      productUrl: it.products.product_url,
+      imageUrl: it.products.image_url,
+      matched: true,
     };
   }
   return {
@@ -82,7 +102,7 @@ export async function getConversationMessages(conversationId) {
     const { data, error: itemsError } = await supabase
       .from("outfit_recommendation_items")
       .select(
-        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category)"
+        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url)"
       )
       .in("recommendation_id", recIds);
     if (itemsError) throw new Error(itemsError.message);
@@ -157,7 +177,7 @@ export async function listOutfitHistory() {
     const { data: items, error: itemsError } = await supabase
       .from("outfit_recommendation_items")
       .select(
-        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category)"
+        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url)"
       )
       .in("recommendation_id", recIds);
     if (itemsError) throw new Error(itemsError.message);

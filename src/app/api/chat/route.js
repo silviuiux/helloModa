@@ -9,12 +9,23 @@ import {
   formatWardrobeForPrompt,
   formatProfileForPrompt,
 } from "@/lib/stylist";
+import { matchProducts } from "@/lib/productMatching";
 
 // Model choice: claude-opus-5 (current default per house policy). Swappable
 // to claude-sonnet-5 here alone if per-message cost becomes a concern at
 // real volume — see docs/07-costs-budget.md.
 const MODEL = "claude-opus-5";
 const HISTORY_TURNS = 10;
+
+// Awin product matching (docs/05-integrations-affiliates.md) — how confident
+// a pgvector cosine-similarity hit has to be before a "shop" suggestion
+// resolves to a real, buyable product instead of staying an honest AI text
+// guess. Picked without real match data to calibrate against — the synced
+// Italist catalog has no embeddings populated in production yet (checked
+// directly against Supabase 2026-09-22: 0 of 25,100 rows), so this number
+// is a reasonable CLIP-similarity starting point, not a tuned value. Revisit
+// once there's real embedding data to eyeball good vs. bad matches against.
+const PRODUCT_MATCH_MIN_SIMILARITY = 0.26;
 
 const CATEGORY_TO_TYPE = {
   Tops: "top",
@@ -175,12 +186,34 @@ export async function POST(request) {
 
   // Defensive: never trust a model-returned wardrobeItemId at face value.
   const wardrobeById = new Map((wardrobe || []).map((w) => [w.id, w]));
-  const pieces = parsed.pieces.map((p) => {
-    const wardrobeItem = p.source === "closet" ? wardrobeById.get(p.wardrobeItemId) : null;
-    return wardrobeItem
-      ? { source: "closet", wardrobeItem }
-      : { source: "shop", brand: p.brand, name: p.name, type: p.type };
-  });
+  // "shop" pieces get one shot at resolving to a real, buyable product
+  // (Awin-synced catalog) before falling back to the honest AI text guess
+  // this app has always shown — never a live retailer API call in the
+  // request path (docs/05-integrations-affiliates.md), just a pgvector
+  // lookup against the pre-synced `products` cache. Deliberately NOT
+  // filtered by category: verified directly against the real Italist data
+  // that its own category strings ("Sneakers", "Shirts", "Clothing
+  // Accessories") don't line up with this app's top/bottoms/dress/...
+  // enum, and that mismatch would only get worse across different
+  // retailers' own taxonomies — semantic similarity on the description
+  // alone is the more robust filter across advertisers.
+  const pieces = await Promise.all(
+    parsed.pieces.map(async (p) => {
+      const wardrobeItem = p.source === "closet" ? wardrobeById.get(p.wardrobeItemId) : null;
+      if (wardrobeItem) return { source: "closet", wardrobeItem };
+
+      let product = null;
+      try {
+        const [top] = await matchProducts(supabase, `${p.brand} ${p.name}`.trim(), { limit: 1 });
+        if (top && top.similarity >= PRODUCT_MATCH_MIN_SIMILARITY) product = top;
+      } catch (err) {
+        console.error("Product match failed, falling back to AI suggestion:", err);
+      }
+      return product
+        ? { source: "shop", type: p.type, product }
+        : { source: "shop", brand: p.brand, name: p.name, type: p.type };
+    })
+  );
 
   const { data: assistantMessageRow, error: assistantMessageError } = await supabase
     .from("messages")
@@ -206,27 +239,37 @@ export async function POST(request) {
     return NextResponse.json({ error: recommendationError.message }, { status: 500 });
   }
 
-  const itemRows = pieces.map((p) =>
-    p.source === "closet"
-      ? { recommendation_id: recommendationRow.id, wardrobe_item_id: p.wardrobeItem.id }
-      : {
-          recommendation_id: recommendationRow.id,
-          suggested_brand: p.brand,
-          suggested_name: p.name,
-          suggested_category: p.type,
-        }
-  );
+  const itemRows = pieces.map((p) => {
+    if (p.source === "closet") {
+      return { recommendation_id: recommendationRow.id, wardrobe_item_id: p.wardrobeItem.id };
+    }
+    if (p.product) {
+      return { recommendation_id: recommendationRow.id, product_id: p.product.id };
+    }
+    return {
+      recommendation_id: recommendationRow.id,
+      suggested_brand: p.brand,
+      suggested_name: p.name,
+      suggested_category: p.type,
+    };
+  });
   const { data: insertedItems, error: itemsError } = await supabase
     .from("outfit_recommendation_items")
     .insert(itemRows)
-    .select("id, wardrobe_item_id, suggested_brand, suggested_name, suggested_category");
+    .select("id, wardrobe_item_id, product_id, suggested_brand, suggested_name, suggested_category");
   if (itemsError) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  const uiPieces = insertedItems.map((it) => {
-    if (it.wardrobe_item_id) {
-      const w = wardrobeById.get(it.wardrobe_item_id);
+  // Zips back up with `pieces` by index — safe here because both arrays
+  // come from the same single-statement INSERT...RETURNING above, which
+  // preserves row order; `it.product_id` alone isn't enough to rebuild the
+  // full product (brand/price/image/etc.) without a second query, and the
+  // matched row is already sitting in memory from the match above.
+  const uiPieces = insertedItems.map((it, i) => {
+    const p = pieces[i];
+    if (p.source === "closet") {
+      const w = p.wardrobeItem;
       return {
         id: it.id,
         brand: w.brand,
@@ -237,11 +280,26 @@ export async function POST(request) {
         source: "closet",
       };
     }
+    if (p.product) {
+      return {
+        id: it.id,
+        brand: p.product.brand,
+        name: p.product.name,
+        type: p.type || "top",
+        price: p.product.price_cents != null ? p.product.price_cents / 100 : null,
+        currency: p.product.currency || "EUR",
+        retailer: p.product.retailer,
+        source: "shop",
+        productUrl: p.product.product_url,
+        imageUrl: p.product.image_url,
+        matched: true,
+      };
+    }
     return {
       id: it.id,
-      brand: it.suggested_brand,
-      name: it.suggested_name,
-      type: it.suggested_category || "top",
+      brand: p.brand,
+      name: p.name,
+      type: p.type || "top",
       price: null,
       retailer: "Suggested",
       source: "shop",

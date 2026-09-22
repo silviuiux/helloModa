@@ -1,5 +1,8 @@
 import GarmentArt from "../GarmentArt.jsx";
+import ImageWithFallback from "../ImageWithFallback.jsx";
 import { Heart, Hanger } from "../Icons.jsx";
+
+const EUR = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 2 });
 
 function RetailerTag({ retailer, source }) {
   if (source === "closet") {
@@ -25,11 +28,31 @@ function RetailerTag({ retailer, source }) {
   );
 }
 
+// A real Awin-matched product (docs/05-integrations-affiliates.md) gets a
+// real photo and an outbound link straight to the retailer — everything
+// else (closet pieces, unmatched AI "shop" guesses) stays exactly as
+// before, no photo, no link, since there's nowhere real to send anyone.
+// The link wraps only the image (an <a>), not the whole card, so the save
+// button stays its own separate control rather than nested interactive
+// elements inside the anchor.
 function ProductCard({ card, onToggleSave, saved }) {
+  const isMatched = card.matched && card.productUrl;
+
   return (
     <div>
       <div className="group relative aspect-[3/4] overflow-hidden rounded-xl2">
-        <GarmentArt type={card.type} />
+        {isMatched ? (
+          <a href={card.productUrl} target="_blank" rel="noopener nofollow sponsored" className="absolute inset-0 block">
+            <ImageWithFallback
+              src={card.imageUrl}
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              fallback={<GarmentArt type={card.type} />}
+            />
+          </a>
+        ) : (
+          <GarmentArt type={card.type} />
+        )}
         <button
           onClick={() => onToggleSave?.(card)}
           aria-label={saved ? "Saved to wardrobe" : "Save to wardrobe"}
@@ -44,8 +67,11 @@ function ProductCard({ card, onToggleSave, saved }) {
       <div className="mt-3">
         <p className="label text-faint">{card.brand}</p>
         <p className="mt-1 text-[14px] font-medium text-ink">{card.name}</p>
-        <div className="mt-1">
+        <div className="mt-1 flex items-center justify-between gap-2">
           <RetailerTag retailer={card.retailer} source={card.source} />
+          {card.price != null && (
+            <span className="shrink-0 text-[12.5px] font-medium text-ink">{EUR.format(card.price)}</span>
+          )}
         </div>
       </div>
     </div>

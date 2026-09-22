@@ -11,13 +11,19 @@
 // into chat/commit it — same rule as the Replicate token).
 //
 // Run manually (nightly cron/scheduled job later):
-//   node scripts/sync-products-italist.mjs [--limit 50]
+//   node scripts/sync-products-italist.mjs [--limit 50] [--embed-limit 400]
 // or with .env.local already populated (AWIN_ITALIST_FEED_URL,
 // SUPABASE_SERVICE_ROLE_KEY):
 //   node scripts/sync-products-italist.mjs
 //
 // Costs real money (one Replicate CLIP call per new/changed product) — use
-// --limit while testing against a fresh feed.
+// --limit while testing against a fresh feed. --embed-limit caps how many
+// products get embedded in this one run (default 400, matching the cron
+// route's default so a serverless invocation stays inside its time limit) —
+// run this script manually with a large --embed-limit (or just run it
+// several times back to back) for an initial full backfill rather than
+// waiting on ~400/night from cron alone; there's no serverless time cap
+// here, so a single long-running manual pass can clear the whole backlog.
 
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -43,9 +49,12 @@ const { syncAwinProducts } = await import(path.join(rootDir, "scripts/lib/syncAw
 
 const limitArg = process.argv.indexOf("--limit");
 const limit = limitArg !== -1 ? parseInt(process.argv[limitArg + 1], 10) : undefined;
+const embedLimitArg = process.argv.indexOf("--embed-limit");
+const embedLimit = embedLimitArg !== -1 ? parseInt(process.argv[embedLimitArg + 1], 10) : undefined;
 
 await syncAwinProducts({
   retailer: "italist",
   feedUrl: process.env.AWIN_ITALIST_FEED_URL,
   limit,
+  ...(embedLimit != null ? { embedLimit } : {}),
 });

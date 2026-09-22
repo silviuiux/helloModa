@@ -22,6 +22,28 @@ const FIELD_ALIASES = {
   imageUrl: ["aw_image_url", "merchant_image_url", "large_image"],
 };
 
+// Minimal concurrency-limited runner — no new dependency, mirrors this
+// repo's other no-dependency-script preference. Needed because embedding is
+// one Replicate call per product: at the catalog sizes a real Awin feed
+// actually has (Italist alone is 25,000+ rows), doing this one at a time
+// would take hours and blow well past any serverless function's time limit
+// (the cron route below caps at 300s) — caught 2026-09-22 checking a real
+// sync's results directly against Supabase: 0 of 25,100 products had ever
+// gotten an embedding, most likely because a fully sequential loop here
+// never got anywhere close to finishing within one invocation.
+async function mapWithConcurrency(items, concurrency, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i], i);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+  return results;
+}
+
 function pick(row, keys) {
   for (const key of keys) {
     if (row[key] != null && row[key] !== "") return row[key];
@@ -103,7 +125,13 @@ function toProductRecord(row, retailer) {
   };
 }
 
-export async function syncAwinProducts({ retailer, feedUrl, limit }) {
+export async function syncAwinProducts({
+  retailer,
+  feedUrl,
+  limit,
+  embedLimit = 400,
+  embedConcurrency = 8,
+}) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set — required to write past RLS.");
   }
@@ -156,17 +184,25 @@ export async function syncAwinProducts({ retailer, feedUrl, limit }) {
     console.log(`[${retailer}] upserted ${upserted}/${records.length}`);
   }
 
-  console.log(`[${retailer}] embedding new/changed products (this is the slow, costly part)...`);
+  // Capped + concurrent, not "embed everything now" — at real catalog sizes
+  // that's hours of sequential work (see mapWithConcurrency's comment
+  // above). This processes up to `embedLimit` products per call, in
+  // parallel batches of `embedConcurrency`, and leaves the rest for the
+  // next run (nightly cron, or the manual script again) — resumable for
+  // free since this always re-queries `embedding is null`, so a capped or
+  // even interrupted run never redoes finished work.
+  console.log(`[${retailer}] embedding up to ${embedLimit} new/changed products (the slow, costly part)...`);
   const { data: unembedded, error: selectError } = await supabase
     .from("products")
     .select("id, name, brand, category, image_url")
     .eq("retailer", retailer)
-    .is("embedding", null);
+    .is("embedding", null)
+    .limit(embedLimit);
   if (selectError) throw new Error(selectError.message);
 
   let embedded = 0;
   let failed = 0;
-  for (const product of unembedded || []) {
+  await mapWithConcurrency(unembedded || [], embedConcurrency, async (product) => {
     try {
       const embedding = product.image_url
         ? await embedImageUrl(product.image_url)
@@ -181,7 +217,7 @@ export async function syncAwinProducts({ retailer, feedUrl, limit }) {
       console.error(`  embedding failed for product ${product.id}:`, err.message);
       failed++;
     }
-  }
+  });
 
   console.log(`[${retailer}] done. upserted=${records.length} embedded=${embedded} failed=${failed}`);
   return { upserted: records.length, embedded, failed };
