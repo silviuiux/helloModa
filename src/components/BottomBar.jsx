@@ -142,6 +142,76 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
   );
 }
 
+// helloAvatar (docs/03-roadmap.md Phase 3): who the next generated outfit
+// is modeled on. Only shown once at least one avatar exists (self or
+// family) — nothing to pick otherwise, and this shouldn't clutter the bar
+// for accounts that haven't set one up. "No avatar" is always the first
+// option — picking it goes back to today's plain generation, no reference
+// figure.
+function AvatarMenu({ avatarProfiles, activeAvatarId, onSelectAvatar }) {
+  if (!avatarProfiles?.length) return null;
+  const active = avatarProfiles.find((a) => a.id === activeAvatarId) || null;
+
+  return (
+    <Dropdown
+      trigger={(toggle, open) => (
+        <button
+          onClick={toggle}
+          aria-label="Styling for"
+          title={active ? `Styling for ${active.display_name}` : "Styling for: no avatar"}
+          className={`grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full transition-colors ${
+            open ? "bg-white/70" : "glass-circle"
+          }`}
+        >
+          {active?.avatar_image_signed_url ? (
+            <img src={active.avatar_image_signed_url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <User size={18} className="text-muted" />
+          )}
+        </button>
+      )}
+    >
+      {(close) => (
+        <div className="px-1 py-1">
+          <p className="px-2 py-1.5 text-[11px] uppercase tracking-label text-faint">Styling for</p>
+          <button
+            onClick={() => {
+              onSelectAvatar(null);
+              close();
+            }}
+            className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-[13.5px] transition-colors ${
+              !activeAvatarId ? "bg-accent-tint font-medium text-accent-deep" : "text-muted hover:bg-white/60 hover:text-ink"
+            }`}
+          >
+            No avatar
+          </button>
+          {avatarProfiles.map((a) => (
+            <button
+              key={a.id}
+              onClick={() => {
+                onSelectAvatar(a.id);
+                close();
+              }}
+              className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-[13.5px] transition-colors ${
+                a.id === activeAvatarId ? "bg-accent-tint font-medium text-accent-deep" : "text-muted hover:bg-white/60 hover:text-ink"
+              }`}
+            >
+              <span className="grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-full bg-white/60">
+                {a.avatar_image_signed_url ? (
+                  <img src={a.avatar_image_signed_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <User size={12} className="text-faint" />
+                )}
+              </span>
+              {a.is_self ? "Myself" : a.display_name}
+            </button>
+          ))}
+        </div>
+      )}
+    </Dropdown>
+  );
+}
+
 function AccountMenu({ userEmail, onSignOut }) {
   if (!userEmail) return null;
   return (
@@ -169,6 +239,12 @@ function AccountMenu({ userEmail, onSignOut }) {
             className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/60 hover:text-accent-deep"
           >
             Profile
+          </Link>
+          <Link
+            href="/avatars"
+            className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/60 hover:text-accent-deep"
+          >
+            Avatars
           </Link>
           <form action={onSignOut}>
             <button
@@ -236,6 +312,9 @@ export default function BottomBar({
   onSend,
   sending = false,
   shareText,
+  avatarProfiles = [],
+  activeAvatarId,
+  onSelectAvatar,
 }) {
   const [value, setValue] = useState("");
 
@@ -270,6 +349,7 @@ export default function BottomBar({
         onSelect={onSelectConversation}
         onNewChat={onNewChat}
       />
+      <AvatarMenu avatarProfiles={avatarProfiles} activeAvatarId={activeAvatarId} onSelectAvatar={onSelectAvatar} />
       <ShareButton shareText={shareText} />
       <AccountMenu userEmail={userEmail} onSignOut={onSignOut} />
     </>

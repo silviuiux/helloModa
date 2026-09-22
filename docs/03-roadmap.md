@@ -93,9 +93,15 @@ plus retention features.
   against the wardrobe (which is real, needs no Awin) since it's a shared prerequisite either way.
   What's left here once Awin exists: the ingestion job that populates `products.embedding`, and
   extending `match_wardrobe_items()`'s pattern to a `products` equivalent.
-- helloAvatar v1: user-uploaded reference photos → a simple digital twin the generated outfit
-  is rendered on (start basic — this is a GDPR-sensitive feature, see risks doc, don't over-build
-  before the legal/consent flow is right).
+- ✅ **helloAvatar v1, shipped 2026-09-22:** `/avatars` — the account holder plus up to 3 family
+  members, each with their own measurements/sizes and a generated watercolor avatar. Consent is
+  per-avatar and recorded (`avatar_profiles.consent_attested_at/consent_text_version`), and the
+  reference photo is never stored at all (not stored-then-deleted — never written to disk/Storage
+  in the first place; see `06-risks-legal.md` #3 and the 2026-09-22 changelog entry for the full
+  reasoning). Wired into chat: picking an avatar in the bottom bar sends outfit generation through
+  that avatar's painted image as an img2img reference (`generateOutfitImage`, `src/lib/imageGen.js`),
+  and the stylist's text reply uses that avatar's sizing/measurements when it isn't the account
+  holder's own.
 - Calendar sync (Google first) + proactive nudges (needs a scheduled job, not just reactive chat).
 - ✅ **Closet analytics, shipped 2026-09-22:** cost-per-wear and wardrobe value on the Wardrobe
   view — turned out to need two new `wardrobe_items` columns first (`price_cents`, `wear_count`),

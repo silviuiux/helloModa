@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { listConversations } from "@/actions/conversations";
+import { listAvatarProfiles } from "@/actions/avatars";
 import { signWardrobeItems } from "@/lib/wardrobeImages";
+import { signAvatarProfiles } from "@/lib/avatarImages";
 import AppShell from "./AppShell.jsx";
 import LandingPage from "./LandingPage.jsx";
 
@@ -39,6 +41,12 @@ export default async function HomePage() {
     return [];
   });
 
+  const avatarRows = await listAvatarProfiles().catch((err) => {
+    console.error("Failed to load avatar profiles:", err.message);
+    return [];
+  });
+  const avatarProfiles = await signAvatarProfiles(supabase, avatarRows);
+
   // Always land on the welcome screen (docs/09-conversation-design.md) — past
   // conversations are reachable via the top bar's History dropdown, not
   // auto-resumed.
@@ -51,6 +59,7 @@ export default async function HomePage() {
       initialConversations={conversations}
       initialActiveConversationId={null}
       initialMessages={[]}
+      initialAvatarProfiles={avatarProfiles}
     />
   );
 }

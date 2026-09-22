@@ -55,6 +55,29 @@ classifies as special-category (Article 9) — higher consent bar than ordinary 
 - This is exactly why `03-roadmap.md` Phase 3 says "don't over-build before the legal/consent
   flow is right" — build the consent mechanism as part of the feature, not after.
 
+**✅ Built as part of the feature, shipped 2026-09-22 — still not a substitute for real legal
+review before any public launch:**
+- Consent is per-avatar-profile, separate text from ToS (`src/lib/avatarConsent.js`), a required
+  checkbox before the generate button is enabled, and the response is stamped
+  (`consent_attested_at`, `consent_text_version`) — reusable evidence of what was agreed to and
+  when, not just an unchecked assumption.
+- For a family member (who has no login of their own), consent is the account holder's explicit
+  attestation ("I have this person's permission, or I'm their parent/guardian") — a direct product
+  decision (2026-09-22), not a legal opinion that this is sufficient in every jurisdiction. A
+  family member consenting for themselves, with their own account, would be the more airtight
+  version of this and is a reasonable next step if this feature sees real usage.
+- Retention: the source photo is never written to Storage, the database, or logs at all — it
+  lives only in the memory of the single request that turns it into a short non-identifying
+  appearance description (build/hair/skin tone, explicitly not facial-recognition-level detail),
+  then a generated watercolor image. Only that final image is retained; deleting an avatar profile
+  (`deleteAvatarProfile`, `src/actions/avatars.js`) removes it from Storage too, not just the DB
+  row. This is a stricter retention posture than "store then delete," chosen specifically to
+  minimize how long anything derived from the photo exists.
+- Still open, not addressed by this build: whether this consent design actually satisfies GDPR
+  Article 9's bar in the jurisdictions this ships to is a real legal question, not something to
+  infer from the code — get it reviewed before this leaves private beta, same as the rest of this
+  document's items.
+
 ## 4. Retailer Terms of Service
 
 Covered in depth in `05-integrations-affiliates.md`: use affiliate network feeds, not scraping.

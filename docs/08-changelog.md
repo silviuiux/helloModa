@@ -4,6 +4,64 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — helloAvatar v1: family avatars as outfit models
+
+Direct request: an avatar per user plus up to 3 family members, each with their own measurements
+and a watercolor-style render, used as the model for outfits generated in chat. `03-roadmap.md`
+already flagged this as GDPR-sensitive (`06-risks-legal.md` #3) and said the consent flow has to
+be built as part of the feature, not after — that shaped most of the design decisions below, all
+confirmed directly rather than assumed:
+
+- **Photo-based likeness, not attribute-only** — a reference photo is genuinely used to inform
+  the avatar, not just a picker of build/skin-tone/hair options.
+- **The photo is never stored, anywhere, at any point.** It arrives as base64 in one API request
+  (`POST /api/avatar/generate`), goes straight into a single Claude vision call
+  (`src/lib/avatarDescriber.js` — deliberately scoped to a non-identifying, illustrator's-brief
+  level of description: build, hair, skin tone, explicitly *not* facial-feature detail), and is
+  discarded when the request completes. Nothing downstream — the image generation step, Storage,
+  the database, logs — ever sees the raw photo. Only the final generated watercolor image is
+  persisted. This is stricter than "store then delete on a timer"; there's nothing to delete
+  because nothing was written.
+- **Consent is per-avatar, separate from ToS, and recorded** — a required checkbox
+  (`src/lib/avatarConsent.js`) gates the generate button, and a successful generation stamps
+  `consent_attested_at` + `consent_text_version` on that avatar_profiles row. For a family member
+  (no login of their own), consent is the account holder's explicit attestation that they have
+  that person's permission or are their parent/guardian — a real product decision, not a legal
+  conclusion; `06-risks-legal.md` #3 now documents exactly what was built and what's still open.
+- **New `avatar_profiles` table** (migration `avatar_profiles`, applied directly to Supabase —
+  see `04-data-model.md`): one row per model, `is_self` true for exactly one (partial unique
+  index), up to 3 more as family members (capped app-side in `src/actions/avatars.js`, matching
+  this codebase's existing preference for business rules in the action layer over DB triggers).
+  New private `avatar-renders` Storage bucket, same owner-folder RLS pattern as the other three
+  buckets. Deleting a profile (`deleteAvatarProfile`) removes its Storage object too, not just
+  the row.
+- **New `/avatars` page** (`AvatarsView.jsx`, `AvatarCard.jsx`, `AvatarProfileModal.jsx`) — a
+  card grid matching the app's existing large-surface visual language (`EmptyState.jsx`'s
+  occasion cards), linked from the account menu in `BottomBar.jsx`. "Set up your avatar" prefills
+  from the measurements already on `/profile` rather than asking twice.
+  `src/app/api/avatar/generate/route.js` does the vision → appearance-brief → watercolor-portrait
+  pipeline (`generateAvatarPortrait`, `src/lib/imageGen.js`, sharing the same `STYLE_DIRECTIVE`
+  as outfit images, so an avatar and a generated look read as the same house style).
+- **Wired into chat, both halves:** `BottomBar.jsx` gets a "styling for" picker (defaults to the
+  account holder if a self-avatar exists, otherwise none selected — never silently assumed
+  otherwise). The pick flows through `/api/chat` two ways: (1) `formatProfileForPrompt`
+  (`src/lib/stylist.js`) now takes the selected avatar and swaps in *their* sizing/measurements
+  instead of the account holder's when styling for someone else, so the narrative fits the right
+  body; (2) the resulting `outfit_recommendations` row stores `avatar_profile_id`, which
+  `POST /api/generate-image` reads back to pass that avatar's painted image to Flux as an img2img
+  reference (`generateOutfitImage`'s new `referenceImageUrl` param) — the honest limit here is
+  that Flux has no true character-consistency mechanism, so this is a strong loose reference
+  (pose/figure/coloring), not a guarantee of pixel-identical likeness across generations.
+
+Not screenshot-verified in this sandbox — `/avatars` sits behind the same invite-only auth gate
+as the rest of the signed-in app, and Replicate/Anthropic calls aren't reachable here either
+(same limitation as every other real-generation feature in this codebase). `npm run build` passes
+with no errors; the migration (table, RLS, unique index, Storage bucket + policies) was applied
+and confirmed directly against the live Supabase project, same as the closet-analytics migration
+above.
+
+---
+
 ## 2026-09-22 — Closet analytics: cost-per-wear + wardrobe value
 
 Next roadmap item after the Style Journal (`03-roadmap.md` Phase 3). The roadmap called this

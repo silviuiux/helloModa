@@ -46,6 +46,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Message can't be empty." }, { status: 400 });
   }
   const conversationId = body.conversationId || null;
+  const avatarProfileId = body.avatarProfileId || null;
 
   // Resolve/verify the conversation server-side — never trust a client-passed
   // conversationId without checking it actually belongs to this user (RLS
@@ -91,6 +92,19 @@ export async function POST(request) {
     console.error("Failed to load profile for chat context:", profileError.message);
   }
 
+  // RLS (owner-only) makes a cross-user id just come back null here — no
+  // separate ownership check needed before using it.
+  let avatarProfile = null;
+  if (avatarProfileId) {
+    const { data, error: avatarError } = await supabase
+      .from("avatar_profiles")
+      .select("id, is_self, display_name, relationship, gender, height_cm, weight_kg, bust_cm, waist_cm, hip_cm, size_top, size_bottom, size_shoe")
+      .eq("id", avatarProfileId)
+      .maybeSingle();
+    if (avatarError) console.error("Failed to load avatar profile for chat context:", avatarError.message);
+    avatarProfile = data || null;
+  }
+
   const { data: priorMessages, error: priorError } = await supabase
     .from("messages")
     .select("role, content")
@@ -110,7 +124,7 @@ export async function POST(request) {
     return NextResponse.json({ error: userMessageError.message }, { status: 500 });
   }
 
-  const contextBlock = [formatProfileForPrompt(profile), formatWardrobeForPrompt(wardrobe)]
+  const contextBlock = [formatProfileForPrompt(profile, avatarProfile), formatWardrobeForPrompt(wardrobe)]
     .filter(Boolean)
     .join("\n\n");
   const apiMessages = [
@@ -184,6 +198,7 @@ export async function POST(request) {
       title: parsed.title,
       hero_prompt: parsed.heroPrompt,
       quick_replies: parsed.quickReplies,
+      avatar_profile_id: avatarProfile?.id || null,
     })
     .select("id")
     .single();

@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { generateOutfitImage } from "@/lib/imageGen";
 import { signLookImageUrl } from "@/lib/lookImages";
+import { signAvatarRenderUrl } from "@/lib/avatarImages";
 
 // Phase 2 "Magic Mirror" (docs/03-roadmap.md). Called client-side
 // (OutfitHero.jsx) right after a chat turn renders, so the text reply shows
@@ -33,7 +34,7 @@ export async function POST(request) {
   // a recommendation that isn't this user's simply won't be found.
   const { data: recommendation, error: recError } = await supabase
     .from("outfit_recommendations")
-    .select("id, hero_prompt, generated_image_url")
+    .select("id, hero_prompt, generated_image_url, avatar_profile_id")
     .eq("id", recommendationId)
     .maybeSingle();
   if (recError) {
@@ -50,9 +51,27 @@ export async function POST(request) {
     return NextResponse.json({ imageUrl });
   }
 
+  // helloAvatar (docs/03-roadmap.md Phase 3): if this look was generated
+  // with a family member selected as the model, use their painted avatar
+  // as an img2img reference so the outfit renders on "them," not a
+  // generic figure. No avatar selected (the default, unchanged) or that
+  // avatar hasn't been painted yet -> falls straight back to the plain
+  // text-to-image path below.
+  let referenceImageUrl = null;
+  if (recommendation.avatar_profile_id) {
+    const { data: avatarProfile } = await supabase
+      .from("avatar_profiles")
+      .select("avatar_image_url")
+      .eq("id", recommendation.avatar_profile_id)
+      .maybeSingle();
+    if (avatarProfile?.avatar_image_url) {
+      referenceImageUrl = await signAvatarRenderUrl(supabase, avatarProfile.avatar_image_url);
+    }
+  }
+
   let imagePath;
   try {
-    const blob = await generateOutfitImage(recommendation.hero_prompt, "3:2");
+    const blob = await generateOutfitImage(recommendation.hero_prompt, "3:2", referenceImageUrl);
     imagePath = `${user.id}/${recommendationId}.jpg`;
     const { error: uploadError } = await supabase.storage
       .from("generated-looks")

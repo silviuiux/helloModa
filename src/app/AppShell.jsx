@@ -52,6 +52,7 @@ export default function AppShell({
   initialConversations,
   initialActiveConversationId,
   initialMessages,
+  initialAvatarProfiles,
 }) {
   const [view, setView] = useState("chat");
   const [wardrobe, setWardrobe] = useState(initialWardrobe.map(dbRowToItem));
@@ -60,6 +61,13 @@ export default function AppShell({
   const [messages, setMessages] = useState(initialMessages || []);
   const [thinking, setThinking] = useState(false);
   const [isSwitching, startSwitching] = useTransition();
+  const [avatarProfiles] = useState(initialAvatarProfiles || []);
+  // Defaults to "styling for myself" (or nothing, if no avatar is set up
+  // yet) — a family member has to be actively picked each session, never
+  // silently assumed.
+  const [activeAvatarId, setActiveAvatarId] = useState(
+    () => (initialAvatarProfiles || []).find((a) => a.is_self)?.id || null
+  );
 
   useEffect(() => {
     if (userId) identifyUser(userId, { email: userEmail });
@@ -182,7 +190,7 @@ export default function AppShell({
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId: activeConversationId, message: text }),
+        body: JSON.stringify({ conversationId: activeConversationId, message: text, avatarProfileId: activeAvatarId }),
       });
       const data = await res.json();
 
@@ -267,6 +275,9 @@ export default function AppShell({
         onSend={handleSend}
         sending={thinking}
         shareText={shareText}
+        avatarProfiles={avatarProfiles}
+        activeAvatarId={activeAvatarId}
+        onSelectAvatar={setActiveAvatarId}
       />
     </div>
   );

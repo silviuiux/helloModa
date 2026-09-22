@@ -64,29 +64,45 @@ Rules:
 // table) injected into the user turn alongside the wardrobe list. Same
 // reasoning as formatWardrobeForPrompt for why this lives outside the
 // (cached) system prompt.
-export function formatProfileForPrompt(profile) {
-  if (!profile) return "";
+// `avatarProfile` (helloAvatar, docs/03-roadmap.md Phase 3): when the user
+// picked a family member as who this look is for (avatar_profiles, not the
+// account holder), that person's name/gender/sizes/measurements override
+// the account's own — the outfit needs to fit THEM. Style preferences and
+// favorite/avoid brands still come from the account's `profiles` row
+// either way (avatar_profiles doesn't collect those — v1 scope is
+// measurements/sizes, docs/04-data-model.md), since it's the account
+// holder doing the describing regardless of who they're dressing.
+export function formatProfileForPrompt(profile, avatarProfile) {
+  if (!profile && !avatarProfile) return "";
+  const stylingForOther = avatarProfile && !avatarProfile.is_self;
+  const subject = stylingForOther ? avatarProfile : profile;
+
   const parts = [];
-  if (profile.display_name) parts.push(`Name: ${profile.display_name}`);
-  if (profile.gender) parts.push(`Gender: ${profile.gender}`);
-  if (profile.style_traits?.length) parts.push(`Style preferences: ${profile.style_traits.join(", ")}`);
+  if (stylingForOther) {
+    parts.push(
+      `Styling for: ${avatarProfile.display_name}${avatarProfile.relationship ? ` (the user's ${avatarProfile.relationship.toLowerCase()})` : ""} — NOT the account holder. Address the narrative to the account holder about this person (e.g. "for ${avatarProfile.display_name}"), using their sizing below, not the account holder's own.`
+    );
+  }
+  if (subject?.display_name && !stylingForOther) parts.push(`Name: ${subject.display_name}`);
+  if (subject?.gender) parts.push(`Gender: ${subject.gender}`);
+  if (profile?.style_traits?.length) parts.push(`Style preferences: ${profile.style_traits.join(", ")}`);
 
   const sizes = [];
-  if (profile.size_top) sizes.push(`top ${profile.size_top}`);
-  if (profile.size_bottom) sizes.push(`bottom ${profile.size_bottom}`);
-  if (profile.size_shoe) sizes.push(`shoe ${profile.size_shoe}`);
+  if (subject?.size_top) sizes.push(`top ${subject.size_top}`);
+  if (subject?.size_bottom) sizes.push(`bottom ${subject.size_bottom}`);
+  if (subject?.size_shoe) sizes.push(`shoe ${subject.size_shoe}`);
   if (sizes.length) parts.push(`Sizes: ${sizes.join(", ")}`);
 
   const measurements = [];
-  if (profile.height_cm) measurements.push(`height ${profile.height_cm}cm`);
-  if (profile.weight_kg) measurements.push(`weight ${profile.weight_kg}kg`);
-  if (profile.bust_cm) measurements.push(`bust ${profile.bust_cm}cm`);
-  if (profile.waist_cm) measurements.push(`waist ${profile.waist_cm}cm`);
-  if (profile.hip_cm) measurements.push(`hip ${profile.hip_cm}cm`);
+  if (subject?.height_cm) measurements.push(`height ${subject.height_cm}cm`);
+  if (subject?.weight_kg) measurements.push(`weight ${subject.weight_kg}kg`);
+  if (subject?.bust_cm) measurements.push(`bust ${subject.bust_cm}cm`);
+  if (subject?.waist_cm) measurements.push(`waist ${subject.waist_cm}cm`);
+  if (subject?.hip_cm) measurements.push(`hip ${subject.hip_cm}cm`);
   if (measurements.length) parts.push(`Measurements: ${measurements.join(", ")}`);
 
-  if (profile.favorite_brands?.length) parts.push(`Favorite brands: ${profile.favorite_brands.join(", ")}`);
-  if (profile.avoid_brands?.length) parts.push(`Brands to avoid: ${profile.avoid_brands.join(", ")}`);
+  if (profile?.favorite_brands?.length) parts.push(`Favorite brands: ${profile.favorite_brands.join(", ")}`);
+  if (profile?.avoid_brands?.length) parts.push(`Brands to avoid: ${profile.avoid_brands.join(", ")}`);
 
   if (!parts.length) return "";
   return `User profile:\n${parts.map((p) => `- ${p}`).join("\n")}`;

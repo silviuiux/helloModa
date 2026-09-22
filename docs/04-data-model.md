@@ -44,6 +44,22 @@ wardrobe_items
   last_worn_at        timestamptz nullable -- set alongside wear_count on each log
   created_at
 
+avatar_profiles                  -- helloAvatar (Phase 3), added 2026-09-22
+  id (uuid, pk)
+  user_id (fk -> users)
+  is_self                bool    -- exactly one true row per user (partial unique index)
+  relationship            text   -- e.g. "Partner", "Daughter" — null for the is_self row
+  display_name            text
+  gender                  text
+  height_cm | weight_kg | bust_cm | waist_cm | hip_cm    numeric, all nullable
+  size_top | size_bottom | size_shoe                     text, free-form
+  avatar_image_url        text   -- Supabase Storage path, `avatar-renders` bucket (private,
+                                     signed URL via src/lib/avatarImages.js); null until a photo
+                                     is generated — the row can exist for measurements alone
+  consent_attested_at  timestamptz  -- set by POST /api/avatar/generate, never before
+  consent_text_version     text   -- src/lib/avatarConsent.js's AVATAR_CONSENT_TEXT_VERSION
+  created_at, updated_at
+
 conversations
   id (uuid, pk)
   user_id (fk -> users)
@@ -69,6 +85,10 @@ outfit_recommendations
   occasion                text
   weather_context         jsonb
   followup_question       text   -- superseded by quick_replies; unused going forward, kept for now
+  avatar_profile_id (fk -> avatar_profiles, nullable, on delete set null)   -- helloAvatar, added
+                             2026-09-22: which avatar (if any) this look was generated for. Set
+                             from the chat request; POST /api/generate-image reads it back to use
+                             that avatar's image as an img2img reference (src/lib/imageGen.js).
 
 outfit_recommendation_items
   id (uuid, pk)
