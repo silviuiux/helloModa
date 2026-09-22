@@ -6,6 +6,17 @@ import Replicate from "replicate";
 // place that calls out to a generation provider.
 const MODEL = "black-forest-labs/flux-dev";
 
+// Used only when an avatar is selected (helloAvatar, docs/03-roadmap.md
+// Phase 3) — an image-EDITING model, not plain img2img: given a reference
+// photo and an instruction, it's built to keep the same subject (face,
+// hair, body) while changing context/clothing, which is a much closer
+// match to "same face/hair/body type" than flux-dev's generic img2img
+// (`prompt_strength`) below ever could be — that one just nudges the
+// output toward the reference's rough structure/coloring, nothing more.
+// Kept as a separate model constant so a bad call here can fail closed
+// into the existing img2img path rather than the whole feature.
+const KONTEXT_MODEL = "black-forest-labs/flux-kontext-dev";
+
 // The house visual style, prepended to every heroPrompt — this is the one
 // place to tune "what a generated look actually looks like." Currently:
 // watercolor rendering with realistic detail kept in the outfit itself
@@ -40,19 +51,45 @@ const STYLE_DIRECTIVE =
 //
 // `referenceImageUrl` (helloAvatar, docs/03-roadmap.md Phase 3): when the
 // user picked a family member's avatar as the model, pass its signed
-// watercolor-portrait URL here — Flux img2img (`image` + `prompt_strength`)
-// uses it as a loose structural reference (pose/figure/coloring) while the
-// prompt still drives the actual scene and outfit. `prompt_strength` is
-// deliberately high (little of the source is preserved) since the goal is
-// "the same-looking figure," not "the same picture with new clothes" —
-// Flux has no garment-editing/inpainting precision for that, and claiming
-// otherwise would overpromise. Omit it for the plain text-to-image path
-// (no avatar selected — today's default, unchanged).
+// watercolor-portrait URL here. Tries Flux Kontext first (KONTEXT_MODEL
+// above) — an editing model that keeps the same person while changing
+// their outfit/scene, which is what "same face, same hair, same body
+// type" actually needs (direct request 2026-09-22, after plain img2img
+// turned out too loose to hold a consistent face across generations). If
+// that call fails for any reason (a bad param, a model-availability
+// hiccup — this integration hasn't been exercised against a real
+// Replicate account yet, see docs/08-changelog.md's 2026-09-22 entry) this
+// falls back to flux-dev's own img2img (`image` + `prompt_strength`) so a
+// Kontext problem degrades to today's looser-but-working reference instead
+// of failing the whole generation. Omit referenceImageUrl entirely for the
+// plain text-to-image path (no avatar selected — unchanged).
 export async function generateOutfitImage(prompt, aspectRatio, referenceImageUrl) {
   if (!aspectRatio) {
     throw new Error("generateOutfitImage requires an aspectRatio matching the display crop.");
   }
   const replicate = new Replicate(); // reads REPLICATE_API_TOKEN from env
+
+  if (referenceImageUrl) {
+    try {
+      const [output] = await replicate.run(KONTEXT_MODEL, {
+        input: {
+          prompt:
+            `${STYLE_DIRECTIVE} Scene: ${prompt}. Keep this exact same person — same face, same ` +
+            `hairstyle and hair color, same body type and skin tone as the reference image. Only ` +
+            `their outfit and the surrounding scene should change.`,
+          input_image: referenceImageUrl,
+          aspect_ratio: aspectRatio,
+          output_format: "jpg",
+        },
+      });
+      if (output) {
+        return Buffer.from(await output.blob().then((b) => b.arrayBuffer()));
+      }
+      console.error("Flux Kontext returned no output — falling back to flux-dev img2img.");
+    } catch (err) {
+      console.error("Flux Kontext generation failed — falling back to flux-dev img2img:", err);
+    }
+  }
 
   const input = {
     prompt: `${STYLE_DIRECTIVE} Scene: ${prompt}`,

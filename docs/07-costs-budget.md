@@ -24,6 +24,7 @@ patterns exist — treat these as planning numbers, not commitments.
 |---|---|
 | Everything above | ~$70–110/mo |
 | Hosted SDXL generation (fal.ai/Replicate), est. $0.01–0.05/image, ~500–2000 images/mo at beta scale | ~$10–100/mo |
+| helloAvatar-linked generations only: Flux Kontext instead of plain flux-dev (~$0.025–0.04/image vs ~$0.025/image, added 2026-09-22 — see 08-changelog.md) | negligible at beta scale, revisit if avatar-linked chats become most of volume |
 | **Total** | **~$100–200/mo** |
 
 ## Phase 3 (+ CV matching, avatar, calendar)

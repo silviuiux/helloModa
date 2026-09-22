@@ -4,6 +4,39 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — helloAvatar: same face/hair/body across chat generations
+
+Direct question: could a selected avatar's face, hair, and body type actually carry over into
+the outfit images generated in chat? The honest answer at the time was no, not really — the
+img2img path shipped with helloAvatar v1 (`generateOutfitImage`'s `prompt_strength: 0.82`
+reference) was always documented as "a strong loose reference (pose/figure/coloring), not a
+guarantee of pixel-identical likeness," because plain flux-dev img2img just nudges the output
+toward the reference's rough structure — it was never going to hold a consistent face.
+
+Switched the avatar-linked path to **Flux Kontext** (`black-forest-labs/flux-kontext-dev`,
+`src/lib/imageGen.js`) instead: an image-*editing* model, not img2img — given a reference photo
+and an instruction, it's built to preserve the subject (face, hair, body) while changing
+context/clothing, which is what this request actually needs. The prompt explicitly says to keep
+the same face, hairstyle/color, body type and skin tone, and only change the outfit and scene.
+
+- **Fails closed, not open:** if the Kontext call errors or returns nothing, `generateOutfitImage`
+  falls straight back to the previous flux-dev img2img path rather than failing the whole
+  generation — an avatar-linked look still renders, just with the older, looser reference
+  behavior, if Kontext has a problem.
+- **Scope:** only affects generations where an avatar is selected
+  (`outfit_recommendations.avatar_profile_id` set). Plain text-to-image generation (no avatar
+  picked) is completely unchanged.
+- **Genuinely unverified** — this sandbox still can't reach `api.replicate.com`, so this
+  integration is written from documented Kontext behavior/parameter conventions, not exercised
+  against a live call. If the input schema (`input_image`, `aspect_ratio`, `output_format`)
+  doesn't match what Replicate's flux-kontext-dev actually expects, the try/catch above means it
+  quietly falls back to img2img rather than erroring visibly — worth explicitly testing a real
+  avatar-linked chat generation once this is live, not just trusting the fallback to mask it.
+- Cost: Kontext is priced slightly above plain flux-dev per image on Replicate; only avatar-linked
+  generations use it, so this is negligible at private-beta volume (`07-costs-budget.md`).
+
+---
+
 ## 2026-09-22 — Fix: helloAvatar painting the wrong gender
 
 Bug report: a "Man" avatar was being painted as a woman. Two likely causes in
