@@ -53,7 +53,7 @@ export default function RegisterPage() {
           </div>
           <h1 className="mt-5 font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">helloModa</h1>
           <p className="mt-1.5 text-[13.5px] text-muted">
-            Invite-only private beta — create your account.
+            You&apos;re invited. Create your account and get styled in minutes.
           </p>
         </div>
 
@@ -105,7 +105,10 @@ export default function RegisterPage() {
                 {status === "error" && <p className="text-[13px] text-red-500">{error}</p>}
               </form>
 
-              <p className="mt-5 text-center text-[13px] text-muted">
+              <p className="mt-5 text-center text-[12.5px] leading-relaxed text-faint">
+                No code? helloModa is invite-only for now — ask whoever sent you here.
+              </p>
+              <p className="mt-3 text-center text-[13px] text-muted">
                 Already have an account?{" "}
                 <Link href="/login" className="font-medium text-accent-deep hover:underline">
                   Sign in

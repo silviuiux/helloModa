@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, useTransition } from "react";
+import OrganicField from "@/components/OrganicField.jsx";
 import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
@@ -199,7 +200,7 @@ export default function AppShell({
       if (!res.ok) {
         setMessages((prev) => [
           ...prev,
-          { id: `err-${Date.now()}`, role: "ai", title: null, narrative: data.error || "Something went wrong. Please try again." },
+          { id: `err-${Date.now()}`, role: "ai", title: null, narrative: data.error || "That one didn't go through — mind sending it again?" },
         ]);
         return;
       }
@@ -224,7 +225,7 @@ export default function AppShell({
       console.error("Chat request failed:", err);
       setMessages((prev) => [
         ...prev,
-        { id: `err-${Date.now()}`, role: "ai", title: null, narrative: "Couldn't reach the server. Please try again." },
+        { id: `err-${Date.now()}`, role: "ai", title: null, narrative: "I can't reach helloModa right now. Check your connection and try again." },
       ]);
     } finally {
       setThinking(false);
@@ -240,6 +241,7 @@ export default function AppShell({
     <div
       className="relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink"
     >
+      <OrganicField />
       <Suspense fallback={null}>
         <ConversationFromQuery onConversationId={handleSelectConversation} />
       </Suspense>

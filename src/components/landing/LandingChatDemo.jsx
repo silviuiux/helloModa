@@ -96,8 +96,8 @@ export default function LandingChatDemo() {
       <div className="min-h-[120px] space-y-10">
         {turns.length === 0 && (
           <p className="py-6 text-center text-[13.5px] text-muted">
-            Tap an occasion below to see helloModa style it — this is a real turn from the app,
-            replayed here.
+            Tap an occasion below and watch helloModa style it — a real answer from the app,
+            replayed.
           </p>
         )}
         {turns.map((t) => (

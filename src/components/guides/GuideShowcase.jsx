@@ -28,8 +28,9 @@ export default function GuideShowcase({ guide }) {
         </div>
       </div>
       <p className="mt-5 max-w-2xl text-[13px] leading-relaxed text-faint">
-        This is what a helloModa turn looks like — describe your own occasion and get one
-        specific direction, pulling from your closet first, not a grid of generic options.
+        This is what a helloModa answer looks like. Describe your own version of this occasion
+        and get one specific look — built from your wardrobe first, painted on you, not a grid
+        of generic options.
       </p>
     </section>
   );

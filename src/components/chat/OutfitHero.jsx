@@ -1,13 +1,15 @@
 import { useState } from "react";
 import PlaceholderImage from "../PlaceholderImage.jsx";
 import Orb from "../Orb.jsx";
+import OrganicField from "../OrganicField.jsx";
 
 // Phase 2 "Magic Mirror" (docs/03-roadmap.md): the generated look, via
 // Replicate (src/lib/imageGen.js). Generation is kicked off + tracked by
 // useOutfitImage (src/lib/useOutfitImage.js); this component only renders
 // the three states the caller hands it:
 //
-//   pending  -> a dark plate with a slow warm light sweep and the orb in its
+//   pending  -> a lavender plate with a slow light sweep, drifting
+//               organic cells and spores (OrganicField), and the orb in its
 //               thinking state (organic skeleton, never a spinner)
 //   image    -> the painting, which resolves in from a blur once it has
 //               actually loaded (not the moment the URL arrives, which would
@@ -22,9 +24,10 @@ export default function OutfitHero({ imageUrl, pending = false, errorMessage, se
     <div className="relative aspect-[4/5] w-full overflow-hidden rounded-bubble border border-line bg-paper">
       {pending && !imageUrl && (
         <div className="skeleton-organic animate-shimmer absolute inset-0 grid place-items-center">
-          <div className="flex flex-col items-center gap-5">
+          <OrganicField variant="plate" />
+          <div className="relative flex flex-col items-center gap-5">
             <Orb size={64} state="thinking" />
-            <span className="label text-faint">painting the look</span>
+            <span className="label text-faint">painting your look</span>
           </div>
         </div>
       )}

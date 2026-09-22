@@ -27,9 +27,9 @@ export default function GlobalError({ error, reset }) {
           }}
         >
           <div>
-            <h1 style={{ fontSize: 20, fontWeight: 600 }}>Something went wrong.</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 600 }}>That wasn&apos;t supposed to happen.</h1>
             <p style={{ marginTop: 8, fontSize: 14, opacity: 0.7 }}>
-              helloModa hit an unexpected error. We've been notified.
+              helloModa hit an unexpected snag. Try again — your wardrobe and looks are safe.
             </p>
             <button
               onClick={() => reset()}

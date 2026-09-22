@@ -45,7 +45,7 @@ export default function LoginPage() {
             <Orb size={48} />
           </div>
           <h1 className="mt-5 font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">helloModa</h1>
-          <p className="mt-1.5 text-[13.5px] text-muted">Private beta — sign in to continue.</p>
+          <p className="mt-1.5 text-[13.5px] text-muted">Welcome back. Your wardrobe missed you.</p>
         </div>
 
         <div className="mt-6">
@@ -82,9 +82,9 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-5 text-center text-[13px] text-muted">
-            No account yet?{" "}
+            Have an invite code?{" "}
             <Link href="/register" className="font-medium text-accent-deep hover:underline">
-              Register
+              Create your account
             </Link>
           </p>
         </div>

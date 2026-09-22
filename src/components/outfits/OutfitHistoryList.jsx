@@ -42,12 +42,12 @@ export default function OutfitHistoryList({ rows }) {
         </h1>
       </div>
       <p className="mb-14 text-[14px] text-muted">
-        Your style journal — every look, kept.
+        Every look you&apos;ve been styled, kept. Open one to restyle it.
       </p>
 
       {rows.length === 0 ? (
         <p className="text-[14px] text-muted">
-          No outfits yet — start a conversation and your looks will show up here.
+          No looks yet. Tell helloModa where you&apos;re going and your first one lands here.
         </p>
       ) : (
         <div className="space-y-14">

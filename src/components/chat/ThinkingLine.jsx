@@ -27,6 +27,9 @@ const PHRASES = [
   "Checking the light",
   "Tailoring the fit",
   "Steaming out the wrinkles",
+  "Raiding your wardrobe",
+  "Checking the dress code",
+  "Mixing the paints",
 ];
 
 // The orb in its thinking state carries the "working" signal; the phrase

@@ -116,7 +116,7 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
           </button>
           <div className="scroll-area mt-1 max-h-72 space-y-0.5 overflow-y-auto">
             {conversations.length === 0 ? (
-              <p className="px-3 py-2 text-[12.5px] text-faint">No conversations yet.</p>
+              <p className="px-3 py-2 text-[12.5px] text-faint">No looks yet — your first one starts here.</p>
             ) : (
               conversations.map((c) => (
                 <button
@@ -268,7 +268,7 @@ function ShareButton({ shareText }) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
-    const text = shareText || "Check out helloModa — an AI stylist that shops your closet.";
+    const text = shareText || "Styled by helloModa — the AI stylist that starts in your closet.";
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ text, title: "helloModa" });
@@ -387,7 +387,7 @@ export default function BottomBar({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               disabled={sending}
-              placeholder={sending ? "styling your look…" : "Describe an occasion, a mood, a place…"}
+              placeholder={sending ? "styling your look…" : "Where are you going? An occasion, a mood, the weather…"}
               className="h-full flex-1 bg-transparent text-[15px] text-ink placeholder:text-faint focus:outline-none disabled:cursor-not-allowed"
             />
             <button

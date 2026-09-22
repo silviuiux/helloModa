@@ -76,7 +76,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
       if (data.tags.brand) setBrand(data.tags.brand);
     } catch (err) {
       console.error("Wardrobe photo tagging failed:", err);
-      setPhotoError("Couldn't auto-tag that photo — fill in the details below.");
+      setPhotoError("Couldn't read that photo — add the details below instead.");
     } finally {
       setAnalyzing(false);
     }
@@ -131,7 +131,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
       >
         <h3 className="font-display text-[22px] font-semibold tracking-[-0.03em] text-ink">Add wardrobe item</h3>
         <p className="mt-1 text-[13px] text-muted">
-          Snap a photo and helloModa fills in the details — or log it manually.
+          Snap a photo and helloModa fills in the rest — or add the details yourself.
         </p>
 
         <div className="mt-5 space-y-4">
@@ -223,7 +223,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
               placeholder="e.g. 89.00"
               className="input"
             />
-            <p className="mt-1 text-[11.5px] text-faint">Powers cost-per-wear on this piece — skip it, add it anytime.</p>
+            <p className="mt-1 text-[11.5px] text-faint">Unlocks cost per wear for this piece. Optional — add it anytime.</p>
           </Field>
         </div>
 

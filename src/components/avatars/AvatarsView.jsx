@@ -90,9 +90,9 @@ export default function AvatarsView({ profiles, selfDefaults, maxAvatars }) {
         {selfProfile && maxFamily === 0 && (
           <div className="glass grid aspect-[3/4] place-items-center rounded-bubble p-6 text-center">
             <div>
-              <p className="text-[13px] font-medium text-ink">Add family members with Pro</p>
+              <p className="text-[13px] font-medium text-ink">Style the whole family with Pro</p>
               <p className="mt-1.5 text-[11.5px] text-muted">
-                Style outfits for up to 3 more people, each with their own avatar and measurements.
+                Add up to 3 more people — partner, kids, parents — each with their own avatar, sizes and measurements.
               </p>
             </div>
           </div>

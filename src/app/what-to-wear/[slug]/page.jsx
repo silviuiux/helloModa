@@ -143,7 +143,7 @@ export default function GuidePage({ params }) {
           href="/register"
           className="inline-flex items-center gap-1.5 rounded-[10px] bg-accent px-5 py-2.5 text-[14px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
         >
-          Try helloModa
+          Get this styled for you
           <ArrowRight size={15} />
         </Link>
       </div>

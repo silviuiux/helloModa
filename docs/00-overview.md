@@ -57,6 +57,8 @@ Made 2026-09-19, in this session:
 | `06-risks-legal.md` | Fashion Days conflict, IP/likeness, GDPR, marketplace liability |
 | `07-costs-budget.md` | Monthly cost estimate by phase |
 | `08-changelog.md` | Living log — append only, never rewritten |
+| `09-conversation-design.md` | How the stylist talks and how a chat turn is laid out |
+| `10-copy-deck.md` | Every user-facing string, positioning and voice rules — source of truth for copy |
 
 ## Open questions still to resolve (not blocking, but track them)
 

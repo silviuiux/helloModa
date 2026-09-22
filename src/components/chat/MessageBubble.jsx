@@ -118,7 +118,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
               <ToolbarBtn icon={ThumbsDown} label="Not for me" />
               <span className="mx-1 h-4 w-px bg-line" aria-hidden="true" />
               <button className="rounded-bubble-sm border border-line px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:border-accent-soft hover:text-ink">
-                Retry
+                Restyle
               </button>
               {message.pieces?.length > 0 && (
                 <button
@@ -126,7 +126,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
                   className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-5 py-2 text-[11px] font-semibold uppercase tracking-label text-canvas transition-all hover:bg-accent-deep"
                 >
                   <Hanger size={13} />
-                  {showPieces ? "Hide pieces" : "Find outfit"}
+                  {showPieces ? "Hide pieces" : "See the pieces"}
                 </button>
               )}
             </div>

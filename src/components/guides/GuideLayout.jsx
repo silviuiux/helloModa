@@ -18,7 +18,7 @@ export default function GuideLayout({ children }) {
           href="/register"
           className="rounded-[10px] bg-accent px-4 py-2 text-[13px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
         >
-          Try helloModa
+          Join the beta
         </Link>
       </header>
 

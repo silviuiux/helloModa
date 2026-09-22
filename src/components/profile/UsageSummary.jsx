@@ -43,7 +43,7 @@ export default function UsageSummary({ usage }) {
       </div>
       {usage.plan === "free" && (
         <p className="mt-4 text-[11.5px] text-faint">
-          Free plan — resets on the 1st. helloModa Pro (coming soon) adds unlimited messages and
+          Free plan — resets on the 1st. helloModa Pro (coming soon) adds unlimited styling and
           image generations, plus family avatars.
         </p>
       )}

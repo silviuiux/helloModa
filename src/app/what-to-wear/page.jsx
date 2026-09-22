@@ -27,9 +27,9 @@ export default function GuidesIndexPage() {
         What to wear, by occasion
       </h1>
       <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
-        Outfit dressing depends more on the specific occasion than most advice admits — what
-        works at a beach wedding will look out of place at a job interview. Pick your occasion
-        below for real, specific guidance.
+        What works at a beach wedding looks wrong at a job interview — so generic style advice
+        only gets you so far. Pick your occasion for specific, practical guidance: what to wear,
+        what to skip, and how to handle the weather and the setting.
       </p>
 
       {categories.map((category, i) => (

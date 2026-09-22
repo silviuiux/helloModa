@@ -56,7 +56,7 @@ export function SceneOccasion() {
   return (
     <Frame>
       <div className="flex h-full flex-col justify-center">
-        <p className="label text-faint">the welcome screen</p>
+        <p className="label text-faint">pick an occasion — or type your own</p>
         <div className="mt-5 grid max-w-[600px] grid-cols-3 gap-3 sm:gap-4">
           <Tile slug="rooftop-birthday" type="outerwear" label="Rooftop birthday" />
           <Tile slug="wedding-guest" type="dress" label="Wedding guest" />
@@ -87,7 +87,7 @@ export function SceneCloset() {
       <div className="flex h-full flex-col justify-center">
         <div className="flex items-baseline justify-between">
           <p className="label text-faint">your wardrobe</p>
-          <p className="label hidden text-accent-deep sm:block">3 of 6 matched</p>
+          <p className="label hidden text-accent-deep sm:block">3 pieces you own</p>
         </div>
         <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-6">
           {closet.map((c) => (
@@ -96,7 +96,7 @@ export function SceneCloset() {
         </div>
         <p className="mt-7 flex items-center gap-2 text-[13px] text-muted">
           <Hanger size={14} />
-          Matched on how the pieces actually look — not a category label.
+          Recognised by how each piece looks — colour, cut, texture.
         </p>
       </div>
     </Frame>
@@ -123,11 +123,11 @@ export function SceneLook() {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <span className="rounded-bubble-sm border border-line px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-muted">
-              Retry
+              Restyle
             </span>
             <span className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-canvas shadow-soft">
               <Hanger size={11} />
-              Find outfit
+              See the pieces
             </span>
           </div>
         </div>
@@ -147,7 +147,7 @@ export function SceneGap() {
   return (
     <Frame>
       <div className="flex h-full flex-col justify-center">
-        <p className="label text-faint">find outfit — expanded</p>
+        <p className="label text-faint">the pieces</p>
         <div className="mt-5 grid max-w-[680px] grid-cols-2 gap-4 sm:grid-cols-4">
           {pieces.map((p, i) => (
             <div key={p.label} className="min-w-0">
@@ -172,7 +172,7 @@ export function SceneGap() {
           ))}
         </div>
         <p className="mt-7 text-[13px] text-muted">
-          Three you own, one worth buying. No fabricated prices, no wall of products.
+          Three you already own. One worth buying. That&apos;s the whole list.
         </p>
       </div>
     </Frame>
@@ -201,7 +201,7 @@ export function SceneHistory() {
   return (
     <Frame>
       <div className="flex h-full flex-col justify-center">
-        <p className="label text-faint">hello—outfits</p>
+        <p className="label text-faint">your style journal</p>
         <div className="mt-4 divide-y divide-line">
           {rows.map((r) => (
             <div key={r.title} className="flex items-center gap-5 py-4">
@@ -216,7 +216,7 @@ export function SceneHistory() {
               <div className="min-w-0">
                 <h4 className="font-script text-[26px] leading-none text-ink">{r.title}</h4>
                 <p className="mt-1.5 truncate text-[12.5px] text-muted">
-                  Tap to pick the conversation back up where it stopped.
+                  Open to restyle it or pick the chat back up.
                 </p>
               </div>
             </div>
@@ -224,7 +224,7 @@ export function SceneHistory() {
         </div>
         <p className="mt-5 flex items-center gap-2 text-[13px] text-muted">
           <Sparkle size={14} />
-          Every look you&apos;ve ever been given, still editable.
+          Every look you&apos;ve been styled, kept in one place.
         </p>
       </div>
     </Frame>

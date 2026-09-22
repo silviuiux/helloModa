@@ -4,13 +4,15 @@ import Orb from "../Orb.jsx";
 import PlaceholderImage from "../PlaceholderImage.jsx";
 import Reveal from "../Reveal.jsx";
 
-// Specimen cards, not feature bullets. Each one renders the actual detail
-// live rather than describing it — the corner geometry uses the real
-// rounded-bubble-sm/-reply-sm tokens, the type specimens are the real three
-// faces, the fallback tiles are the real PlaceholderImage component, and the
-// presence card is the real Orb in each of its three states. A bento with
-// deliberately uneven spans (7/5, 5/7, 12) so it reads as a composition
-// rather than a card row.
+// "What you get" — benefit cards, each carrying a small live specimen of
+// the real feature rather than an icon: the avatar's measurement-driven
+// likeness (helloAvatar, src/components/avatars/), the closet numbers
+// (ClosetStats.jsx — values here are an illustrative example, labelled as
+// such), the style journal (VibeCard.jsx), shopping honesty (Awin-matched
+// products, docs/05-integrations-affiliates.md) and the orb's three real
+// states. Every claim here is true of the shipped product — copy rewrite
+// 2026-09-22 (docs/10-copy-deck.md). A bento with deliberately uneven spans
+// (7/5, 5/7, 12) so it reads as a composition rather than a card row.
 function Card({ span, label, title, body, children }) {
   return (
     <Reveal className={`${span} glass-soft grain relative overflow-hidden rounded-xl3 p-7 sm:p-8`}>
@@ -33,91 +35,104 @@ function Annotation({ children }) {
   );
 }
 
+function Chip({ children }) {
+  return (
+    <span className="rounded-full border border-line bg-white/60 px-3.5 py-1.5 text-[11px] uppercase tracking-label text-muted">
+      {children}
+    </span>
+  );
+}
+
 export default function DetailHighlights() {
   return (
     <div className="grid gap-5 sm:grid-cols-12">
       <Card
         span="sm:col-span-7"
-        label="Geometry"
-        title="Every corner is round but one."
-        body="Every bubble, photo and button shares one idea — rounded everywhere but one near-square corner: bottom-left when you speak, top-right when it answers. The shape tells you who's talking, so the interface never needs a label to do it."
+        label="helloAvatar"
+        title="See it on you, not on a model."
+        body="Add a photo and your measurements once. helloModa paints a watercolour avatar with your face, hair and real build — not a default slim-and-athletic body — and dresses it in every look it styles for you. The photo is deleted as soon as the painting is done."
       >
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="max-w-xs rounded-bubble-sm border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5">
-              <p className="text-[13.5px] leading-relaxed text-ink">Rooftop birthday, Saturday.</p>
-            </div>
-            <Annotation>square bottom-left</Annotation>
+        <div className="flex items-end gap-5">
+          <div className="relative aspect-[4/5] w-32 shrink-0 overflow-hidden rounded-xl2 shadow-soft">
+            <PlaceholderImage seed="avatar-specimen" width={320} height={400} />
           </div>
-          <div className="flex flex-row-reverse items-center gap-4">
-            <div className="max-w-xs rounded-bubble-reply-sm border border-accent-soft bg-white/60 px-5 py-3.5">
-              <p className="text-[13.5px] leading-relaxed text-ink">On it — give me a second.</p>
-            </div>
-            <Annotation>square top-right</Annotation>
+          <div className="flex flex-wrap gap-2">
+            <Chip>178 cm</Chip>
+            <Chip>Average build</Chip>
+            <Chip>Wavy hair</Chip>
+            <Chip>Size M / 32</Chip>
           </div>
         </div>
       </Card>
 
       <Card
         span="sm:col-span-5"
-        label="Three voices"
-        title="Sans, serif, mono."
-        body="A sharp geometric sans carries structure, an editorial serif names each look, and anything that behaves like data is monospaced. Nothing is decorative — each face marks a different kind of information."
+        label="Closet insights"
+        title="Know what your clothes really cost."
+        body="Add what you paid and log when you wear something. helloModa shows your cost per wear, what your wardrobe is worth, and the pieces you never reach for — so the next purchase is a smarter one."
       >
-        <div className="space-y-4">
-          <p className="font-script text-[38px] italic leading-none text-ink">Rooftop after dark</p>
-          <p className="font-display text-[22px] font-bold tracking-[-0.03em] text-ink">How it works</p>
-          <p className="label text-muted">03 — the look</p>
+        <div className="grid grid-cols-3 gap-3 border-t border-line pt-5">
+          {[
+            ["€1,240", "wardrobe value"],
+            ["€4", "avg. cost / wear"],
+            ["6", "never worn"],
+          ].map(([v, l]) => (
+            <div key={l}>
+              <p className="font-display text-[24px] font-bold tracking-[-0.03em] text-ink">{v}</p>
+              <p className="label mt-1.5 leading-[1.6] text-faint">{l}</p>
+            </div>
+          ))}
         </div>
+        <p className="mt-4">
+          <Annotation>example closet</Annotation>
+        </p>
       </Card>
 
       <Card
         span="sm:col-span-5"
-        label="Graceful degradation"
-        title="It never shows you a broken frame."
-        body="Photography is generated per look and cached. Until an image exists, a placeholder photograph holds its place — the same one every time, never an empty box or a spinner."
+        label="Style journal"
+        title="Every look, kept."
+        body="Each look you're styled lands in your journal with its painting and its story. Come back before the next wedding, the next trip, the next Tuesday — and restyle it in one message."
       >
-        <div className="flex items-end gap-4">
-          <div className="relative aspect-square w-28 overflow-hidden rounded-xl2 shadow-soft">
-            <PlaceholderImage seed="specimen-dress" width={300} height={300} />
-          </div>
-          <div className="relative aspect-square w-28 overflow-hidden rounded-xl2 shadow-soft">
-            <PlaceholderImage seed="specimen-outerwear" width={300} height={300} />
-          </div>
-          <Annotation>fallback, not failure</Annotation>
+        <div className="flex items-end gap-3">
+          {["journal-a", "journal-b", "journal-c"].map((seed, i) => (
+            <div
+              key={seed}
+              className="relative aspect-[4/5] w-20 overflow-hidden rounded-xl2 shadow-soft"
+              style={{ transform: `translateY(${i === 1 ? -8 : 0}px)` }}
+            >
+              <PlaceholderImage seed={seed} width={200} height={250} />
+            </div>
+          ))}
+          <p className="ml-2 font-script text-[26px] leading-none text-ink">Vineyard, golden hour</p>
         </div>
       </Card>
 
       <Card
         span="sm:col-span-7"
-        label="House style"
-        title="One painted look, not stock photography."
-        body="Every generated image runs through the same watercolour directive — visible brushwork and paper texture, with the fit and fabric of the outfit still rendered precisely. It's defined in exactly one place in the codebase, so the whole product shifts together when it changes."
+        label="Honest shopping"
+        title="It only sends you shopping when it has to."
+        body="The look is styled first, from what you own. Only if something is genuinely missing does helloModa point to one real product from a real shop, at its real price. Some links earn helloModa a small commission — that never decides what gets recommended."
       >
         <div className="flex flex-wrap items-center gap-3">
-          {["Hand-painted", "Visible brushwork", "Paper texture", "Precise fit", "Soft natural light"].map(
-            (t) => (
-              <span
-                key={t}
-                className="rounded-full border border-line bg-white/60 px-3.5 py-1.5 text-[11px] uppercase tracking-label text-muted"
-              >
-                {t}
-              </span>
-            )
-          )}
+          <Chip>Your closet first</Chip>
+          <Chip>One piece, max</Chip>
+          <Chip>Real retailers</Chip>
+          <Chip>Real prices</Chip>
+          <Chip>No sponsored picks</Chip>
         </div>
       </Card>
 
       <Card
         span="sm:col-span-12"
-        label="Presence"
-        title="Alive, not animated."
-        body="helloModa is a shape, not a mascot. It breathes while it waits, leans in while you type, and draws itself inward while it styles — every change a slow blend, never a spinner or a bounce."
+        label="Always listening"
+        title="A stylist that feels present."
+        body="helloModa isn't a chat box with a logo. It breathes while it waits, leans in while you type, and gathers itself while it styles — so you always know it's with you, without a spinner in sight."
       >
         <div className="flex flex-wrap items-end gap-x-16 gap-y-10">
           {[
-            ["idle", "waiting"],
-            ["listening", "you're typing"],
+            ["idle", "ready when you are"],
+            ["listening", "hearing you out"],
             ["thinking", "styling your look"],
           ].map(([state, caption]) => (
             <div key={state} className="flex items-center gap-5">

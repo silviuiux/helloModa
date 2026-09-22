@@ -16,29 +16,29 @@ import { SCENES } from "./StageVisuals.jsx";
 // from the same STEPS array, so the story can't drift between them.
 const STEPS = [
   {
-    kicker: "The occasion",
-    title: "Start with what's actually happening.",
-    body: "A rooftop birthday at 9pm. A vineyard wedding in June. A first-round interview on Tuesday. Say it the way you'd say it to a friend — no tags, no filters, no style quiz.",
+    kicker: "Tell it",
+    title: "Say where you're going, like you'd tell a friend.",
+    body: "A rooftop birthday at 9pm. A vineyard wedding in June. A first-round interview on Tuesday. No style quiz, no filters, no forty questions — just the occasion, in your own words.",
   },
   {
     kicker: "Your closet",
-    title: "It reaches for what you own first.",
-    body: "Every piece you've added is CLIP-embedded, so matching happens on how a garment actually looks — not on the category label someone typed. Shopping is the last resort, not the business model.",
+    title: "It shops your wardrobe first.",
+    body: "Snap your clothes once and helloModa learns them by how they actually look — colour, cut, texture — not by a label you had to type. Every look starts there. Buying something new is the last resort, not the point.",
   },
   {
     kicker: "The look",
-    title: "One direction, not a catalogue.",
-    body: "A single styled look per turn, written in a real editorial voice, with a generated image of the outfit in its actual setting. Not a mood board. Not twelve products in a grid.",
+    title: "One confident look, painted on you.",
+    body: "Not a mood board, not twelve products in a grid — one decisive outfit, explained the way a good stylist would. Then it's painted in watercolour on your own avatar, so you see it on you before you get dressed.",
   },
   {
     kicker: "The gap",
-    title: "Then the one piece worth adding.",
-    body: "Expand the look and you see exactly which pieces came out of your wardrobe and which single thing is missing. No invented prices, no affiliate wall dressed up as advice.",
+    title: "And the one piece worth buying — if any.",
+    body: "Open the look to see what came from your wardrobe and what, if anything, is genuinely missing. When it does suggest something, it's a real product from a real shop, at its real price. No sponsored picks, no endless scroll.",
   },
   {
-    kicker: "Later",
-    title: "Every look stays, and stays editable.",
-    body: "Past conversations live on as an outfit history with its own cover image — open any of them and the conversation picks up exactly where it stopped.",
+    kicker: "Your journal",
+    title: "Every look, kept — and still open.",
+    body: "Each look lands in your style journal with its painting. Open any of them to pick the conversation back up — swap the shoes, dress it down, restyle it for next time.",
   },
 ];
 

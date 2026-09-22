@@ -63,7 +63,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search pieces…"
+              placeholder="Search your wardrobe…"
               className="w-36 bg-transparent text-[14px] text-ink placeholder:text-faint focus:outline-none sm:w-48"
             />
           </div>
@@ -112,7 +112,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
         {filtered.length === 0 ? (
           <div className="grid place-items-center py-24 text-center text-muted">
             <Hanger size={36} />
-            <p className="mt-3 text-[15px]">Nothing here yet.</p>
+            <p className="mt-3 text-[15px]">Your wardrobe is empty — for now. Add a few pieces and every look starts with them.</p>
             <button
               onClick={() => setModalOpen(true)}
               className="mt-3 text-[14px] font-medium text-accent-deep hover:underline"

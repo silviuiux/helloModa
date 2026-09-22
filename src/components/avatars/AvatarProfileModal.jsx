@@ -197,8 +197,8 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
         </h3>
         <p className="mt-1 text-[13px] text-muted">
           {isSelf
-            ? "Your measurements power fit — a photo (optional) paints your watercolor avatar."
-            : "Their measurements power fit for outfits styled on their behalf."}
+            ? "Your measurements shape how every look fits. Add a photo (optional) and helloModa paints you in watercolour — the photo is deleted right after."
+            : "Their measurements shape how every look fits them when you style on their behalf."}
         </p>
 
         <form onSubmit={saveDetails} className="mt-5 space-y-4">
@@ -327,7 +327,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
                     )}
                   </button>
                   {paintedOnce && !generating && (
-                    <span className="text-[11.5px] text-faint">Not quite right? Repaints with the same photo.</span>
+                    <span className="text-[11.5px] text-faint">Not quite you? Repaint from the same photo.</span>
                   )}
                 </div>
               )}

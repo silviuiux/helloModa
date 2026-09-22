@@ -4,6 +4,86 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Orb clip fix, organic detail pass, full copy rewrite
+
+Direct request, three parts. First, the orb blob turned into a square after its first state
+change. Second, the organic elements needed a lot more detail. Third, the user asked for a
+full inventory of the product's copy, rewritten by an expert copywriter to explain and sell
+helloModa better, including the landing page and the chat intro.
+
+**Orb bug.** When the orb entered its thinking state, `.orb__body` got a `transform` and a
+`filter`, while its children (the drifting colour layers) were already GPU-composited.
+Browsers that composite on the GPU then drop the `overflow:hidden` + border-radius clip. The
+blob rendered as its square bounding box and stayed that way afterwards. Headless Chromium
+reproduced it once the extra layers existed.
+
+The fix has two parts:
+
+- The state scale/filter moved to a new `.orb__shape` wrapper. The drop shadow is now a
+  `drop-shadow()` filter, so it follows the blob's shape.
+- The body clips with an animated `clip-path: inset(0 round …)` (`morph-clip`), using the
+  same four shapes as `morph`. That clip applies to composited children in every engine.
+
+Captured across idle, listening and thinking: no square edges.
+
+**Organic detail (`Orb.jsx`, `globals.css`).** New layers, from the outside in:
+
+- **Dial:** fine ticks every 7.5°, with longer marks every 45°, turning once every 90s.
+- **Pulses:** three staggered rings that ripple outward. Faint while listening, full while
+  thinking.
+- **Satellites:** two, orbiting the ring at different speeds and directions.
+- **Iridescent current:** a conic swirl, overlay-blended.
+- **Contour veins:** off-centre, sweeping slowly.
+- **Surface finish:** grain, a specular gloss and a lower inner shadow, so the body reads as a
+  lit, glassy volume.
+
+`mini` orbs keep only the body. All motion stays transform/opacity-only and stops under
+reduced motion.
+
+**New `OrganicField.jsx`.** Ambient life behind the surfaces: wandering violet cells, spores
+drifting upward and hairline wave filaments. Positions are deterministic, so server and
+client render the same markup.
+
+- The `page` variant sits behind the whole landing page and the whole app (`AppShell`).
+- The `plate` variant is quicker and denser, and runs inside the image-generation skeleton
+  (`OutfitHero`), so the wait looks alive.
+
+**Copy rewrite.** The new `docs/10-copy-deck.md` holds the positioning, the voice rules and a
+before/after table for every user-facing string. It's now the source of truth for copy, and
+it's added to the doc map in `00-overview.md`. Headlines of what changed:
+
+- **CTAs.** "Request an invite" promised a flow that doesn't exist: registration takes one
+  shared invite code. It's now "Join with your invite" / "Join the beta", and the register
+  page says what to do without a code.
+- **The "Details" bento is rebuilt as "What you get".** The old cards sold the design system
+  (corner geometry, typefaces, image fallbacks). The new benefit cards cover:
+  - helloAvatar
+  - closet insights, with the specimen figures labelled "example closet"
+  - the style journal
+  - honest shopping, which discloses the affiliate commission
+  - the orb's presence
+- **The story steps now sell outcomes, not tech.** "CLIP-embedded" is gone, and the "painted
+  on your avatar" promise now appears on the landing page.
+- **Accuracy fixes.** Two claims went because they over-promised:
+  - "Where your data stays" is now "is stored". Styling and painting call US-hosted model
+    APIs.
+  - "We've been notified" is gone. No error reporting is wired to the global error page.
+- **Chat intro.** New kicker ("your stylist is in"), a new body line, and four specific,
+  constraint-led starter prompts. The composer placeholder, button labels ("Restyle", "See
+  the pieces"), error lines and share text are all rewritten.
+- **App and auth surfaces.** The wardrobe, journal, avatars, usage note, login, register,
+  guides and meta title/description are all rewritten.
+
+**Out of scope, on purpose.** The nine guide articles (SEO long-form), the 20 occasion prompts
+(sent verbatim to the stylist, so changing them changes the styling output) and the stylist's
+reply voice. All three are noted in the copy deck.
+
+**Caveats.** Placeholder photos and Google Fonts are still blocked in the sandbox, so the
+screenshots show fallback plates and fallback fonts. The organic-field and orb performance
+hasn't been profiled on a low-end phone.
+
+---
+
 ## 2026-09-22 — Light theme with violet accent; placeholder photos replace vector art
 
 Direct request: keep the light theme with purple accents, and use placeholder images instead of

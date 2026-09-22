@@ -6,10 +6,10 @@ import Orb from "../Orb.jsx";
 import { occasions } from "../../data/occasions.js";
 
 const EXAMPLE_PROMPTS = [
-  "What should I wear to a black-tie gala?",
-  "Help me pack for a beach weekend",
-  "I need an outfit for a work presentation",
-  "Something for a first date, not too much",
+  "Black-tie gala on Saturday — but I hate heels",
+  "Beach weekend, carry-on only. What do I pack?",
+  "Presenting to the leadership team on Thursday",
+  "First date at a wine bar, not too try-hard",
 ];
 
 function firstNameFromEmail(email) {
@@ -49,7 +49,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt, orbSt
           <Orb size={104} state={orbState} />
         </div>
         <p className="label animate-fade-up mt-12 text-accent" style={{ animationDelay: "120ms" }}>
-          helloModa — your stylist
+          your stylist is in
         </p>
         <h1
           className="animate-fade-up mt-5 font-display text-[52px] font-semibold leading-[0.95] tracking-[-0.035em] text-ink sm:text-[84px]"
@@ -65,8 +65,9 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt, orbSt
           className="animate-fade-up mt-6 max-w-sm text-[15px] leading-relaxed text-muted"
           style={{ animationDelay: "280ms" }}
         >
-          Describe an occasion and I&apos;ll style a look from your closet — plus the one piece
-          worth adding.
+          Tell me the occasion, the vibe or the weather. I&apos;ll build the look from your
+          wardrobe, paint it on you, and only suggest something new if it&apos;s genuinely
+          missing.
         </p>
       </div>
 
@@ -99,7 +100,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt, orbSt
             />
             <span className="absolute bottom-4 left-5 text-[14px] font-medium text-white">{c.label}</span>
             <span className="label absolute bottom-[18px] right-5 text-white/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              style this →
+              style me →
             </span>
           </button>
         ))}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/Icons.jsx";
 import Orb from "@/components/Orb.jsx";
 import Reveal from "@/components/Reveal.jsx";
+import OrganicField from "@/components/OrganicField.jsx";
 import StickyStage from "@/components/landing/StickyStage.jsx";
 import OccasionMarquee from "@/components/landing/OccasionMarquee.jsx";
 import DetailHighlights from "@/components/landing/DetailHighlights.jsx";
@@ -24,10 +25,10 @@ import LandingChatDemo from "@/components/landing/LandingChatDemo.jsx";
 // customer logos, testimonials or metrics.
 
 const FACTS = [
-  { value: "20", label: "occasions covered out of the box" },
-  { value: "1", label: "styled look per turn, never a product wall" },
-  { value: "EU", label: "Frankfurt — where your data stays" },
-  { value: "0", label: "invented prices or fake retailers" },
+  { value: "20", label: "occasions ready to style, or type your own" },
+  { value: "1", label: "decisive look per answer, never a product wall" },
+  { value: "0", label: "sponsored picks, made-up prices or fake shops" },
+  { value: "EU", label: "your data is stored in Frankfurt" },
 ];
 
 const ORB_CYCLE = ["idle", "listening", "thinking"];
@@ -88,7 +89,7 @@ function Wordmark({ size = 22 }) {
   );
 }
 
-function PrimaryCta({ children = "Request an invite", className = "" }) {
+function PrimaryCta({ children = "Join with your invite", className = "" }) {
   return (
     <Link
       href="/register"
@@ -115,7 +116,7 @@ function Nav() {
             Occasion guides
           </Link>
           <a href="#try" className="hidden text-[13.5px] text-muted transition-colors hover:text-ink sm:block">
-            Try it
+            See it style
           </a>
           <Link href="/login" className="text-[13.5px] text-muted transition-colors hover:text-ink">
             Sign in
@@ -124,7 +125,7 @@ function Nav() {
             href="/register"
             className="rounded-[10px] bg-accent px-4 py-2 text-[13px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
           >
-            Request an invite
+            Join the beta
           </Link>
         </nav>
       </div>
@@ -167,10 +168,10 @@ function edgePoint(size, f, side) {
 }
 
 const CALLOUTS = [
-  { side: "left", f: 0.28, index: "01", title: "Starts in your closet", body: "Styles from what you own first." },
-  { side: "left", f: 0.72, index: "02", title: "One look per turn", body: "A direction, not a product wall." },
-  { side: "right", f: 0.3, index: "03", title: "Painted, not stock", body: "Every look rendered in watercolour." },
-  { side: "right", f: 0.7, index: "04", title: "Names one piece to buy", body: "Only when your closet can't." },
+  { side: "left", f: 0.28, index: "01", title: "Your closet first", body: "Every look starts with what you own." },
+  { side: "left", f: 0.72, index: "02", title: "One confident look", body: "Not forty tabs of maybes." },
+  { side: "right", f: 0.3, index: "03", title: "Painted on you", body: "Your face, your build, in watercolour." },
+  { side: "right", f: 0.7, index: "04", title: "One piece, if any", body: "Only when there's a real gap." },
 ];
 
 const HERO_ORB = 320;
@@ -214,7 +215,8 @@ export default function LandingPage() {
     // overflow-x-CLIP, not hidden: `hidden` turns this into a scroll
     // container, which silently breaks `position: sticky` for the
     // scrollytelling stage. `clip` contains overhangs without a scroll box.
-    <div className="app-canvas min-h-screen w-full overflow-x-clip">
+    <div className="app-canvas relative isolate min-h-screen w-full overflow-x-clip">
+      <OrganicField className="-z-10" />
       <Nav />
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
@@ -229,7 +231,7 @@ export default function LandingPage() {
 
         <div className="mt-24 grid items-end gap-10 lg:grid-cols-[1fr_minmax(320px,400px)] lg:gap-16">
           <div>
-            <p className="label animate-fade-up text-accent">Private beta — invite only</p>
+            <p className="label animate-fade-up text-accent">Your AI stylist · private beta</p>
             <h1
               className="animate-fade-up mt-6 font-display text-[44px] font-extrabold leading-[0.9] tracking-[-0.045em] text-ink sm:text-[84px] lg:text-[100px]"
               style={{ animationDelay: "120ms" }}
@@ -243,14 +245,14 @@ export default function LandingPage() {
           </div>
           <div className="animate-fade-up lg:pb-3" style={{ animationDelay: "260ms" }}>
             <p className="text-[16.5px] leading-[1.65] text-muted">
-              helloModa is a conversational AI stylist. Tell it what&apos;s coming up — it styles a
-              real look from the clothes already in your wardrobe, paints you a picture of it, and
-              names the one piece worth buying.
+              Tell helloModa where you&apos;re going. It builds the look from clothes you already
+              own, paints it on you so you can see it before you get dressed, and only suggests
+              buying something when your wardrobe genuinely can&apos;t cover it.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-6">
               <PrimaryCta />
               <p className="text-[13.5px] text-muted">
-                Have an invite?{" "}
+                Already a member?{" "}
                 <Link href="/login" className="text-ink underline decoration-line underline-offset-4 hover:decoration-accent">
                   Sign in
                 </Link>
@@ -281,11 +283,12 @@ export default function LandingPage() {
       {/* ── Positioning statement ────────────────────────────────────── */}
       <section id="how" className="mx-auto max-w-[1400px] px-6 py-36 sm:py-52">
         <Reveal>
-          <p className="label text-accent">The difference</p>
+          <p className="label text-accent">Why helloModa</p>
           <h2 className="mt-8 max-w-5xl font-display text-[36px] font-bold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[64px]">
-            Most styling apps are a shop with advice bolted on.{" "}
+            Most style apps are shops wearing a stylist&apos;s badge.{" "}
             <span className="text-faint">
-              helloModa starts inside your wardrobe, and only goes shopping when it{" "}
+              helloModa works for your wardrobe, not a retailer — and only sends you shopping when
+              it{" "}
               <span className="font-script font-normal italic tracking-normal text-muted">has to.</span>
             </span>
           </h2>
@@ -299,14 +302,15 @@ export default function LandingPage() {
       <section className="py-36 sm:py-52">
         <Reveal className="mx-auto mb-16 grid max-w-[1400px] gap-6 px-6 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-end">
           <div>
-            <p className="label text-accent">Range</p>
+            <p className="label text-accent">Occasions</p>
             <h2 className="mt-6 max-w-2xl font-display text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[56px]">
-              Twenty occasions, ready before you ask.
+              Twenty occasions, ready when you are.
             </h2>
           </div>
           <p className="text-[15px] leading-relaxed text-muted">
-            Weddings and interviews, yes — but also the rooftop birthday, the 90&apos;s throwback
-            party, the pumpkin-patch date. Anything you&apos;d actually get dressed for.
+            The wedding and the interview, obviously. But also the rooftop birthday, the
+            90s throwback party, the pumpkin-patch date — or anything else, in your own words.
+            If you&apos;d get dressed for it, helloModa can style it.
           </p>
         </Reveal>
         <OccasionMarquee />
@@ -315,9 +319,9 @@ export default function LandingPage() {
       {/* ── Craft details ────────────────────────────────────────────── */}
       <section className="mx-auto max-w-[1400px] px-6 pb-36 sm:pb-52">
         <Reveal className="mb-16">
-          <p className="label text-accent">Details</p>
+          <p className="label text-accent">What you get</p>
           <h2 className="mt-6 max-w-2xl font-display text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[56px]">
-            The small decisions, on purpose.
+            Everything a great stylist does. None of the pressure.
           </h2>
         </Reveal>
         <DetailHighlights />
@@ -327,13 +331,14 @@ export default function LandingPage() {
       <section id="try" className="mx-auto max-w-[1400px] scroll-mt-24 px-6 pb-36 sm:pb-52">
         <div className="grid gap-12 lg:grid-cols-[minmax(260px,340px)_1fr] lg:gap-20">
           <Reveal>
-            <p className="label text-accent">Try it</p>
+            <p className="label text-accent">See it style</p>
             <h2 className="mt-6 font-display text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[48px]">
-              Have a go, no account needed.
+              Watch it style a real occasion.
             </h2>
             <p className="mt-5 text-[15px] leading-relaxed text-muted">
-              Pick an occasion and watch a real turn play out — the same components the signed-in
-              app renders, replayed here.
+              Tap an occasion and see exactly what you&apos;d get: the look, the reasoning, the
+              pieces, and what to ask next. These are real answers from the app, replayed — no
+              sign-up needed.
             </p>
           </Reveal>
           <Reveal delay={120}>
@@ -349,15 +354,15 @@ export default function LandingPage() {
             <Orb size={420} />
           </div>
           <div className="relative max-w-xl">
-            <p className="label text-accent">Invite only, for now</p>
+            <p className="label text-accent">Private beta</p>
             <h2 className="mt-7 font-display text-[48px] font-extrabold leading-[0.92] tracking-[-0.045em] text-ink sm:text-[80px]">
               come get
               <br />
               <span className="font-script font-normal italic tracking-[-0.01em]">dressed.</span>
             </h2>
             <p className="mt-7 max-w-md text-[15.5px] leading-relaxed text-muted">
-              helloModa is in private beta while the styling gets sharper. Request an invite and
-              we&apos;ll open a seat.
+              helloModa is invite-only while we sharpen the styling. Got a code? You&apos;re one
+              step away. No code yet? Ask whoever sent you here — they can pass theirs on.
             </p>
             <PrimaryCta className="mt-10" />
           </div>
@@ -370,27 +375,28 @@ export default function LandingPage() {
           <div>
             <Wordmark />
             <p className="mt-5 max-w-xs text-[13.5px] leading-relaxed text-muted">
-              A conversational AI stylist that starts in your wardrobe. Part of helloCorp.
+              The AI stylist that starts in your wardrobe — and paints the look on you. A
+              helloCorp company.
             </p>
           </div>
           <div>
             <p className="label text-faint">Product</p>
             <ul className="mt-5 space-y-3 text-[13.5px]">
               <li><Link href="/what-to-wear" className="text-muted hover:text-ink">Occasion guides</Link></li>
-              <li><a href="#try" className="text-muted hover:text-ink">Try it</a></li>
+              <li><a href="#try" className="text-muted hover:text-ink">See it style</a></li>
             </ul>
           </div>
           <div>
             <p className="label text-faint">Account</p>
             <ul className="mt-5 space-y-3 text-[13.5px]">
               <li><Link href="/login" className="text-muted hover:text-ink">Sign in</Link></li>
-              <li><Link href="/register" className="text-muted hover:text-ink">Request an invite</Link></li>
+              <li><Link href="/register" className="text-muted hover:text-ink">Join with an invite</Link></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-line">
           <p className="label mx-auto max-w-[1400px] px-6 py-6 text-faint">
-            © helloModa — private beta · data hosted in the EU
+            © helloModa · private beta · data stored in the EU
           </p>
         </div>
       </footer>
