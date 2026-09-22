@@ -9,6 +9,11 @@ import { useEffect, useRef, useState } from "react";
 export function useOutfitImage({ recommendationId, heroPrompt, generatedImageUrl }) {
   const [imageUrl, setImageUrl] = useState(generatedImageUrl || null);
   const [status, setStatus] = useState(generatedImageUrl ? "ready" : "idle");
+  // Surfaced by MessageBubble.jsx specifically for the quota-exceeded case
+  // (src/lib/usage.js) — that's now an expected, routine failure on the
+  // free plan, not the rare edge case a silent placeholder was fine for
+  // before usage metering existed.
+  const [errorMessage, setErrorMessage] = useState(null);
   const started = useRef(false);
 
   useEffect(() => {
@@ -27,6 +32,7 @@ export function useOutfitImage({ recommendationId, heroPrompt, generatedImageUrl
           setImageUrl(data.imageUrl);
           setStatus("ready");
         } else {
+          setErrorMessage(data.error || null);
           setStatus("error");
         }
       })
@@ -40,5 +46,5 @@ export function useOutfitImage({ recommendationId, heroPrompt, generatedImageUrl
   // — treat that the same as "ready" so callers don't wait on it forever.
   const settled = !recommendationId || !heroPrompt || status === "ready" || status === "error";
 
-  return { imageUrl, status, settled };
+  return { imageUrl, status, settled, errorMessage };
 }

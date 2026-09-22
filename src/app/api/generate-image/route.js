@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { generateOutfitImage } from "@/lib/imageGen";
 import { signLookImageUrl } from "@/lib/lookImages";
 import { signAvatarRenderUrl } from "@/lib/avatarImages";
+import { assertUnderQuota, recordUsage } from "@/lib/usage";
 
 // Phase 2 "Magic Mirror" (docs/03-roadmap.md). Called client-side
 // (OutfitHero.jsx) right after a chat turn renders, so the text reply shows
@@ -51,6 +52,15 @@ export async function POST(request) {
     return NextResponse.json({ imageUrl });
   }
 
+  // Checked here, after the idempotent short-circuit above — revisiting an
+  // already-generated turn must never cost quota, only an actual new
+  // generation should (usage metering, src/lib/usage.js).
+  try {
+    await assertUnderQuota(supabase, user.id, "image_generation");
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: err.status || 500 });
+  }
+
   // helloAvatar (docs/03-roadmap.md Phase 3): if this look was generated
   // with a family member selected as the model, use their painted avatar
   // as an img2img reference so the outfit renders on "them," not a
@@ -92,6 +102,7 @@ export async function POST(request) {
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
+  await recordUsage(supabase, user.id, "image_generation");
 
   const imageUrl = await signLookImageUrl(supabase, imagePath);
   return NextResponse.json({ imageUrl });

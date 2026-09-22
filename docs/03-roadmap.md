@@ -138,6 +138,28 @@ resolved (`06-risks-legal.md`) and the core loop (Phases 1–3) is validated wit
 - Public GTM per the business plan: SEO wedge content live publicly, then Phase 2/3 viral loops
   ("Help Me Choose" voting links).
 
+## Monetization — cross-cutting, not tied to one phase
+
+Cost control and a real Pro gate turned out to be prerequisites for monetizing at all, not
+something to add after — this app had zero rate limiting anywhere before 2026-09-22, meaning any
+account could call Claude/Replicate without bound.
+
+- ✅ **Usage metering + free/Pro plumbing, shipped 2026-09-22:** `usage_events` table +
+  `src/lib/plans.js`/`usage.js` meter chat messages and image generations per calendar month
+  against free-tier caps (30 messages, 10 images — starting numbers, untuned against real usage).
+  Family avatars (helloAvatar) are gated too: free is self-only, Pro unlocks the existing 3-family
+  cap. Surfaced in the product two ways: a "You've used your N free X this month" error from
+  `/api/chat`/`/api/generate-image`/`/api/avatar/generate` when a limit is hit, and a running
+  usage summary on `/profile` so hitting a wall isn't the first anyone hears of a limit existing.
+- **No real Pro tier to buy yet.** `subscriptions` has existed in the schema since Phase 0 with
+  no code ever touching it — `getUserPlan()` checks it for an `active` row, which today never
+  exists, so every account is "free." Also found and fixed in the same pass: the table had RLS
+  enabled with **zero policies**, so no user could ever have read their own row back even once
+  Stripe started writing one — a real latent bug, not just missing scaffolding.
+- **Not yet built**: actual Stripe Checkout + a webhook that writes `subscriptions` rows, a
+  pricing page, and a cancel/manage-billing flow. That's the concrete next step to turn this
+  metering into real revenue.
+
 ## Explicitly deferred, not in this roadmap
 Smart Mirror (IoT), AR "Style Snatch," biometric styling (Apple Watch/Oura), generative
 manufacturing/3D knitting — the business plan's own "Future Horizon" section. Correctly framed

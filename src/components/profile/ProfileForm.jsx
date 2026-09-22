@@ -7,6 +7,7 @@ import { resizeImageFile } from "../../lib/imageResize.js";
 import { createClient } from "../../lib/supabase/client.js";
 import { updateProfile } from "../../actions/profile.js";
 import { track } from "../../lib/analytics.js";
+import UsageSummary from "./UsageSummary.jsx";
 
 const GENDER_OPTIONS = ["Woman", "Man", "Non-binary", "Prefer not to say"];
 const STYLE_SUGGESTIONS = [
@@ -22,7 +23,7 @@ const STYLE_SUGGESTIONS = [
   "Bold color",
 ];
 
-export default function ProfileForm({ profile, avatarUrl, userEmail }) {
+export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [gender, setGender] = useState(profile?.gender || "");
   const [heightCm, setHeightCm] = useState(profile?.height_cm ?? "");
@@ -121,6 +122,10 @@ export default function ProfileForm({ profile, avatarUrl, userEmail }) {
           <h1 className="font-display text-[26px] font-medium leading-tight text-ink">Your profile</h1>
           <p className="mt-0.5 text-[13.5px] text-muted">{userEmail}</p>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <UsageSummary usage={usage} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

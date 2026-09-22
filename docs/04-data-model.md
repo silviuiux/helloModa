@@ -132,13 +132,24 @@ products                          -- cached/synced from affiliate feeds, see 05-
 
   unique(retailer, external_id)
 
-subscriptions                      -- helloModa Pro
+subscriptions                      -- helloModa Pro. Schema only — no Stripe integration writes
+                                    to this yet (src/lib/usage.js's getUserPlan() checks for an
+                                    `active` row, so every account is "free" until it does).
+                                    RLS note: had zero policies until 2026-09-22 despite RLS being
+                                    enabled — a real bug (no user could read their own row back),
+                                    not just missing scaffolding; owner-select policy added then.
   id (uuid, pk)
   user_id (fk -> users)
   stripe_customer_id
   stripe_subscription_id
   status                    text
   current_period_end
+
+usage_events                       -- usage metering (Monetization, 03-roadmap.md), added 2026-09-22
+  id (uuid, pk)
+  user_id (fk -> users)
+  kind                      text   -- 'chat_message' | 'image_generation'
+  created_at
 
 marketplace_listings                -- Phase 4
   id (uuid, pk)

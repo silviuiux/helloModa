@@ -4,6 +4,49 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Usage metering + free/Pro plumbing
+
+Follow-up to a monetization brainstorm: before any revenue model works, this app needed the thing
+it didn't have at all — a bound on per-user Claude/Replicate cost, and an actual gate the
+`subscriptions` table (present since Phase 0, never wired to anything) could sell.
+
+- **New `usage_events` table** (migration `usage_metering`) — one row per billable action.
+  Scoped to the two real per-request external-API costs for v1: `chat_message` (`/api/chat`) and
+  `image_generation` (`/api/generate-image` and `/api/avatar/generate`, sharing one bucket since
+  both are a Replicate generation call). Wardrobe/avatar vision-tagging calls aren't metered yet
+  — smaller, less frequent, deliberately out of scope for a first pass.
+- **`src/lib/plans.js` + `usage.js`**: free caps at 30 chat messages and 10 image generations per
+  calendar month, Pro unlimited — starting numbers, not tuned against real usage data (no
+  production traffic to tune against yet, same honest caveat as this session's product-match
+  threshold and avatar quota work). `assertUnderQuota()` checks and throws before any billable
+  work happens (fail fast, before writing conversation/message rows or spending on a Claude call);
+  `recordUsage()` is called only after the actual cost was incurred, not before, so a request that
+  fails midway (bad input, API error) never burns a slot of the user's quota it didn't actually use.
+- **Family avatars gated too**: free is self-only, Pro unlocks the existing self+3 cap
+  (`actions/avatars.js`, `/avatars` page). The "Add family member" tile is replaced by a plain
+  "Add family members with Pro" card at the free cap, rather than letting someone fill out the
+  whole form and get blocked only on submit.
+- **Surfaced, not silent**: a quota-exceeded response shows a real message ("You've used your 30
+  free styling messages this month...") in the chat error bubble (existing generic error-message
+  path) and, new, under the outfit hero image when generation is blocked
+  (`useOutfitImage.js`/`OutfitHero.jsx` now carry the failure reason through, where before any
+  generation failure — quota or otherwise — just showed a silent placeholder forever). A new
+  `UsageSummary.jsx` on `/profile` shows the month's running totals so a limit isn't a surprise.
+- **Found and fixed a real, unrelated bug while wiring `getUserPlan()`**: `subscriptions` has had
+  RLS enabled since Phase 0 with **zero policies** — meaning no user could ever read their own
+  subscription row back, even once Stripe existed and wrote one. Would have silently made every
+  account look "free" forever regardless of actual billing status. Added an owner-select policy
+  (migration `subscriptions_owner_select`); writes are still meant to come only from a trusted
+  Stripe webhook via the service role, so no insert/update policy was added for users.
+
+**Not built yet, the deliberate next step**: real Stripe Checkout, a webhook writing
+`subscriptions` rows, a pricing page, and billing management — this ships the metering and the
+gate, not a way to actually pay for Pro. Every account is "free" in practice until that exists.
+`npm run build` passes with no errors; the new RLS policies and table were checked directly
+against the live Supabase project.
+
+---
+
 ## 2026-09-22 — Wire Awin product matching into chat, fix the embedding backlog
 
 Picked back up `05-integrations-affiliates.md`'s explicitly-flagged follow-up: "Not yet wired

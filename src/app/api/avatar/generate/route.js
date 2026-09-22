@@ -8,6 +8,7 @@ import { AVATAR_CONSENT_TEXT_VERSION } from "@/lib/avatarConsent";
 import { suggestBuildFromBMI, buildPromptPhrase } from "@/lib/avatarBuild";
 import { generateAvatarPortrait } from "@/lib/imageGen";
 import { signAvatarRenderUrl } from "@/lib/avatarImages";
+import { assertUnderQuota, recordUsage } from "@/lib/usage";
 
 const VISION_MODEL = "claude-opus-5";
 const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -65,6 +66,16 @@ export async function POST(request) {
   if (!avatarProfile) {
     // RLS (owner-only) makes another user's profile id 404 here too, not a 403 — fine either way.
     return NextResponse.json({ error: "Avatar profile not found." }, { status: 404 });
+  }
+
+  // Shares the image_generation quota with outfit-hero generations
+  // (src/lib/usage.js) — same Replicate-generation cost shape, and this
+  // route isn't idempotent like /api/generate-image (every "Try again"
+  // repaint is a fresh paid call), so it needs its own check every time.
+  try {
+    await assertUnderQuota(supabase, user.id, "image_generation");
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: err.status || 500 });
   }
 
   const client = new Anthropic();
@@ -150,6 +161,7 @@ export async function POST(request) {
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
+  await recordUsage(supabase, user.id, "image_generation");
 
   const imageUrl = await signAvatarRenderUrl(supabase, imagePath);
   return NextResponse.json({ imageUrl });

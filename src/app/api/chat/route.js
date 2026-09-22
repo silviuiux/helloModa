@@ -10,6 +10,7 @@ import {
   formatProfileForPrompt,
 } from "@/lib/stylist";
 import { matchProducts } from "@/lib/productMatching";
+import { assertUnderQuota, recordUsage } from "@/lib/usage";
 
 // Model choice: claude-opus-5 (current default per house policy). Swappable
 // to claude-sonnet-5 here alone if per-message cost becomes a concern at
@@ -44,6 +45,14 @@ export async function POST(request) {
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  }
+
+  // Fail fast and cheap, before any conversation/message rows are written —
+  // usage metering (docs/07-costs-budget.md follow-up, src/lib/usage.js).
+  try {
+    await assertUnderQuota(supabase, user.id, "chat_message");
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: err.status || 500 });
   }
 
   let body;
@@ -163,6 +172,10 @@ export async function POST(request) {
       );
     }
     parsed = response.parsed_output;
+    // Recorded here, not at the top — a request that fails before this
+    // point (bad input, Claude error) never actually cost anything, so it
+    // shouldn't burn a slot of the caller's monthly quota.
+    await recordUsage(supabase, user.id, "chat_message");
   } catch (err) {
     console.error("Claude request failed:", err);
     Sentry.captureException(err);

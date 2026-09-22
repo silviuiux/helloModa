@@ -2,13 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getUserPlan } from "@/lib/usage";
+import { limitsFor } from "@/lib/plans";
 
 // helloAvatar (docs/03-roadmap.md Phase 3, docs/04-data-model.md
-// `avatar_profiles`). One "self" row plus up to 3 family members per user —
-// the cap is enforced here, app-side, rather than a DB trigger, matching
-// this codebase's existing preference for business-rule checks in the
-// action layer (e.g. no DB constraint on conversation counts either).
-const MAX_PROFILES_PER_USER = 4;
+// `avatar_profiles`). Self plus up to plans.js's maxAvatars family
+// members per user — the cap is enforced here, app-side, rather than a DB
+// trigger, matching this codebase's existing preference for business-rule
+// checks in the action layer (e.g. no DB constraint on conversation counts
+// either). Free is self-only; family members are a Pro feature
+// (2026-09-22, part of giving the subscriptions table an actual gate to
+// sell — see docs/08-changelog.md).
 
 export async function listAvatarProfiles() {
   const supabase = await createClient();
@@ -46,13 +50,18 @@ export async function createAvatarProfile(fields) {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not signed in");
 
-  const { count, error: countError } = await supabase
-    .from("avatar_profiles")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id);
+  const [{ count, error: countError }, plan] = await Promise.all([
+    supabase.from("avatar_profiles").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+    getUserPlan(supabase, user.id),
+  ]);
   if (countError) throw new Error(countError.message);
-  if ((count || 0) >= MAX_PROFILES_PER_USER) {
-    throw new Error("You can have up to 4 avatars (yourself + 3 family members).");
+  const maxAvatars = limitsFor(plan).maxAvatars;
+  if ((count || 0) >= maxAvatars) {
+    throw new Error(
+      maxAvatars === 1
+        ? "Free plan includes one avatar (yourself). Upgrade to helloModa Pro to add family members."
+        : `You can have up to ${maxAvatars} avatars (yourself + ${maxAvatars - 1} family members).`
+    );
   }
 
   const row = fieldsToRow(fields);

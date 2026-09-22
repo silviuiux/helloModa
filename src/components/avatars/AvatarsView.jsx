@@ -7,8 +7,6 @@ import { deleteAvatarProfile } from "../../actions/avatars.js";
 import AvatarCard from "./AvatarCard.jsx";
 import AvatarProfileModal from "./AvatarProfileModal.jsx";
 
-const MAX_FAMILY = 3;
-
 function AddTile({ label, sublabel, onClick }) {
   return (
     <button
@@ -26,12 +24,13 @@ function AddTile({ label, sublabel, onClick }) {
   );
 }
 
-export default function AvatarsView({ profiles, selfDefaults }) {
+export default function AvatarsView({ profiles, selfDefaults, maxAvatars }) {
   const [list, setList] = useState(profiles);
   const [editing, setEditing] = useState(null); // { profile, isSelf } | null
 
   const selfProfile = list.find((p) => p.is_self) || null;
   const familyProfiles = list.filter((p) => !p.is_self);
+  const maxFamily = Math.max(0, maxAvatars - 1);
 
   function handleSaved(row) {
     setList((prev) => {
@@ -63,9 +62,10 @@ export default function AvatarsView({ profiles, selfDefaults }) {
         <h1 className="font-script text-[40px] leading-none text-ink sm:text-[52px]">hello—Avatar</h1>
       </div>
       <p className="mb-10 max-w-lg text-[14px] text-muted">
-        Watercolor avatars helloModa styles outfits on in chat — yourself, plus up to {MAX_FAMILY} family
-        members, each with their own measurements. A reference photo is used once to paint the avatar,
-        then discarded — only the finished painting is kept.
+        Watercolor avatars helloModa styles outfits on in chat — yourself
+        {maxFamily > 0 ? `, plus up to ${maxFamily} family members` : ""}, each with their own
+        measurements. A reference photo is used once to paint the avatar, then discarded — only
+        the finished painting is kept.
       </p>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -79,12 +79,23 @@ export default function AvatarsView({ profiles, selfDefaults }) {
           <AvatarCard key={p.id} profile={p} onEdit={(prof) => setEditing({ profile: prof, isSelf: false })} onDelete={handleDeleted} />
         ))}
 
-        {familyProfiles.length < MAX_FAMILY && (
+        {familyProfiles.length < maxFamily && (
           <AddTile
             label="Add family member"
-            sublabel={`${MAX_FAMILY - familyProfiles.length} of ${MAX_FAMILY} left`}
+            sublabel={`${maxFamily - familyProfiles.length} of ${maxFamily} left`}
             onClick={() => setEditing({ profile: null, isSelf: false })}
           />
+        )}
+
+        {selfProfile && maxFamily === 0 && (
+          <div className="glass grid aspect-[3/4] place-items-center rounded-bubble p-6 text-center">
+            <div>
+              <p className="text-[13px] font-medium text-ink">Add family members with Pro</p>
+              <p className="mt-1.5 text-[11.5px] text-muted">
+                Style outfits for up to 3 more people, each with their own avatar and measurements.
+              </p>
+            </div>
+          </div>
         )}
       </div>
 

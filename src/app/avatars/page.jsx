@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { listAvatarProfiles } from "@/actions/avatars";
 import { signAvatarProfiles } from "@/lib/avatarImages";
+import { getUserPlan } from "@/lib/usage";
+import { limitsFor } from "@/lib/plans";
 import AvatarsView from "@/components/avatars/AvatarsView.jsx";
 
 // Auth is already enforced by middleware (src/middleware.js).
@@ -15,6 +17,8 @@ export default async function AvatarsPage() {
     return [];
   });
   const profiles = await signAvatarProfiles(supabase, rows);
+  const plan = await getUserPlan(supabase, user.id);
+  const maxAvatars = limitsFor(plan).maxAvatars;
 
   // Prefills "Set up your avatar" with measurements the user already gave
   // on /profile, rather than asking them to re-enter the same numbers.
@@ -31,7 +35,7 @@ export default async function AvatarsPage() {
         background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
       }}
     >
-      <AvatarsView profiles={profiles} selfDefaults={selfProfile} />
+      <AvatarsView profiles={profiles} selfDefaults={selfProfile} maxAvatars={maxAvatars} />
     </div>
   );
 }
