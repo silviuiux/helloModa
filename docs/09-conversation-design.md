@@ -79,7 +79,7 @@ corner, small elements (`rounded-bubble-sm` / `-reply-sm`) 14px with a 4px
 tail — so every element reads as a rounded square, never a pill:
 
 - **`rounded-bubble`** (square bottom-left) — the user's message bubble
-  (always **left-aligned**, amber-warmed `bg-accent-tint`), the outfit
+  (always **left-aligned**, violet-tinted `bg-accent-tint`), the outfit
   hero image, and in-chat buttons/chips.
 - **`rounded-bubble-reply`** (square top-right, mirrored) — a text-only
   assistant reply (always **right-aligned**, outlined not filled). Today

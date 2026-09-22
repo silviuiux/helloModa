@@ -1,5 +1,5 @@
 import { useState } from "react";
-import GarmentArt from "../GarmentArt.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import Orb from "../Orb.jsx";
 
 // Phase 2 "Magic Mirror" (docs/03-roadmap.md): the generated look, via
@@ -12,9 +12,10 @@ import Orb from "../Orb.jsx";
 //   image    -> the painting, which resolves in from a blur once it has
 //               actually loaded (not the moment the URL arrives, which would
 //               flash an empty box first)
-//   neither  -> the GarmentArt illustration, plus the failure reason if
-//               there was one (most often now the free-plan quota message)
-export default function OutfitHero({ imageUrl, pending = false, errorMessage }) {
+//   neither  -> a placeholder photo (src/lib/placeholder.js, seeded per
+//               message so it's stable), plus the failure reason if there
+//               was one (most often the free-plan quota message)
+export default function OutfitHero({ imageUrl, pending = false, errorMessage, seed }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -39,14 +40,14 @@ export default function OutfitHero({ imageUrl, pending = false, errorMessage }) 
         />
       )}
 
-      {!pending && !imageUrl && <GarmentArt type="look" />}
+      {!pending && !imageUrl && <PlaceholderImage seed={seed} width={800} height={1000} />}
 
       {errorMessage && (
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-5 pt-12"
-          style={{ background: "linear-gradient(to top, rgba(15,14,12,0.92), transparent)" }}
+          style={{ background: "linear-gradient(to top, rgba(30,26,46,0.82), transparent)" }}
         >
-          <p className="pointer-events-auto text-[12.5px] leading-snug text-ink/90">{errorMessage}</p>
+          <p className="pointer-events-auto text-[12.5px] leading-snug text-white/90">{errorMessage}</p>
         </div>
       )}
     </div>

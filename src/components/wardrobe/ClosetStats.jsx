@@ -28,7 +28,7 @@ export default function ClosetStats({ items }) {
   const neverWorn = items.filter((it) => it.wearCount === 0).length;
 
   return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-line bg-white/[0.04] px-6 py-4 sm:px-8">
+    <div className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-line bg-white/60 px-6 py-4 sm:px-8">
       <Stat
         value={priced.length ? EUR.format(wardrobeValueCents / 100) : "—"}
         label="Wardrobe value"

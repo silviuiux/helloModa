@@ -92,7 +92,7 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
         href="/outfits"
         aria-label="Outfit history"
         className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors ${
-          open ? "bg-white/[0.08] text-ink" : "glass-circle text-muted hover:text-ink"
+          open ? "bg-white/85 text-ink" : "glass-circle text-muted hover:text-ink"
         }`}
       >
         <History size={18} />
@@ -128,7 +128,7 @@ function ConversationMenu({ conversations, activeConversationId, onSelect, onNew
                   className={`w-full truncate rounded-xl px-3 py-2 text-left text-[13px] transition-colors ${
                     c.id === activeConversationId
                       ? "bg-accent-tint text-accent-deep"
-                      : "text-muted hover:bg-white/[0.05] hover:text-ink"
+                      : "text-muted hover:bg-white/70 hover:text-ink"
                   }`}
                   title={c.title}
                 >
@@ -161,7 +161,7 @@ function AvatarMenu({ avatarProfiles, activeAvatarId, onSelectAvatar }) {
           aria-label="Styling for"
           title={active ? `Styling for ${active.display_name}` : "Styling for: no avatar"}
           className={`grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full transition-colors ${
-            open ? "bg-white/[0.08]" : "glass-circle"
+            open ? "bg-white/85" : "glass-circle"
           }`}
         >
           {active?.avatar_image_signed_url ? (
@@ -181,7 +181,7 @@ function AvatarMenu({ avatarProfiles, activeAvatarId, onSelectAvatar }) {
               close();
             }}
             className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-[13.5px] transition-colors ${
-              !activeAvatarId ? "bg-accent-tint font-medium text-accent-deep" : "text-muted hover:bg-white/[0.05] hover:text-ink"
+              !activeAvatarId ? "bg-accent-tint font-medium text-accent-deep" : "text-muted hover:bg-white/70 hover:text-ink"
             }`}
           >
             No avatar
@@ -194,10 +194,10 @@ function AvatarMenu({ avatarProfiles, activeAvatarId, onSelectAvatar }) {
                 close();
               }}
               className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-[13.5px] transition-colors ${
-                a.id === activeAvatarId ? "bg-accent-tint font-medium text-accent-deep" : "text-muted hover:bg-white/[0.05] hover:text-ink"
+                a.id === activeAvatarId ? "bg-accent-tint font-medium text-accent-deep" : "text-muted hover:bg-white/70 hover:text-ink"
               }`}
             >
-              <span className="grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-full bg-white/[0.06]">
+              <span className="grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-full bg-white/70">
                 {a.avatar_image_signed_url ? (
                   <img src={a.avatar_image_signed_url} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -223,7 +223,7 @@ function AccountMenu({ userEmail, onSignOut }) {
           onClick={toggle}
           aria-label="Account"
           className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors ${
-            open ? "bg-white/[0.08] text-ink" : "glass-circle text-muted hover:text-ink"
+            open ? "bg-white/85 text-ink" : "glass-circle text-muted hover:text-ink"
           }`}
         >
           <User size={18} />
@@ -237,20 +237,20 @@ function AccountMenu({ userEmail, onSignOut }) {
           </p>
           <Link
             href="/profile"
-            className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/[0.05] hover:text-accent-deep"
+            className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/70 hover:text-accent-deep"
           >
             Profile
           </Link>
           <Link
             href="/avatars"
-            className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/[0.05] hover:text-accent-deep"
+            className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/70 hover:text-accent-deep"
           >
             Avatars
           </Link>
           <form action={onSignOut}>
             <button
               type="submit"
-              className="mt-0.5 w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/[0.05] hover:text-accent-deep"
+              className="mt-0.5 w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-medium text-muted hover:bg-white/70 hover:text-accent-deep"
             >
               Sign out
             </button>
@@ -371,7 +371,7 @@ export default function BottomBar({
     // cut off by a panel.
     <div
       className="relative z-20 -mt-10 shrink-0 px-3 pb-4 pt-10 sm:px-5 sm:pb-5"
-      style={{ background: "linear-gradient(to top, #0f0e0c 55%, rgba(15,14,12,0))" }}
+      style={{ background: "linear-gradient(to top, #f5f3fa 55%, rgba(245,243,250,0))" }}
     >
       <div className="mx-auto flex max-w-content flex-col gap-2 sm:flex-row sm:items-center">
         <div className="hidden shrink-0 items-center gap-2 sm:flex">{navIcons}</div>
@@ -397,7 +397,7 @@ export default function BottomBar({
               className={`grid h-10 w-10 shrink-0 place-items-center rounded-[12px] transition-all duration-300 disabled:cursor-not-allowed ${
                 hasDraft && !sending
                   ? "bg-accent text-canvas hover:bg-accent-deep"
-                  : "bg-white/[0.04] text-faint"
+                  : "bg-white/60 text-faint"
               }`}
             >
               <ArrowRight size={16} />

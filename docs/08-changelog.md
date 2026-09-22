@@ -4,6 +4,45 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Light theme with violet accent; placeholder photos replace vector art
+
+Direct request: keep the light theme with purple accents, and use placeholder images instead of
+the vector garment graphics throughout the app.
+
+- **Light theme.** The redesign's structure stays: orb, organic motion, choreography, and
+  Plus Jakarta Sans / Instrument Serif / IBM Plex Mono. The tokens flip back to light:
+  - canvas `#f5f3fa`, paper `#fff`, ink `#1e1a2e`
+  - accent violet `#8b6cf0`, deep `#6a4bd8`, soft `#d4c8fb`, tint `#f0ebff`
+  - purple-tinted shadows and a violet glow
+  - `.app-canvas` haze, glass, grain (multiply), scrollbar, skeleton, and the orb (lavender body,
+    violet blobs, halo and ripple) recoloured in `globals.css`
+  - favicon is a violet orb
+- **Contrast fixes.**
+  - Image overlays (avatar, vibe, occasion, and empty-state cards; outfit error) use an ink scrim
+    with white text.
+  - Modal scrims are `bg-ink/25`.
+  - The composer fade, wardrobe card controls and label fade, `.input`, and global-error are all
+    light.
+- **Placeholder photos.** `GarmentArt.jsx` is deleted. The new `src/lib/placeholder.js` is the one
+  place the source is defined: deterministic picsum seed URLs. The new `PlaceholderImage.jsx`
+  loads in three steps: the real image, then the seeded placeholder photo, then a soft violet
+  plate. It's used in:
+  - landing: the stage visuals, the editorial plates (the `shapes` prop is removed), the occasion
+    marquee, and the detail specimens (copy updated)
+  - chat: the empty-state cards, the outfit hero, and recommendation cards
+  - vibe cards and guide hero images
+  - Each slot seeds on a stable key (slug, id, or path), so it always shows the same photo until
+    the real image replaces it.
+- **Intentionally kept.** Wardrobe item cards still show the garment-colour swatch and icon. A
+  random photo would misrepresent the user's own clothes.
+- **Caveats.**
+  - The picsum photos are generic, not fashion. A curated set can go in `public/placeholders/`
+    by changing only `placeholderSrc`.
+  - The sandbox blocks picsum and Google Fonts. Screenshots showed the violet fallback plate and
+    fallback fonts, so real photos haven't been seen rendered yet.
+
+---
+
 ## 2026-09-22 — Full redesign: "organic intelligence" (app + landing page)
 
 Direct request: a complete redesign of the app and landing page — super minimalist but friendly,

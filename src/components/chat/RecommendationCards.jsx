@@ -1,5 +1,4 @@
-import GarmentArt from "../GarmentArt.jsx";
-import ImageWithFallback from "../ImageWithFallback.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import { Heart, Hanger } from "../Icons.jsx";
 
 const EUR = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 2 });
@@ -43,15 +42,16 @@ function ProductCard({ card, onToggleSave, saved }) {
       <div className="group relative aspect-[3/4] overflow-hidden rounded-xl2">
         {isMatched ? (
           <a href={card.productUrl} target="_blank" rel="noopener nofollow sponsored" className="absolute inset-0 block">
-            <ImageWithFallback
+            <PlaceholderImage
               src={card.imageUrl}
-              alt=""
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-              fallback={<GarmentArt type={card.type} />}
+              seed={card.id}
+              width={600}
+              height={800}
+              className="transition-transform duration-300 group-hover:scale-[1.03]"
             />
           </a>
         ) : (
-          <GarmentArt type={card.type} />
+          <PlaceholderImage seed={`${card.type}-${card.name}`} width={600} height={800} />
         )}
         <button
           onClick={() => onToggleSave?.(card)}

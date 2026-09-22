@@ -1,7 +1,6 @@
 "use client";
 
-import GarmentArt from "../GarmentArt.jsx";
-import ImageWithFallback from "../ImageWithFallback.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import { occasions } from "../../data/occasions.js";
 
 // Full-bleed proof-of-breadth: the actual 20 occasions from
@@ -23,17 +22,12 @@ export default function OccasionMarquee() {
             key={`${o.slug}-${i}`}
             className="group relative aspect-[4/5] w-[300px] shrink-0 overflow-hidden rounded-bubble border border-line shadow-soft"
           >
-            <ImageWithFallback
-              src={`/occasions/${o.slug}-hero.jpg`}
-              alt=""
-              className="h-full w-full object-cover"
-              fallback={<GarmentArt type={o.type} />}
-            />
+            <PlaceholderImage src={`/occasions/${o.slug}-hero.jpg`} seed={o.slug} width={600} height={750} />
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
-              style={{ background: "linear-gradient(to top, rgba(15,14,12,0.88), transparent)" }}
+              style={{ background: "linear-gradient(to top, rgba(30,26,46,0.7), transparent)" }}
             />
-            <span className="absolute bottom-3 left-4 text-[12.5px] font-medium text-ink">
+            <span className="absolute bottom-3 left-4 text-[12.5px] font-medium text-white">
               {o.label}
             </span>
           </div>

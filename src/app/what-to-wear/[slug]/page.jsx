@@ -5,7 +5,7 @@ import { SITE_URL } from "@/lib/siteConfig.js";
 import GuideLayout from "@/components/guides/GuideLayout.jsx";
 import GuideHeroImage from "@/components/guides/GuideHeroImage.jsx";
 import GuideShowcase from "@/components/guides/GuideShowcase.jsx";
-import GarmentArt from "@/components/GarmentArt.jsx";
+import PlaceholderImage from "@/components/PlaceholderImage.jsx";
 import { ArrowRight } from "@/components/Icons.jsx";
 
 export function generateStaticParams() {
@@ -77,12 +77,12 @@ export default function GuidePage({ params }) {
         />
       </div>
 
-      {/* For her / for him — alternating split with illustrated look tiles
-          (not the real hero photo again — repeating one generated image
-          across the page would read as repetitive, not "lots of images") */}
+      {/* For her / for him — alternating split with their own placeholder
+          photos (not the hero photo again — repeating one image across the
+          page would read as repetitive, not "lots of images") */}
       <div className="mt-24 grid gap-8 sm:mt-28 sm:grid-cols-2 sm:items-center">
         <div className="aspect-[4/5] overflow-hidden rounded-xl3 sm:order-1">
-          <GarmentArt type="dress" />
+          <PlaceholderImage seed={`${guide.slug}-her`} width={800} height={1000} />
         </div>
         <div className="sm:order-2">
           <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">For her</h2>
@@ -92,7 +92,7 @@ export default function GuidePage({ params }) {
 
       <div className="mt-16 grid gap-8 sm:grid-cols-2 sm:items-center">
         <div className="aspect-[4/5] overflow-hidden rounded-xl3 sm:order-2">
-          <GarmentArt type="outerwear" />
+          <PlaceholderImage seed={`${guide.slug}-him`} width={800} height={1000} />
         </div>
         <div className="sm:order-1">
           <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">For him</h2>

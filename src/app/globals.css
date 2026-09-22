@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
@@ -14,67 +14,68 @@ body,
 
 body {
   margin: 0;
-  background: #0f0e0c;
-  color: #ece8e1;
+  background: #f5f3fa;
+  color: #1e1a2e;
   font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(212, 168, 83, 0.35);
-  color: #fff8ea;
+  background: rgba(139, 108, 240, 0.22);
+  color: #1e1a2e;
 }
 
 /* ---- Atmosphere --------------------------------------------------------
-   The canvas is an environment, not a flat fill: a low amber haze from the
-   top-left (where the conversation begins) and a faint cool counter-light
-   bottom-right. Fixed, so it reads as a room the content moves through. */
+   The canvas is an environment, not a flat fill: a soft violet haze from the
+   top-left (where the conversation begins) and a white bloom bottom-right.
+   Fixed, so it reads as a room the content moves through. */
 .app-canvas {
-  background-color: #0f0e0c;
+  background-color: #f5f3fa;
   background-image:
-    radial-gradient(60% 55% at 10% 0%, rgba(212, 168, 83, 0.1), transparent 70%),
-    radial-gradient(45% 40% at 100% 100%, rgba(130, 150, 170, 0.06), transparent 70%);
+    radial-gradient(60% 55% at 8% 0%, rgba(167, 137, 244, 0.2), transparent 70%),
+    radial-gradient(50% 45% at 100% 100%, rgba(255, 255, 255, 0.9), transparent 70%);
   background-attachment: fixed;
 }
 
-/* ---- Glass (dark) ---- */
+/* ---- Glass ---- */
 .glass {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 50px -24px rgba(0, 0, 0, 0.75);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 14px 44px -20px rgba(43, 36, 72, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 .glass-soft {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px) saturate(1.15);
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.75);
 }
 .glass-panel {
-  background: rgba(255, 255, 255, 0.025);
-  backdrop-filter: blur(16px) saturate(1.15);
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
 }
 .glass-circle {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px -5px rgba(43, 36, 72, 0.25);
 }
 
 /* Thin, quiet scrollbars */
 .scroll-area {
   scrollbar-width: thin;
-  scrollbar-color: #2e2a24 transparent;
+  scrollbar-color: #dcd5ee transparent;
 }
 .scroll-area::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 .scroll-area::-webkit-scrollbar-thumb {
-  background: #2e2a24;
+  background: #dcd5ee;
   border-radius: 999px;
 }
 .scroll-area::-webkit-scrollbar-track {
@@ -90,20 +91,20 @@ body {
 }
 
 /* Fine film grain over large flat areas. Inline SVG turbulence, so no
-   image request; soft-light on dark instead of multiply on light. */
+   image request. */
 .grain::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.28;
-  mix-blend-mode: soft-light;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
 /* ---- The orb --------------------------------------------------------------
    helloModa's presence (src/components/Orb.jsx): an organic, always-moving
-   body inside a crisp 1px geometric ring — the "organic intelligence inside
+   violet body inside a crisp 1px geometric ring — the "organic intelligence inside
    instrument precision" idea the whole redesign hangs on.
 
    States (idle / listening / thinking) change ONLY transitionable
@@ -151,7 +152,7 @@ body {
   position: absolute;
   inset: -45%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(212, 168, 83, 0.32), rgba(212, 168, 83, 0) 72%);
+  background: radial-gradient(closest-side, rgba(139, 108, 240, 0.3), rgba(139, 108, 240, 0) 72%);
   filter: blur(8px);
   opacity: 0.5;
   animation: breathe 6s ease-in-out infinite;
@@ -161,8 +162,8 @@ body {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #1b1812;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  background: #d9cdfc;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 12px 30px -14px rgba(90, 60, 200, 0.45);
   animation: morph 14s ease-in-out infinite;
   transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.9s ease;
 }
@@ -175,16 +176,16 @@ body {
 }
 .orb__blob--a {
   background:
-    radial-gradient(circle at 32% 30%, #f3dca3 0%, rgba(243, 220, 163, 0) 36%),
-    radial-gradient(circle at 68% 58%, #d4a853 0%, rgba(212, 168, 83, 0) 46%),
-    radial-gradient(circle at 38% 82%, #7a4e22 0%, rgba(122, 78, 34, 0) 52%);
+    radial-gradient(circle at 32% 30%, #ffffff 0%, rgba(255, 255, 255, 0) 36%),
+    radial-gradient(circle at 68% 58%, #8b6cf0 0%, rgba(139, 108, 240, 0) 46%),
+    radial-gradient(circle at 38% 82%, #4a2fb0 0%, rgba(74, 47, 176, 0) 52%);
   animation-duration: 18s;
 }
 .orb__blob--b {
   background:
-    radial-gradient(circle at 66% 24%, rgba(236, 232, 225, 0.8) 0%, rgba(236, 232, 225, 0) 28%),
-    radial-gradient(circle at 24% 68%, #b8863d 0%, rgba(184, 134, 61, 0) 42%);
-  mix-blend-mode: screen;
+    radial-gradient(circle at 66% 24%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 28%),
+    radial-gradient(circle at 24% 68%, #b9a4ff 0%, rgba(185, 164, 255, 0) 42%);
+  mix-blend-mode: soft-light;
   filter: blur(4px);
   animation-duration: 26s;
   animation-direction: reverse;
@@ -193,7 +194,7 @@ body {
   position: absolute;
   inset: 14%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 240, 205, 0.9), rgba(255, 240, 205, 0) 65%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 65%);
   filter: blur(6px);
   opacity: 0;
   animation: morph 3.2s ease-in-out infinite, breathe 1.6s ease-in-out infinite;
@@ -203,7 +204,7 @@ body {
   position: absolute;
   inset: -12%;
   border-radius: 50%;
-  border: 1px solid rgba(212, 168, 83, 0.16);
+  border: 1px solid rgba(139, 108, 240, 0.22);
   transition: border-color 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .orb[data-state="listening"] .orb__body {
@@ -213,12 +214,12 @@ body {
   opacity: 0.8;
 }
 .orb[data-state="listening"] .orb__ring {
-  border-color: rgba(212, 168, 83, 0.38);
+  border-color: rgba(139, 108, 240, 0.45);
   transform: scale(1.04);
 }
 .orb[data-state="thinking"] .orb__body {
   transform: scale(0.94);
-  filter: saturate(1.25) brightness(1.12);
+  filter: saturate(1.2) brightness(1.06);
 }
 .orb[data-state="thinking"] .orb__halo {
   opacity: 1;
@@ -227,7 +228,7 @@ body {
   opacity: 0.75;
 }
 .orb[data-state="thinking"] .orb__ring {
-  border-color: rgba(212, 168, 83, 0.5);
+  border-color: rgba(139, 108, 240, 0.6);
   transform: scale(1.1);
 }
 /* At tiny inline sizes (composer, reply marker) the ring is just noise and
@@ -240,17 +241,17 @@ body {
 }
 
 /* ---- Organic skeleton ------------------------------------------------------
-   Image-generation placeholder: a dark plate with a slow warm light sweep.
-   Never a spinner. */
+   Image-generation placeholder: a soft lavender plate with a slow light
+   sweep. Never a spinner. */
 .skeleton-organic {
-  background-color: #16140f;
+  background-color: #efeafb;
   background-image: linear-gradient(
     100deg,
-    rgba(212, 168, 83, 0) 20%,
-    rgba(212, 168, 83, 0.09) 45%,
-    rgba(243, 220, 163, 0.12) 50%,
-    rgba(212, 168, 83, 0.09) 55%,
-    rgba(212, 168, 83, 0) 80%
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(214, 200, 252, 0.6) 50%,
+    rgba(255, 255, 255, 0.55) 55%,
+    rgba(255, 255, 255, 0) 80%
   );
   background-size: 60% 100%;
   background-repeat: no-repeat;

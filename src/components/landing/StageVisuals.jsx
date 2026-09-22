@@ -1,7 +1,6 @@
 "use client";
 
-import GarmentArt from "../GarmentArt.jsx";
-import ImageWithFallback from "../ImageWithFallback.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import EditorialPlate from "./EditorialPlate.jsx";
 import { Hanger, Check, Sparkle } from "../Icons.jsx";
 
@@ -14,8 +13,8 @@ import { Hanger, Check, Sparkle } from "../Icons.jsx";
 //
 // Real generated photography drops in automatically wherever a
 // public/occasions/{slug}-hero.jpg exists (scripts/generate-occasion-
-// images.mjs); until then every slot falls back to the GarmentArt
-// illustration, same as the rest of the app.
+// images.mjs); until then every slot falls back to a placeholder photo
+// (src/lib/placeholder.js), same as the rest of the app.
 
 function Frame({ children }) {
   return <div className="h-full w-full p-6 sm:p-8">{children}</div>;
@@ -33,11 +32,11 @@ function Tile({ slug, type, label, matched }) {
           matched ? "ring-2 ring-accent ring-offset-2 ring-offset-paper/60" : ""
         }`}
       >
-        <ImageWithFallback
+        <PlaceholderImage
           src={slug ? `/occasions/${slug}-hero.jpg` : undefined}
-          alt=""
-          className="h-full w-full object-cover"
-          fallback={<GarmentArt type={type} />}
+          seed={slug || `${type}-${label}`}
+          width={400}
+          height={400}
         />
         {matched && (
           <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-accent text-canvas shadow-soft">
@@ -113,7 +112,6 @@ export function SceneLook() {
           <EditorialPlate
             src="/occasions/rooftop-birthday-hero.jpg"
             palette="dusk"
-            shapes={["top", "bottoms", "outerwear"]}
           />
         </div>
         <div>
@@ -158,7 +156,7 @@ export function SceneGap() {
                   i === 0 ? "ring-2 ring-accent ring-offset-2 ring-offset-paper/60" : ""
                 }`}
               >
-                <GarmentArt type={p.type} />
+                <PlaceholderImage seed={`gap-${p.label}`} width={450} height={600} />
               </div>
               <p className="mt-2 truncate text-[11.5px] font-medium leading-tight text-ink">
                 {p.label}
@@ -188,19 +186,16 @@ export function SceneHistory() {
       slug: "rooftop-birthday",
       title: "Rooftop after dark",
       palette: "dusk",
-      shapes: ["top", "outerwear"],
     },
     {
       slug: "networking-mixer",
       title: "Composed, not corporate",
       palette: "slate",
-      shapes: ["outerwear", "bottoms"],
     },
     {
       slug: "wedding-guest",
       title: "Vineyard, golden hour",
       palette: "sand",
-      shapes: ["dress", "bag"],
     },
   ];
   return (
@@ -214,7 +209,7 @@ export function SceneHistory() {
                 <EditorialPlate
                   src={`/occasions/${r.slug}-hero.jpg`}
                   palette={r.palette}
-                  shapes={r.shapes}
+                 
                   showSwatches={false}
                 />
               </div>

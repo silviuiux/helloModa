@@ -12,7 +12,7 @@ function Meter({ label, used, limit }) {
         </span>
       </div>
       {!unlimited && (
-        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.04]">
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/60">
           <div
             className={`h-full rounded-full ${atLimit ? "bg-red-400" : "bg-accent"}`}
             style={{ width: `${pct}%` }}

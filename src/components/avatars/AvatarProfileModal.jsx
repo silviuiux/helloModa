@@ -190,7 +190,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4">
-      <div className="absolute inset-0 bg-canvas/75 backdrop-blur-md" onClick={onClose} />
+      <div className="absolute inset-0 bg-ink/25 backdrop-blur-md" onClick={onClose} />
       <div className="glass animate-fade-up relative my-8 w-full max-w-lg rounded-xl3 p-6">
         <h3 className="font-display text-[22px] font-semibold tracking-[-0.03em] text-ink">
           {savedProfile ? `Edit ${savedProfile.display_name}` : isSelf ? "Set up your avatar" : "Add a family member"}
@@ -283,7 +283,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
           </p>
 
           <div className="mt-4 flex items-start gap-4">
-            <div className="relative grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/[0.04]">
+            <div className="relative grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/60">
               {currentAvatarUrl ? (
                 <img src={currentAvatarUrl} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -349,10 +349,10 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
       <style>{`
         .input{
           width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.03); border:1px solid #2a2621; color:#ece8e1;
+          background:rgba(255,255,255,0.8); border:1px solid #e6e1f0; color:#1e1a2e;
           font-size:14px; outline:none;
         }
-        .input:focus{ border-color:#6e5a33; box-shadow:0 0 0 3px rgba(212,168,83,0.16); }
+        .input:focus{ border-color:#8b6cf0; box-shadow:0 0 0 3px rgba(139,108,240,0.18); }
       `}</style>
     </div>
   );

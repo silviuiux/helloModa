@@ -1,13 +1,13 @@
 "use client";
 
-import GarmentArt from "../GarmentArt.jsx";
 import Orb from "../Orb.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import Reveal from "../Reveal.jsx";
 
 // Specimen cards, not feature bullets. Each one renders the actual detail
 // live rather than describing it — the corner geometry uses the real
 // rounded-bubble-sm/-reply-sm tokens, the type specimens are the real three
-// faces, the fallback tile is the real GarmentArt component, and the
+// faces, the fallback tiles are the real PlaceholderImage component, and the
 // presence card is the real Orb in each of its three states. A bento with
 // deliberately uneven spans (7/5, 5/7, 12) so it reads as a composition
 // rather than a card row.
@@ -50,7 +50,7 @@ export default function DetailHighlights() {
             <Annotation>square bottom-left</Annotation>
           </div>
           <div className="flex flex-row-reverse items-center gap-4">
-            <div className="max-w-xs rounded-bubble-reply-sm border border-accent-soft bg-white/[0.04] px-5 py-3.5">
+            <div className="max-w-xs rounded-bubble-reply-sm border border-accent-soft bg-white/60 px-5 py-3.5">
               <p className="text-[13.5px] leading-relaxed text-ink">On it — give me a second.</p>
             </div>
             <Annotation>square top-right</Annotation>
@@ -75,14 +75,14 @@ export default function DetailHighlights() {
         span="sm:col-span-5"
         label="Graceful degradation"
         title="It never shows you a broken frame."
-        body="Photography is generated per look and cached. Until an image exists, you get a drawn garment in the right silhouette — a deliberate illustration, never an empty box or a spinner."
+        body="Photography is generated per look and cached. Until an image exists, a placeholder photograph holds its place — the same one every time, never an empty box or a spinner."
       >
         <div className="flex items-end gap-4">
           <div className="relative aspect-square w-28 overflow-hidden rounded-xl2 shadow-soft">
-            <GarmentArt type="dress" />
+            <PlaceholderImage seed="specimen-dress" width={300} height={300} />
           </div>
           <div className="relative aspect-square w-28 overflow-hidden rounded-xl2 shadow-soft">
-            <GarmentArt type="outerwear" />
+            <PlaceholderImage seed="specimen-outerwear" width={300} height={300} />
           </div>
           <Annotation>fallback, not failure</Annotation>
         </div>
@@ -99,7 +99,7 @@ export default function DetailHighlights() {
             (t) => (
               <span
                 key={t}
-                className="rounded-full border border-line bg-white/[0.04] px-3.5 py-1.5 text-[11px] uppercase tracking-label text-muted"
+                className="rounded-full border border-line bg-white/60 px-3.5 py-1.5 text-[11px] uppercase tracking-label text-muted"
               >
                 {t}
               </span>

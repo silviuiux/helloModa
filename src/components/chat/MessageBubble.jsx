@@ -50,7 +50,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   const afterStream = message.fresh ? streamTiming(message.narrative).total + 250 : 0;
 
   if (isUser) {
-    // Left-aligned, amber-warmed, near-square bottom-left corner — the
+    // Left-aligned, violet-tinted, near-square bottom-left corner — the
     // opposite speaker corner from helloModa's replies, so who's talking
     // reads from shape alone.
     return (
@@ -80,7 +80,12 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   return (
     <div className="animate-fade-up space-y-8">
       <div className="grid gap-8 sm:grid-cols-2 sm:items-start sm:gap-12">
-        <OutfitHero imageUrl={imageUrl} pending={!settled} errorMessage={settled ? errorMessage : null} />
+        <OutfitHero
+          imageUrl={imageUrl}
+          pending={!settled}
+          errorMessage={settled ? errorMessage : null}
+          seed={message.recommendationId || message.id}
+        />
 
         <div className="flex flex-col">
           <div className="flex items-center gap-2.5">
@@ -157,7 +162,7 @@ function ToolbarBtn({ icon: Icon, label }) {
   return (
     <button
       aria-label={label}
-      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-faint transition-colors hover:bg-white/[0.06] hover:text-accent-deep"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-faint transition-colors hover:bg-white/70 hover:text-accent-deep"
     >
       <Icon size={16} />
     </button>

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import GarmentArt from "../GarmentArt.jsx";
-import ImageWithFallback from "../ImageWithFallback.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import Orb from "../Orb.jsx";
 import { occasions } from "../../data/occasions.js";
 
@@ -87,18 +86,19 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt, orbSt
             onClick={() => onPrompt(c.prompt)}
             className="group relative aspect-square w-[78vw] shrink-0 overflow-hidden rounded-bubble border border-line bg-paper transition-[transform,border-color] duration-500 ease-out hover:-translate-y-1 hover:border-accent-soft sm:w-[508px]"
           >
-            <ImageWithFallback
+            <PlaceholderImage
               src={`/occasions/${c.slug}-hero.jpg`}
-              alt=""
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              fallback={<GarmentArt type={c.type} />}
+              seed={c.slug}
+              width={1000}
+              height={1000}
+              className="transition-transform duration-700 ease-out group-hover:scale-[1.03]"
             />
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
-              style={{ background: "linear-gradient(to top, rgba(15,14,12,0.85), transparent)" }}
+              style={{ background: "linear-gradient(to top, rgba(30,26,46,0.7), transparent)" }}
             />
-            <span className="absolute bottom-4 left-5 text-[14px] font-medium text-ink">{c.label}</span>
-            <span className="label absolute bottom-[18px] right-5 text-faint opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <span className="absolute bottom-4 left-5 text-[14px] font-medium text-white">{c.label}</span>
+            <span className="label absolute bottom-[18px] right-5 text-white/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               style this →
             </span>
           </button>

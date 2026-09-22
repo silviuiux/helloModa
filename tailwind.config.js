@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-// Design system — "organic intelligence" (2026-09-22 redesign, see
-// docs/08-changelog.md). Dark-first warm canvas, one amber accent, a
+// Design system — "organic intelligence", light edition (2026-09-22; see
+// docs/08-changelog.md). A soft lavender-white canvas, one violet accent, a
 // geometric sans for authority, an editorial serif for the looks
 // themselves, mono for anything that behaves like data. Every color is a
 // solid hex on purpose: the app leans on Tailwind opacity modifiers
@@ -11,23 +11,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Warm near-black field + slightly lifted surfaces
-        canvas: "#0f0e0c",
-        paper: "#171512",
-        ink: "#ece8e1",
-        muted: "#9c968c",
-        faint: "#625d55",
-        // Single accent: industrial amber. `deep` is the brighter,
-        // text-legible variant on dark; `soft` is for hairline borders;
-        // `tint` is an amber-warmed surface (e.g. the user's own bubble).
+        // Lavender-white field + pure white surfaces
+        canvas: "#f5f3fa",
+        paper: "#ffffff",
+        ink: "#1e1a2e",
+        muted: "#6b6680",
+        faint: "#a7a2b8",
+        // Single accent: violet. A step deeper than the original #a789f4 so
+        // white text on a filled button clears contrast; `deep` is the
+        // text-legible variant, `soft` hairline borders, `tint` a
+        // violet-washed surface (e.g. the user's own bubble).
         accent: {
-          DEFAULT: "#d4a853",
-          deep: "#e8c47a",
-          soft: "#6e5a33",
-          tint: "#231d14",
+          DEFAULT: "#8b6cf0",
+          deep: "#6a4bd8",
+          soft: "#d4c8fb",
+          tint: "#f0ebff",
         },
-        line: "#2a2621",
-        hair: "#1c1a16",
+        line: "#e6e1f0",
+        hair: "#f0edf7",
       },
       fontFamily: {
         display: ['"Plus Jakarta Sans"', "-apple-system", "BlinkMacSystemFont", "sans-serif"],
@@ -58,11 +59,11 @@ export default {
         "bubble-reply-sm": "14px 4px 14px 14px",
       },
       boxShadow: {
-        panel: "0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 60px -28px rgba(0,0,0,0.8)",
-        soft: "0 1px 0 rgba(255,255,255,0.05) inset, 0 12px 30px -16px rgba(0,0,0,0.7)",
-        lift: "0 1px 0 rgba(255,255,255,0.06) inset, 0 34px 70px -30px rgba(0,0,0,0.9)",
-        glass: "0 1px 0 rgba(255,255,255,0.06) inset, 0 18px 50px -24px rgba(0,0,0,0.75)",
-        glow: "0 0 0 1px rgba(212,168,83,0.35), 0 0 32px -6px rgba(212,168,83,0.45)",
+        panel: "0 1px 2px rgba(43,36,72,0.04), 0 18px 44px -22px rgba(43,36,72,0.24)",
+        soft: "0 1px 2px rgba(43,36,72,0.04), 0 10px 26px -16px rgba(43,36,72,0.2)",
+        lift: "0 2px 4px rgba(43,36,72,0.05), 0 30px 60px -26px rgba(43,36,72,0.3)",
+        glass: "0 14px 44px -18px rgba(43,36,72,0.26), inset 0 1px 0 rgba(255,255,255,0.7)",
+        glow: "0 0 0 1px rgba(139,108,240,0.35), 0 0 30px -6px rgba(139,108,240,0.45)",
       },
       keyframes: {
         // Everything "materializes" rather than slides — a small rise plus
@@ -88,9 +89,9 @@ export default {
           "100%": { backgroundPosition: "220% 0" },
         },
         pulse_dot: {
-          "0%": { boxShadow: "0 0 0 0 rgba(212,168,83,0.5)" },
-          "70%": { boxShadow: "0 0 0 7px rgba(212,168,83,0)" },
-          "100%": { boxShadow: "0 0 0 0 rgba(212,168,83,0)" },
+          "0%": { boxShadow: "0 0 0 0 rgba(139,108,240,0.5)" },
+          "70%": { boxShadow: "0 0 0 7px rgba(139,108,240,0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(139,108,240,0)" },
         },
         // Landing-page occasion marquee — the track renders its children
         // twice, so -50% lands exactly on the seam and loops invisibly.

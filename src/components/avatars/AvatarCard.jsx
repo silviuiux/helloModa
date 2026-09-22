@@ -28,12 +28,12 @@ export default function AvatarCard({ profile, onEdit, onDelete }) {
         )}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
-          style={{ background: "linear-gradient(to top, rgba(15,14,12,0.85), transparent)" }}
+          style={{ background: "linear-gradient(to top, rgba(30,26,46,0.72), transparent)" }}
         />
         <div className="absolute inset-x-0 bottom-0 p-4">
-          <p className="label text-ink/70">{profile.is_self ? "You" : profile.relationship || "Family"}</p>
-          <h3 className="mt-0.5 font-script text-[24px] leading-none text-ink">{profile.display_name}</h3>
-          {summary && <p className="mt-1.5 text-[11px] text-ink/75">{summary}</p>}
+          <p className="label text-white/75">{profile.is_self ? "You" : profile.relationship || "Family"}</p>
+          <h3 className="mt-0.5 font-script text-[24px] leading-none text-white">{profile.display_name}</h3>
+          {summary && <p className="mt-1.5 text-[11px] text-white/80">{summary}</p>}
         </div>
       </button>
       <button

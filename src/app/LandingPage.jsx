@@ -132,7 +132,7 @@ function Nav() {
   );
 }
 
-// One annotation off the orb: text, a hairline, and an amber dot sitting on
+// One annotation off the orb: text, a hairline, and a violet dot sitting on
 // the orb's edge — the NASA-poster callout pattern. `side` decides which way
 // the line runs; `x`/`y` are the dot's position inside the orb box.
 function Callout({ side, x, y, index, title, children }) {

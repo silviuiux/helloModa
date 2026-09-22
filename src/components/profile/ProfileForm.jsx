@@ -131,7 +131,7 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <Section title="Photo & name">
           <div className="flex items-center gap-4">
-            <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border border-dashed border-accent-soft bg-white/[0.04]">
+            <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border border-dashed border-accent-soft bg-white/60">
               {avatarPreview ? (
                 <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -244,10 +244,10 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
       <style>{`
         .input{
           width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.03); border:1px solid #2a2621; color:#ece8e1;
+          background:rgba(255,255,255,0.8); border:1px solid #e6e1f0; color:#1e1a2e;
           font-size:14px; outline:none;
         }
-        .input:focus{ border-color:#6e5a33; box-shadow:0 0 0 3px rgba(212,168,83,0.16); }
+        .input:focus{ border-color:#8b6cf0; box-shadow:0 0 0 3px rgba(139,108,240,0.18); }
       `}</style>
     </div>
   );
@@ -316,7 +316,7 @@ function TagField({ values, onChange, suggestions = [], placeholder }) {
             setDraft("");
           }}
           placeholder={placeholder}
-          className="h-9 min-w-[10rem] flex-1 rounded-full bg-white/[0.04] px-3.5 text-[13px] text-ink placeholder:text-faint focus:outline-none"
+          className="h-9 min-w-[10rem] flex-1 rounded-full bg-white/60 px-3.5 text-[13px] text-ink placeholder:text-faint focus:outline-none"
         />
       </div>
       {remainingSuggestions.length > 0 && (

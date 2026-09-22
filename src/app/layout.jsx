@@ -9,7 +9,7 @@ export const metadata = {
   description:
     "helloModa — a conversational AI stylist that turns mood, occasion, wardrobe and budget into curated outfit direction. Part of helloCorp.",
   icons: {
-    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f0e0c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23d4a853'/%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23d4a853' stroke-opacity='.35'/%3E%3C/svg%3E",
+    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f5f3fa'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%238b6cf0'/%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%238b6cf0' stroke-opacity='.35'/%3E%3C/svg%3E",
   },
 };
 

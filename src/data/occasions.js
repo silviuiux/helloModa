@@ -4,9 +4,8 @@
 // scripts/generate-occasion-images.mjs — a real generated image (house
 // watercolor style, src/lib/imageGen.js) saved to
 // public/occasions/{slug}-hero.jpg. Run that script after adding a card
-// (needs REPLICATE_API_TOKEN); cards degrade gracefully to an illustrated
-// GarmentArt placeholder until the file exists (ImageWithFallback.jsx).
-// `type` is that placeholder's shape key. `prompt` is what gets sent as the
+// (needs REPLICATE_API_TOKEN); cards degrade gracefully to a seeded
+// placeholder photo until the file exists (PlaceholderImage.jsx). `prompt` is what gets sent as the
 // first chat message when a card is tapped.
 export const occasions = [
   {

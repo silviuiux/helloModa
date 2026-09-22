@@ -18,7 +18,7 @@ const CATEGORY_TO_TYPE = {
 // expects. `products` (real Awin-matched pieces, docs/05-integrations-
 // affiliates.md) don't carry this app's own top/bottoms/dress/... type —
 // their `category` is the retailer's own taxonomy string ("Sneakers",
-// "Shirts") — so `type` here is only a GarmentArt-fallback hint for the
+// "Shirts") — so `type` here is only a placeholder-seed hint for the
 // rare case a matched product has no image, not used for filtering.
 function mapRecommendationItem(it) {
   if (it.wardrobe_items) {

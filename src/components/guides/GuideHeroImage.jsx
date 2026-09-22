@@ -1,21 +1,14 @@
 "use client";
 
-import GarmentArt from "../GarmentArt.jsx";
-import ImageWithFallback from "../ImageWithFallback.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 
 // Real generated image (scripts/generate-guide-images.mjs) when it exists,
-// falling back to the same illustrated placeholder the chat UI uses
-// otherwise — never a broken image, and upgrades automatically once the
-// script has run, no code change needed either way.
+// falling back to a placeholder photo seeded on the path — never a broken
+// image, and upgrades automatically once the script has run.
 export default function GuideHeroImage({ src, alt, className = "" }) {
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <ImageWithFallback
-        src={src}
-        alt={alt}
-        className="h-full w-full object-cover"
-        fallback={<GarmentArt type="look" />}
-      />
+      <PlaceholderImage src={src} seed={src} alt={alt} width={1000} height={1250} />
     </div>
   );
 }
