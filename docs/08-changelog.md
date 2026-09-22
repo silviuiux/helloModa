@@ -4,6 +4,46 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — helloAvatar: realistic bodies, age, retry
+
+Follow-up to helloAvatar v1 (same day, below) — direct feedback that avatars should reflect real
+body proportions instead of defaulting to slim/athletic figures, plus a few missing fields.
+
+- **Body realism, not a default athletic figure.** Image models like Flux lean toward
+  slim/idealized bodies unless told firmly otherwise — so a new `build` field (`slim` / `average`
+  / `athletic` / `fuller` / `heavyset`, `src/lib/avatarBuild.js`) is BMI-suggested from height/weight
+  the moment both are entered, always shown as an editable chip selector, and stated as an explicit
+  requirement in the generation prompt ("paint a heavyset build, not a slimmer figure than
+  described") rather than a soft hint. `athletic` is deliberately never auto-suggested — BMI alone
+  can't tell you someone is toned, so that one's opt-in only, matching the request that not every
+  avatar should read as fit.
+- **Age, asked at creation** — whole years, required, but only ever used to pick "boy"/"girl" vs
+  "man"/"woman" phrasing in the prompt; never surfaced as a number anywhere (same "no exact age"
+  rule the vision step already followed, now stated in one place instead of two).
+- **Gender narrowed to Woman/Man** on the avatar form specifically (direct request) — the general
+  `/profile` gender field is unchanged, this only affects how an avatar is painted.
+  `formatProfileForPrompt`'s stylist-facing wording is untouched.
+  "Boy"/"girl" isn't a separate option — it falls out of age + this choice automatically.
+- **Hair type and facial hair**, added to the vision step's output schema
+  (`avatarDescriber.js`): hair texture (straight/wavy/curly/coily/bald) and facial hair
+  (beard/mustache/stubble/clean-shaven/none) are now explicit fields the illustrator's brief
+  reports, not folded into a vaguer "hair" description. Body build moved OUT of that schema
+  entirely — it's now sourced from real height/weight data and the user's own confirmation
+  instead of asking the vision model to guess a body shape from a photo, which is both less
+  reliable and a more sensitive thing to infer than hair/skin tone.
+- **Retry painting** — after a generation, the reference photo (still only ever in memory, never
+  written to Storage) stays available for one more attempt: a "Try again" button reruns
+  generation on the exact same photo without re-uploading, for when the first pass doesn't
+  resemble the person. Choosing a different photo instead resets consent, since that's a new
+  photo being used, not a repaint of the same one already consented to.
+
+Not screenshot-verified in this sandbox, same reasons as the v1 entry below (auth gate,
+Replicate/Anthropic unreachable). `npm run build` passes with no errors; the `age`/`build` columns
+were added via a second migration (`avatar_profiles_age_build`) applied directly to the live
+Supabase project.
+
+---
+
 ## 2026-09-22 — helloAvatar v1: family avatars as outfit models
 
 Direct request: an avatar per user plus up to 3 family members, each with their own measurements

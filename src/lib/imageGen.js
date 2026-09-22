@@ -76,16 +76,32 @@ export async function generateOutfitImage(prompt, aspectRatio, referenceImageUrl
 }
 
 // helloAvatar's own generation step: a full-body watercolor figure from the
-// vision-derived appearance brief (avatarDescriber.js) — never from the
-// photo itself, which never reaches this file. Portrait, plain background,
-// neutral standing pose — deliberately generic-scene so it works as a base
-// figure for later img2img outfit generations above.
-export async function generateAvatarPortrait(appearancePrompt) {
+// vision-derived appearance brief (avatarDescriber.js) plus real profile
+// data (avatarBuild.js) — never from the photo itself, which never reaches
+// this file. Portrait, plain background, neutral standing pose —
+// deliberately generic-scene so it works as a base figure for later img2img
+// outfit generations above.
+//
+// Body realism is a direct, explicit instruction here (2026-09-22): Flux,
+// like most of these models, defaults toward slim/athletic figures unless
+// told firmly otherwise, which would silently misrepresent anyone whose
+// real build/BMI isn't that — so `buildPhrase` is stated as a requirement,
+// not a suggestion, and repeated at the end of the prompt (recency helps
+// it hold against the model's own bias) rather than trusted to one mention.
+export async function generateAvatarPortrait({ appearance, subjectPhrase, buildPhrase }) {
   const replicate = new Replicate();
+
+  const prompt =
+    `${STYLE_DIRECTIVE} Full-body fashion-illustration figure, standing in a relaxed neutral pose, ` +
+    `facing forward, plain soft neutral studio background, simple bodysuit or minimal base clothing ` +
+    `— this is a base model figure for later outfit visualization, not a finished outfit. ` +
+    `Subject: a ${subjectPhrase} with a ${buildPhrase}. ${appearance} ` +
+    `Body proportions MUST realistically match the stated build — this is a specific requirement, ` +
+    `not a generic default: paint a ${buildPhrase}, not a slimmer or more toned figure than described.`;
 
   const [output] = await replicate.run(MODEL, {
     input: {
-      prompt: `${STYLE_DIRECTIVE} Full-body fashion-illustration figure, standing in a relaxed neutral pose, facing forward, plain soft neutral studio background, simple bodysuit or minimal base clothing — this is a base model figure for later outfit visualization, not a finished outfit. Subject: ${appearancePrompt}`,
+      prompt,
       aspect_ratio: "3:4",
       output_format: "jpg",
       num_outputs: 1,

@@ -5,6 +5,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { createClient } from "@/lib/supabase/server";
 import { AvatarAppearanceSchema, AVATAR_DESCRIBER_SYSTEM_PROMPT } from "@/lib/avatarDescriber";
 import { AVATAR_CONSENT_TEXT_VERSION } from "@/lib/avatarConsent";
+import { suggestBuildFromBMI, buildPromptPhrase } from "@/lib/avatarBuild";
 import { generateAvatarPortrait } from "@/lib/imageGen";
 import { signAvatarRenderUrl } from "@/lib/avatarImages";
 
@@ -55,7 +56,7 @@ export async function POST(request) {
 
   const { data: avatarProfile, error: profileError } = await supabase
     .from("avatar_profiles")
-    .select("id, is_self, display_name, gender, height_cm, weight_kg")
+    .select("id, is_self, display_name, gender, age, build, height_cm, weight_kg")
     .eq("id", avatarProfileId)
     .maybeSingle();
   if (profileError) {
@@ -101,13 +102,29 @@ export async function POST(request) {
   }
   // imageBase64 goes out of scope here — nothing further in this request holds it.
 
-  const genderNote = avatarProfile.gender ? `, ${avatarProfile.gender.toLowerCase()}` : "";
-  const appearancePrompt =
-    `${appearance.build}${genderNote}, ${appearance.hair} hair, ${appearance.skinTone} skin tone.`;
+  // Age only ever decides child vs adult phrasing here — never surfaced as
+  // a number (avatarDescriber.js's schema comment says the same for the
+  // vision step; kept consistent end to end).
+  const isChild = typeof avatarProfile.age === "number" && avatarProfile.age < 18;
+  const genderWord = avatarProfile.gender === "Man" ? (isChild ? "boy" : "man") : isChild ? "girl" : "woman";
+  const subjectPhrase = avatarProfile.gender ? genderWord : isChild ? "child" : "adult";
+
+  const buildKey = avatarProfile.build || suggestBuildFromBMI(avatarProfile.height_cm, avatarProfile.weight_kg);
+  const buildPhrase = buildPromptPhrase(buildKey) || "average, proportionate build";
+
+  const appearanceSentence =
+    `${appearance.hair} hair` +
+    (appearance.hairTexture ? `, ${appearance.hairTexture} texture` : "") +
+    (appearance.facialHair && appearance.facialHair.toLowerCase() !== "none" ? `, ${appearance.facialHair}` : "") +
+    `, ${appearance.skinTone} skin tone.`;
 
   let imagePath;
   try {
-    const blob = await generateAvatarPortrait(appearancePrompt);
+    const blob = await generateAvatarPortrait({
+      appearance: appearanceSentence,
+      subjectPhrase,
+      buildPhrase,
+    });
     imagePath = `${user.id}/${avatarProfileId}.jpg`;
     const { error: uploadError } = await supabase.storage
       .from("avatar-renders")

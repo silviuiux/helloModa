@@ -26,6 +26,8 @@ function fieldsToRow(fields) {
     display_name: fields.displayName?.trim(),
     relationship: fields.relationship?.trim() || null,
     gender: fields.gender || null,
+    age: fields.age ?? null,
+    build: fields.build || null,
     height_cm: fields.heightCm ?? null,
     weight_kg: fields.weightKg ?? null,
     bust_cm: fields.bustCm ?? null,

@@ -50,7 +50,14 @@ avatar_profiles                  -- helloAvatar (Phase 3), added 2026-09-22
   is_self                bool    -- exactly one true row per user (partial unique index)
   relationship            text   -- e.g. "Partner", "Daughter" — null for the is_self row
   display_name            text
-  gender                  text
+  gender                  text   -- 'Woman' | 'Man' only (direct decision 2026-09-22); age below
+                                     decides boy/girl vs man/woman phrasing, not a third option here
+  age                     int    -- whole years; only ever used for child/adult phrasing in the
+                                     generation prompt (src/lib/imageGen.js), never shown as a number
+  build                   text   -- 'slim'|'average'|'athletic'|'fuller'|'heavyset', BMI-suggested
+                                     by src/lib/avatarBuild.js and always user-editable — so the
+                                     painted body isn't defaulted to slim/athletic regardless of
+                                     actual measurements
   height_cm | weight_kg | bust_cm | waist_cm | hip_cm    numeric, all nullable
   size_top | size_bottom | size_shoe                     text, free-form
   avatar_image_url        text   -- Supabase Storage path, `avatar-renders` bucket (private,

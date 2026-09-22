@@ -1,18 +1,24 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Plus, Check } from "../Icons.jsx";
+import { Plus, Check, Refresh } from "../Icons.jsx";
 import { resizeImageFile, blobToBase64 } from "../../lib/imageResize.js";
 import { createAvatarProfile, updateAvatarProfile } from "../../actions/avatars.js";
 import { avatarConsentCopy } from "../../lib/avatarConsent.js";
+import { BUILD_OPTIONS, suggestBuildFromBMI } from "../../lib/avatarBuild.js";
 
-const GENDER_OPTIONS = ["Woman", "Man", "Non-binary", "Prefer not to say"];
+// Direct request 2026-09-22: two gender options only (drives "man"/"woman"
+// vs "boy"/"girl" phrasing in the generation prompt via age, not a
+// separate child option here).
+const GENDER_OPTIONS = ["Woman", "Man"];
 
 function toFields(p) {
   return {
     displayName: p?.display_name || "",
     relationship: p?.relationship || "",
     gender: p?.gender || "",
+    age: p?.age ?? "",
+    build: p?.build || "",
     heightCm: p?.height_cm ?? "",
     weightKg: p?.weight_kg ?? "",
     bustCm: p?.bust_cm ?? "",
@@ -31,9 +37,15 @@ function toFields(p) {
 // photo section becomes relevant, so "fill in details, then add a photo"
 // reads as one flow even though it's two requests under the hood.
 export default function AvatarProfileModal({ open, onClose, profile, isSelf, selfDefaults, onSaved, onDeleted }) {
-  const [fields, setFields] = useState(() =>
-    toFields(profile || (isSelf ? { ...selfDefaults, display_name: "" } : null))
-  );
+  const [fields, setFields] = useState(() => {
+    const initial = toFields(profile || (isSelf ? { ...selfDefaults, display_name: "" } : null));
+    if (!initial.build) {
+      const suggested = suggestBuildFromBMI(initial.heightCm, initial.weightKg);
+      if (suggested) initial.build = suggested;
+    }
+    return initial;
+  });
+  const [buildTouched, setBuildTouched] = useState(Boolean(profile?.build));
   const [savedProfile, setSavedProfile] = useState(profile || null);
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | saving | error
   const [saveError, setSaveError] = useState("");
@@ -43,12 +55,34 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
   const [consent, setConsent] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState("");
+  const [paintedOnce, setPaintedOnce] = useState(false);
   const fileInputRef = useRef(null);
 
   if (!open) return null;
 
   function set(key) {
     return (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
+  }
+
+  function setHeightOrWeight(key) {
+    return (e) => {
+      const value = e.target.value;
+      setFields((f) => {
+        const next = { ...f, [key]: value };
+        if (!buildTouched) {
+          const suggested = suggestBuildFromBMI(
+            key === "heightCm" ? value : next.heightCm,
+            key === "weightKg" ? value : next.weightKg
+          );
+          if (suggested) next.build = suggested;
+        }
+        return next;
+      });
+    };
+  }
+
+  function chooseFile() {
+    fileInputRef.current?.click();
   }
 
   async function handlePhotoChange(e) {
@@ -58,6 +92,8 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoBlob(resized);
     setPhotoPreview(URL.createObjectURL(resized));
+    setConsent(false);
+    setPaintedOnce(false);
     setGenError("");
   }
 
@@ -67,6 +103,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
     setSaveError("");
     const numeric = {
       ...fields,
+      age: fields.age === "" ? null : Number(fields.age),
       heightCm: fields.heightCm === "" ? null : Number(fields.heightCm),
       weightKg: fields.weightKg === "" ? null : Number(fields.weightKg),
       bustCm: fields.bustCm === "" ? null : Number(fields.bustCm),
@@ -94,7 +131,8 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
     setGenerating(true);
     setGenError("");
 
-    // Make sure details are saved first, since generation needs a real id.
+    // Make sure details are saved first, since generation needs a real id
+    // and uses the saved age/build/measurements, not just the form state.
     let target = savedProfile;
     if (!target || fieldsChanged()) {
       target = await saveDetails();
@@ -117,10 +155,12 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
       const updated = { ...target, avatar_image_signed_url: data.imageUrl };
       setSavedProfile(updated);
       onSaved(updated);
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
-      setPhotoBlob(null);
-      setPhotoPreview(null);
-      setConsent(false);
+      // Deliberately keeps photoBlob/consent so "Try again" (a different
+      // request to the same photo, still in memory — never re-stored) is
+      // one click if the result doesn't actually look like the person.
+      // The photo itself is discarded the moment this modal closes or a
+      // different one is chosen, same as before.
+      setPaintedOnce(true);
     } catch (err) {
       console.error("Avatar generation failed:", err);
       setGenError(err.message || "Couldn't paint an avatar right now.");
@@ -144,7 +184,9 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
     onClose();
   }
 
-  const currentAvatarUrl = photoPreview || savedProfile?.avatar_image_signed_url;
+  const currentAvatarUrl = paintedOnce
+    ? savedProfile?.avatar_image_signed_url
+    : photoPreview || savedProfile?.avatar_image_signed_url;
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4">
@@ -170,30 +212,55 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
             </Field>
           )}
 
-          <Field label="Gender">
-            <div className="flex flex-wrap gap-2">
-              {GENDER_OPTIONS.map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setFields((f) => ({ ...f, gender: f.gender === g ? "" : g }))}
-                  className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
-                    fields.gender === g ? "bg-accent text-white shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
-                  }`}
-                >
-                  {g}
-                </button>
-              ))}
-            </div>
-          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Gender">
+              <div className="flex flex-wrap gap-2">
+                {GENDER_OPTIONS.map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setFields((f) => ({ ...f, gender: f.gender === g ? "" : g }))}
+                    className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
+                      fields.gender === g ? "bg-accent text-white shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Age">
+              <input type="number" inputMode="numeric" min="0" max="120" value={fields.age} onChange={set("age")} placeholder="e.g. 34" className="input" required />
+            </Field>
+          </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <Field label="Height (cm)"><input type="number" inputMode="decimal" value={fields.heightCm} onChange={set("heightCm")} className="input" /></Field>
-            <Field label="Weight (kg)"><input type="number" inputMode="decimal" value={fields.weightKg} onChange={set("weightKg")} className="input" /></Field>
+            <Field label="Height (cm)"><input type="number" inputMode="decimal" value={fields.heightCm} onChange={setHeightOrWeight("heightCm")} className="input" /></Field>
+            <Field label="Weight (kg)"><input type="number" inputMode="decimal" value={fields.weightKg} onChange={setHeightOrWeight("weightKg")} className="input" /></Field>
             <Field label="Bust (cm)"><input type="number" inputMode="decimal" value={fields.bustCm} onChange={set("bustCm")} className="input" /></Field>
             <Field label="Waist (cm)"><input type="number" inputMode="decimal" value={fields.waistCm} onChange={set("waistCm")} className="input" /></Field>
             <Field label="Hip (cm)"><input type="number" inputMode="decimal" value={fields.hipCm} onChange={set("hipCm")} className="input" /></Field>
           </div>
+
+          <Field label="Body build" hint="Suggested from height/weight — tap to confirm or change it; the avatar is painted to match, not defaulted to slim/athletic.">
+            <div className="flex flex-wrap gap-2">
+              {BUILD_OPTIONS.map((b) => (
+                <button
+                  key={b.key}
+                  type="button"
+                  onClick={() => {
+                    setBuildTouched(true);
+                    setFields((f) => ({ ...f, build: f.build === b.key ? "" : b.key }));
+                  }}
+                  className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
+                    fields.build === b.key ? "bg-accent text-white shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
+                  }`}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          </Field>
 
           <div className="grid grid-cols-3 gap-3">
             <Field label="Top size"><input value={fields.sizeTop} onChange={set("sizeTop")} placeholder="e.g. M" className="input" /></Field>
@@ -224,12 +291,12 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
               )}
             </div>
             <div className="flex-1 space-y-3">
-              <label className="inline-block cursor-pointer text-[13px] font-medium text-accent-deep hover:underline">
-                {photoPreview ? "Choose a different photo" : "Choose a reference photo"}
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="sr-only" />
-              </label>
+              <button type="button" onClick={chooseFile} className="text-[13px] font-medium text-accent-deep hover:underline">
+                {photoBlob ? "Choose a different photo" : "Choose a reference photo"}
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="sr-only" />
 
-              {photoBlob && (
+              {photoBlob && !paintedOnce && (
                 <label className="flex items-start gap-2.5 text-[12px] leading-snug text-muted">
                   <input
                     type="checkbox"
@@ -242,14 +309,27 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
               )}
 
               {photoBlob && (
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={!consent || generating}
-                  className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2 text-[13.5px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {generating ? "Painting…" : "Paint my avatar"}
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGenerate}
+                    disabled={!consent || generating}
+                    className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2 text-[13.5px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {generating ? (
+                      "Painting…"
+                    ) : paintedOnce ? (
+                      <>
+                        <Refresh size={13} /> Try again
+                      </>
+                    ) : (
+                      "Paint my avatar"
+                    )}
+                  </button>
+                  {paintedOnce && !generating && (
+                    <span className="text-[11.5px] text-faint">Not quite right? Repaints with the same photo.</span>
+                  )}
+                </div>
               )}
               {genError && <p className="text-[12.5px] text-red-500">{genError}</p>}
             </div>
@@ -278,11 +358,12 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
   );
 }
 
-function Field({ label, children }) {
+function Field({ label, hint, children }) {
   return (
     <label className="block">
       <span className="label mb-1.5 block text-muted">{label}</span>
       {children}
+      {hint && <span className="mt-1 block text-[11px] text-faint">{hint}</span>}
     </label>
   );
 }
