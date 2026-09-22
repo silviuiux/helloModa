@@ -45,8 +45,9 @@ const STYLE_DIRECTIVE =
 // object-cover-cropped and can cut the subject off (caught 2026-09-21, the
 // chat hero image briefly hardcoded "3:2" here for every caller, silently
 // setting up the same bug for the then-portrait guide-image script next
-// time it ran). Callers: /api/generate-image passes "3:2" (MessageBubble.jsx's
-// side-by-side turn layout), scripts/generate-guide-images.mjs and
+// time it ran). Callers: /api/generate-image passes "4:5" (OutfitHero.jsx's
+// portrait hero image, back to portrait 2026-09-22 after a brief 3:2
+// landscape stint 2026-09-21), scripts/generate-guide-images.mjs and
 // scripts/generate-occasion-images.mjs pass "4:5" (their portrait cards).
 //
 // `referenceImageUrl` (helloAvatar, docs/03-roadmap.md Phase 3): when the

@@ -4,6 +4,25 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Chat hero image: back to portrait
+
+Direct request. The chat hero image (`OutfitHero.jsx`) went portrait `4:5` → landscape `3:2` on
+2026-09-21 to match a supplied mockup for that day's chat-turn redesign — reverted back to `4:5`
+now. Two lines: `OutfitHero.jsx`'s container (`aspect-[3/2]` → `aspect-[4/5]`) and
+`/api/generate-image`'s call into `generateOutfitImage` (`"3:2"` → `"4:5"`, `src/lib/imageGen.js`
+requires the caller's aspect ratio to match the display crop exactly, so both have to move
+together — this is the same coupling the 2026-09-21 entry below documents getting bitten by
+once already). Also fixed a stale comment in `imageGen.js` left over from before that redesign,
+still describing the chat layout as "side-by-side" when it hasn't been since 2026-09-21.
+
+Scoped to the real chat hero image only, same as the original 2026-09-21 change — the landing
+page's mockups of the chat turn (`StageVisuals.jsx`, `LandingPage.jsx`) illustrate the product,
+they don't call the real generation API, and weren't asked about here, so left alone.
+
+Not screenshot-verified in this sandbox (auth gate); `npm run build` passes with no errors.
+
+---
+
 ## 2026-09-22 — helloAvatar: same face/hair/body across chat generations
 
 Direct question: could a selected avatar's face, hair, and body type actually carry over into

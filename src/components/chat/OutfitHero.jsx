@@ -8,7 +8,7 @@ import GarmentArt from "../GarmentArt.jsx";
 // state or badge.
 export default function OutfitHero({ imageUrl }) {
   return (
-    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-bubble">
+    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-bubble">
       {imageUrl ? (
         <img src={imageUrl} alt="" className="h-full w-full object-cover" />
       ) : (
