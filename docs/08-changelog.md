@@ -4,6 +4,31 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Fix: helloAvatar painting the wrong gender
+
+Bug report: a "Man" avatar was being painted as a woman. Two likely causes in
+`generateAvatarPortrait` (`src/lib/imageGen.js`), both about prompt weighting, not the data (the
+gender value itself was flowing through correctly from `avatar_profiles.gender`):
+
+1. The subject/gender clause was stated once, ~40 words into the prompt, after the whole
+   style + pose description. This file's own `STYLE_DIRECTIVE` comment already documents that
+   Flux weights earlier tokens more heavily — a single mid-prompt mention is weak by the same
+   logic that made an *early* style directive necessary in the first place.
+2. "Editorial fashion illustration" as a genre is female-skewed in what these models were
+   trained on, which can override a weak gender signal even when it's technically present.
+
+Fix: the prompt now leads with an explicit subject clause ("Portrait of a male man, heavyset
+build...") before the style directive even starts, states the sex word plainly ("male"/"female",
+not just "man"/"woman"), and repeats it at the end alongside the build reminder — the same
+primacy + recency pairing already used for style and build. No schema or API contract changes.
+
+Not verified against a real generation in this sandbox — `api.replicate.com` isn't reachable here
+(confirmed via a direct connectivity check, same limitation noted throughout this doc for every
+Replicate-backed feature). `npm run build` passes with no errors. Please confirm on a real
+regeneration ("Try again" on an existing avatar, or a fresh one) that this actually resolves it.
+
+---
+
 ## 2026-09-22 — helloAvatar: realistic bodies, age, retry
 
 Follow-up to helloAvatar v1 (same day, below) — direct feedback that avatars should reflect real

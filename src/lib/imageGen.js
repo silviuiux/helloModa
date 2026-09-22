@@ -82,22 +82,41 @@ export async function generateOutfitImage(prompt, aspectRatio, referenceImageUrl
 // deliberately generic-scene so it works as a base figure for later img2img
 // outfit generations above.
 //
+// man/boy -> male, woman/girl -> female. "adult"/"child" (no gender on
+// file) has no sex word — nothing to assert either way.
+const SEX_WORD = { man: "male", boy: "male", woman: "female", girl: "female" };
+
 // Body realism is a direct, explicit instruction here (2026-09-22): Flux,
 // like most of these models, defaults toward slim/athletic figures unless
 // told firmly otherwise, which would silently misrepresent anyone whose
 // real build/BMI isn't that — so `buildPhrase` is stated as a requirement,
 // not a suggestion, and repeated at the end of the prompt (recency helps
 // it hold against the model's own bias) rather than trusted to one mention.
+//
+// Gender gets the same front-AND-back treatment for the same reason
+// (caught 2026-09-22: a selected "Man" was still painted as a woman). Two
+// causes, both addressed here: (1) it was stated only once, well into the
+// prompt, after ~40 words of style/pose text — Flux weights earlier tokens
+// more heavily (see STYLE_DIRECTIVE's own comment above), so a single
+// mid-prompt mention is weak; (2) "editorial fashion illustration" is a
+// genre whose training data skews heavily toward female figures, which can
+// outweigh a weak gender signal even when Flux "reads" it correctly. Fixed
+// by leading with an unambiguous subject clause before the style directive
+// even starts, and restating it plainly at the end — the same primacy +
+// recency pairing already proven for the style/build instructions.
 export async function generateAvatarPortrait({ appearance, subjectPhrase, buildPhrase }) {
   const replicate = new Replicate();
+  const sexWord = SEX_WORD[subjectPhrase];
+  const subjectClause = sexWord ? `a ${sexWord} ${subjectPhrase}` : `a ${subjectPhrase}`;
 
   const prompt =
+    `Portrait of ${subjectClause}, ${buildPhrase}. ` +
     `${STYLE_DIRECTIVE} Full-body fashion-illustration figure, standing in a relaxed neutral pose, ` +
     `facing forward, plain soft neutral studio background, simple bodysuit or minimal base clothing ` +
     `— this is a base model figure for later outfit visualization, not a finished outfit. ` +
-    `Subject: a ${subjectPhrase} with a ${buildPhrase}. ${appearance} ` +
-    `Body proportions MUST realistically match the stated build — this is a specific requirement, ` +
-    `not a generic default: paint a ${buildPhrase}, not a slimmer or more toned figure than described.`;
+    `${appearance} ` +
+    `Reminder, both required: this figure is ${subjectClause}${sexWord ? ` (${sexWord}, not the opposite sex)` : ""}, ` +
+    `with a ${buildPhrase} — painted realistically, not slimmer or more toned than described.`;
 
   const [output] = await replicate.run(MODEL, {
     input: {
