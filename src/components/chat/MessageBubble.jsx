@@ -20,7 +20,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
     // two are visually distinct without needing avatars or labels.
     return (
       <div className="animate-fade-up">
-        <div className="max-w-md rounded-bubble border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
+        <div className="max-w-md rounded-bubble-sm border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.text}</p>
         </div>
       </div>
@@ -35,7 +35,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   if (!message.title && !message.heroPrompt) {
     return (
       <div className="animate-fade-up flex justify-end">
-        <div className="max-w-md rounded-bubble-reply border border-accent-soft bg-white/50 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
+        <div className="max-w-md rounded-bubble-reply-sm border border-accent-soft bg-white/50 px-5 py-3.5 backdrop-blur-md sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.narrative}</p>
         </div>
       </div>
@@ -62,13 +62,13 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <ToolbarBtn icon={ThumbsUp} label="Good match" />
               <ToolbarBtn icon={ThumbsDown} label="Not for me" />
-              <button className="rounded-bubble border border-line px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:border-accent-soft hover:text-ink">
+              <button className="rounded-bubble-sm border border-line px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:border-accent-soft hover:text-ink">
                 Retry
               </button>
               {message.pieces?.length > 0 && (
                 <button
                   onClick={() => setShowPieces((v) => !v)}
-                  className="flex items-center gap-1.5 rounded-bubble bg-accent px-5 py-2 text-[11px] font-medium uppercase tracking-label text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
+                  className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-5 py-2 text-[11px] font-medium uppercase tracking-label text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
                 >
                   <Hanger size={13} />
                   {showPieces ? "Hide Items" : "Find Outfit"}
@@ -89,7 +89,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
             <button
               key={q}
               onClick={() => onQuickReply?.(q)}
-              className="glass-soft rounded-bubble px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep"
+              className="glass-soft rounded-bubble-sm px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep"
             >
               {q}
             </button>

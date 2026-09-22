@@ -101,7 +101,7 @@ function Nav() {
           </Link>
           <Link
             href="/register"
-            className="rounded-bubble bg-accent px-5 py-2 text-[13px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep"
+            className="rounded-bubble-sm bg-accent px-5 py-2 text-[13px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep"
           >
             Request an invite
           </Link>
@@ -135,17 +135,17 @@ function HeroVisual() {
           easy: your tee worn loose over the faded black denim shorts, anchored by the black AF1s.
         </p>
         <div className="mt-5 flex items-center gap-2">
-          <span className="rounded-bubble border border-line px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-muted">
+          <span className="rounded-bubble-sm border border-line px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-muted">
             Retry
           </span>
-          <span className="flex items-center gap-1.5 rounded-bubble bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-white">
+          <span className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-white">
             <Hanger size={11} />
             Find outfit
           </span>
         </div>
       </div>
 
-      <div className="absolute -left-4 -top-6 max-w-[280px] rounded-bubble border border-accent-soft/50 bg-accent-tint px-5 py-3.5 shadow-panel backdrop-blur-md sm:-left-10">
+      <div className="absolute -left-4 -top-6 max-w-[280px] rounded-bubble-sm border border-accent-soft/50 bg-accent-tint px-5 py-3.5 shadow-panel backdrop-blur-md sm:-left-10">
         <p className="text-[13.5px] leading-relaxed text-ink">
           It&apos;s a friend&apos;s rooftop birthday party this weekend, evening in the city.
         </p>
@@ -195,7 +195,7 @@ export default function LandingPage() {
             <div className="mt-9">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 rounded-bubble bg-accent px-7 py-3.5 text-[15px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep"
+                className="inline-flex items-center gap-2 rounded-bubble-sm bg-accent px-7 py-3.5 text-[15px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep"
               >
                 Request an invite
                 <ArrowRight size={16} />
@@ -302,7 +302,7 @@ export default function LandingPage() {
             </p>
             <Link
               href="/register"
-              className="mt-9 inline-flex items-center gap-2 rounded-bubble bg-accent px-7 py-3.5 text-[15px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep"
+              className="mt-9 inline-flex items-center gap-2 rounded-bubble-sm bg-accent px-7 py-3.5 text-[15px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep"
             >
               Request an invite
               <ArrowRight size={16} />

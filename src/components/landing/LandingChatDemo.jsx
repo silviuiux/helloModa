@@ -113,7 +113,7 @@ export default function LandingChatDemo() {
               key={key}
               onClick={() => play(key)}
               disabled={pending}
-              className="glass-soft rounded-bubble px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep disabled:opacity-50"
+              className="glass-soft rounded-bubble-sm px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep disabled:opacity-50"
             >
               {s.prompt}
             </button>

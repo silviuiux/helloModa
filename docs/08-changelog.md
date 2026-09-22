@@ -4,6 +4,38 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Small elements: squared corners, not pills
+
+Direct request: on small elements (chat bubbles, buttons, chips — roughly 30–90px tall), the
+128px `rounded-bubble`/`rounded-bubble-reply` corner clamps to exactly half the box's height,
+which is a full semicircle — it reads as a pill or a circle, not a rounded square. The 128px
+value only works as "a large rounded corner" once the box is comfortably taller than ~250px.
+
+Split the token in two instead of picking one radius for everything:
+
+- `bubble` / `bubble-reply` (128px) — **large surfaces only** now: the chat hero image, the
+  `/outfits` cover photos, `EmptyState`'s occasion cards, the landing page's photo plates and
+  marquee tiles. Unchanged values, scope narrowed.
+- **New** `bubble-sm` / `bubble-reply-sm` (14px, same square-corner position) —
+  **everything small**: the real chat's user/assistant text bubbles and its Retry/Find
+  Outfit/quick-reply buttons (`MessageBubble.jsx` — this was the main offender, since a
+  one-line message is short enough that the old token made it a stadium shape), plus every
+  landing-page bubble/button/chip built to look like those (`LandingPage.jsx`,
+  `StageVisuals.jsx`, `LandingChatDemo.jsx`, `DetailHighlights.jsx`'s corner-geometry specimen,
+  which now demonstrates the token actually in use rather than a stale one). 14px stays visibly
+  under half the height of even the app's smallest chip (~32px), so it reads as a deliberate
+  small curve, not a browser clamp.
+- A few small **photo** tiles that had been using the large token at the wrong scale
+  (`StageVisuals.jsx`'s row thumbnail and fallback demo tiles, `DetailHighlights.jsx`'s fallback
+  specimen, all ~75–112px) moved to the existing `rounded-xl2` (20px) instead — the same radius
+  `WardrobeItemCard`/`RecommendationCards` already use for small tiles, so this is more
+  consistent with the rest of the app, not a new one-off.
+- Updated the two places that asserted the old "everything shares 128px" framing in either code
+  comments or landing-page copy (`DetailHighlights.jsx`'s "Geometry" card body, `StageVisuals.jsx`'s
+  file header) so the page's own claims about its design system stay accurate.
+
+---
+
 ## 2026-09-21 — Landing page redesign: editorial scrollytelling
 
 Second pass at `/`, replacing the centre-stacked first version. Brief: clean, modern,

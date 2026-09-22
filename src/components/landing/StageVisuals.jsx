@@ -23,9 +23,10 @@ function Frame({ children }) {
 
 // Small tiles use rounded-xl2 (20px), matching what the real
 // WardrobeItemCard and RecommendationCards actually use — the 128px
-// rounded-bubble is the app's language for *large* surfaces (chat bubbles,
-// the hero photo, the occasion cards). Applied to a 150px tile it stops
-// reading as a corner treatment and just looks like a blob.
+// rounded-bubble is the app's language for *large* surfaces only (the hero
+// photo, the occasion cards). Chat bubbles and buttons use the smaller
+// rounded-bubble-sm token instead (tailwind.config.js) — 128px on
+// anything under ~250px tall just clamps to a pill/circle.
 function Tile({ slug, type, label, matched }) {
   return (
     <div className="relative min-w-0">
@@ -64,7 +65,7 @@ export function SceneOccasion() {
           <Tile slug="wedding-guest" type="dress" label="Wedding guest" />
           <Tile slug="big-interview" type="bottoms" label="Big interview" />
         </div>
-        <div className="mt-7 max-w-sm rounded-bubble border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md">
+        <div className="mt-7 max-w-sm rounded-bubble-sm border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5 backdrop-blur-md">
           <p className="text-[13.5px] leading-relaxed text-ink">
             It&apos;s a friend&apos;s rooftop birthday party this weekend, evening in the city.
           </p>
@@ -125,10 +126,10 @@ export function SceneLook() {
             AF1s so the whole thing reads sharp instead of casual-by-accident.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            <span className="rounded-bubble border border-line px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-muted">
+            <span className="rounded-bubble-sm border border-line px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-muted">
               Retry
             </span>
-            <span className="flex items-center gap-1.5 rounded-bubble bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-white shadow-soft">
+            <span className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-white shadow-soft">
               <Hanger size={11} />
               Find outfit
             </span>
@@ -211,7 +212,7 @@ export function SceneHistory() {
         <div className="mt-4 divide-y divide-line">
           {rows.map((r) => (
             <div key={r.title} className="flex items-center gap-5 py-4">
-              <div className="relative aspect-[3/2] w-28 shrink-0 overflow-hidden rounded-bubble shadow-soft">
+              <div className="relative aspect-[3/2] w-28 shrink-0 overflow-hidden rounded-xl2 shadow-soft">
                 <EditorialPlate
                   src={`/occasions/${r.slug}-hero.jpg`}
                   palette={r.palette}

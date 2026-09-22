@@ -47,16 +47,23 @@ export default {
         xl2: "20px",
         xl3: "28px",
         // Chat "speech bubble" corner: rounded everywhere except the
-        // bottom-left, which stays square as a tail/anchor point. Used on
-        // the user's message bubble (always left-aligned), the outfit hero
-        // photo, and in-chat buttons/chips — at typical element sizes 128px
-        // is larger than half the box, so it just reads as "fully rounded"
-        // on the three open corners.
+        // bottom-left, which stays square as a tail/anchor point. For
+        // LARGE surfaces only — photos, hero images, big cards (roughly
+        // 250px+ tall) — where 128px is comfortably under half the box and
+        // reads as a deliberate large rounded corner.
         bubble: "128px 128px 128px 0px",
-        // Same idea, mirrored: square top-right instead. Used on the
-        // assistant's text-reply bubble (always right-aligned) so its tail
-        // points the opposite way from the user's.
+        // Same idea, mirrored: square top-right instead. Large surfaces
+        // only, same reasoning as `bubble`.
         "bubble-reply": "128px 0px 128px 128px",
+        // Small-element version of the same shape: text bubbles, buttons,
+        // chips (roughly 30-90px tall). 128px on something that short gets
+        // clamped to exactly half its height, which is a full semicircle —
+        // it reads as a pill/circle, not a rounded square (caught
+        // 2026-09-22, direct request). 14px stays visibly less than half
+        // the height of even the smallest chip in the app (~32px), so the
+        // corner is a deliberate small curve, not a clamp artifact.
+        "bubble-sm": "14px 14px 14px 0px",
+        "bubble-reply-sm": "14px 0px 14px 14px",
       },
       boxShadow: {
         panel: "0 1px 2px rgba(43,40,64,0.04), 0 18px 44px -22px rgba(43,40,64,0.26)",

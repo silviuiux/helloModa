@@ -4,8 +4,9 @@ import GarmentArt from "../GarmentArt.jsx";
 import Reveal from "./Reveal.jsx";
 
 // Specimen cards, not feature bullets. Each one renders the actual detail
-// live rather than describing it — the corner geometry is the real
-// rounded-bubble token, the type specimens are the real three faces, the
+// live rather than describing it — the corner geometry uses the real
+// rounded-bubble-sm/-reply-sm tokens (small-element scale — see
+// tailwind.config.js), the type specimens are the real three faces, the
 // fallback tile is the real GarmentArt component. A bento with deliberately
 // uneven spans (7/5, 5/7) so it reads as a composition rather than a
 // four-up card row.
@@ -38,17 +39,17 @@ export default function DetailHighlights() {
         span="sm:col-span-7"
         label="Geometry"
         title="Every corner is round but one."
-        body="Bubbles, photos and buttons share a single 128px corner with one square edge — bottom-left when you speak, top-right when it answers. The shape itself tells you who's talking, so the interface never needs a label or an avatar to do it."
+        body="Every bubble, photo and button shares the same idea — rounded everywhere but one edge, square bottom-left when you speak, square top-right when it answers. Large photos get a full 128px curve; text and buttons get a smaller one, so a short message never reads as a pill."
       >
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="max-w-xs rounded-bubble border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5">
+            <div className="max-w-xs rounded-bubble-sm border border-accent-soft/50 bg-accent-tint/70 px-5 py-3.5">
               <p className="text-[13.5px] leading-relaxed text-ink">Rooftop birthday, Saturday.</p>
             </div>
             <Annotation>square bottom-left</Annotation>
           </div>
           <div className="flex flex-row-reverse items-center gap-4">
-            <div className="max-w-xs rounded-bubble-reply border border-accent-soft bg-white/60 px-5 py-3.5">
+            <div className="max-w-xs rounded-bubble-reply-sm border border-accent-soft bg-white/60 px-5 py-3.5">
               <p className="text-[13.5px] leading-relaxed text-ink">On it — give me a second.</p>
             </div>
             <Annotation>square top-right</Annotation>
@@ -76,10 +77,10 @@ export default function DetailHighlights() {
         body="Photography is generated per look and cached. Until an image exists, you get a drawn garment in the right silhouette — a deliberate illustration, never an empty box or a spinner."
       >
         <div className="flex items-end gap-4">
-          <div className="relative aspect-square w-28 overflow-hidden rounded-bubble shadow-soft">
+          <div className="relative aspect-square w-28 overflow-hidden rounded-xl2 shadow-soft">
             <GarmentArt type="dress" />
           </div>
-          <div className="relative aspect-square w-28 overflow-hidden rounded-bubble shadow-soft">
+          <div className="relative aspect-square w-28 overflow-hidden rounded-xl2 shadow-soft">
             <GarmentArt type="outerwear" />
           </div>
           <Annotation>fallback, not failure</Annotation>
