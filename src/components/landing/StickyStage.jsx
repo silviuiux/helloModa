@@ -47,9 +47,8 @@ const STEPS = [
 // width blows straight past the fold on a laptop.
 function StageFrame({ children, className = "" }) {
   return (
-    // rounded-xl3 below `sm`: at ~360px wide the 128px bubble corner curves
-    // right through the scene's own corner labels. The full corner needs a
-    // surface the size of the pinned desktop stage to work.
+    // rounded-xl3 below `sm`, the speaker-corner `rounded-bubble` only on
+    // the full pinned desktop stage.
     <div
       className={`glass relative w-full overflow-hidden rounded-xl3 shadow-lift sm:rounded-bubble ${className}`}
     >
@@ -97,7 +96,7 @@ export default function StickyStage() {
                       <p className="label text-accent-deep">
                         {String(i + 1).padStart(2, "0")} — {step.kicker}
                       </p>
-                      <h3 className="mt-2 font-display text-[21px] font-medium leading-tight text-ink">
+                      <h3 className="mt-2 font-display text-[21px] font-semibold tracking-[-0.03em] leading-tight text-ink">
                         {step.title}
                       </h3>
                       <div
@@ -147,7 +146,7 @@ export default function StickyStage() {
               <p className="label text-accent-deep">
                 {String(i + 1).padStart(2, "0")} — {step.kicker}
               </p>
-              <h3 className="mt-2 font-display text-[24px] font-medium leading-tight text-ink">
+              <h3 className="mt-2 font-display text-[24px] font-semibold tracking-[-0.03em] leading-tight text-ink">
                 {step.title}
               </h3>
               <p className="mt-3 text-[14px] leading-relaxed text-muted">{step.body}</p>

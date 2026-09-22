@@ -1,16 +1,19 @@
 // Editorial garment illustrations used to fill image placeholders.
-// Self-contained SVG (no external images) — each type gets a soft gradient
-// background and a stylized flat-lay silhouette so cards feel "shot", not empty.
+// Self-contained SVG (no external images) — each type gets a dark plate and
+// a flat-lay silhouette drawn as fine light linework with amber detail dots,
+// so fallbacks read as deliberate technical drawings, not empty boxes.
 
+// Dark warm plates, a barely-there hue shift per type so a grid of them
+// isn't a flat wall (2026-09-22 dark redesign — these were light lavender).
 const GRADIENTS = {
-  top: ["#f2f1f7", "#e4e1ee"],
-  bottoms: ["#f3f1f7", "#e6e1f0"],
-  dress: ["#f4f3f8", "#e7e4f0"],
-  outerwear: ["#f1f2f6", "#e2e4ee"],
-  shoe: ["#f5f2ed", "#ebe4da"],
-  bag: ["#f3f1f7", "#e7e1ee"],
-  accessory: ["#f6f2ea", "#efe6d8"],
-  look: ["#f4f3f8", "#ded8ec"],
+  top: ["#1d1a16", "#131110"],
+  bottoms: ["#1a1a1c", "#121214"],
+  dress: ["#1f1917", "#141110"],
+  outerwear: ["#191b1b", "#111313"],
+  shoe: ["#201b15", "#15120e"],
+  bag: ["#1c1917", "#131110"],
+  accessory: ["#221c13", "#16130d"],
+  look: ["#221c14", "#12100d"],
 };
 
 // Each path is drawn in a 120 x 160 viewBox, centered around x=60.
@@ -102,8 +105,8 @@ export default function GarmentArt({ type = "top", className = "", bare = false,
       {!bare && (
         /* soft light spot for depth */
         <div
-          className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full opacity-50"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)" }}
+          className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full opacity-60"
+          style={{ background: "radial-gradient(circle, rgba(212,168,83,0.16), transparent 70%)" }}
         />
       )}
       <svg
@@ -114,15 +117,17 @@ export default function GarmentArt({ type = "top", className = "", bare = false,
       >
         <g
           style={{
-            fill: `rgba(70,66,96,${0.14 * strength})`,
+            fill: `rgba(236,232,225,${0.06 * strength})`,
+            stroke: `rgba(236,232,225,${0.22 * strength})`,
+            strokeWidth: 0.8,
           }}
         >
           {SHAPES[key]}
         </g>
         <style>{`
-          svg .stroke{ fill:none; stroke:rgba(70,66,96,${0.22 * strength}); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+          svg .stroke{ fill:none; stroke:rgba(236,232,225,${0.34 * strength}); stroke-width:1; stroke-linecap:round; stroke-linejoin:round; }
           svg .nofill{ fill:none; }
-          svg .dot{ fill:rgba(70,66,96,${0.24 * strength}); }
+          svg .dot{ fill:rgba(212,168,83,${0.75 * strength}); }
         `}</style>
       </svg>
     </div>

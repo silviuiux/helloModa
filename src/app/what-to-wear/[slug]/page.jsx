@@ -63,10 +63,10 @@ export default function GuidePage({ params }) {
       <div className="mt-6 grid gap-10 sm:grid-cols-2 sm:items-center">
         <div>
           <p className="label text-accent-deep">{guide.category}</p>
-          <h1 className="mt-3 font-display text-[38px] font-medium leading-[0.98] text-ink sm:text-[54px]">
+          <h1 className="mt-3 font-display text-[38px] font-semibold tracking-[-0.03em] leading-[0.98] text-ink sm:text-[54px]">
             {guide.title}
           </h1>
-          <p className="mt-6 font-script text-[26px] leading-tight text-accent-deep sm:text-[30px]">
+          <p className="mt-6 font-script text-[26px] italic leading-tight text-ink/85 sm:text-[30px]">
             {guide.hook}
           </p>
         </div>
@@ -85,7 +85,7 @@ export default function GuidePage({ params }) {
           <GarmentArt type="dress" />
         </div>
         <div className="sm:order-2">
-          <h2 className="font-display text-[24px] font-medium text-ink">For her</h2>
+          <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">For her</h2>
           <p className="mt-3 text-[16px] leading-relaxed text-ink">{guide.forHer}</p>
         </div>
       </div>
@@ -95,14 +95,14 @@ export default function GuidePage({ params }) {
           <GarmentArt type="outerwear" />
         </div>
         <div className="sm:order-1">
-          <h2 className="font-display text-[24px] font-medium text-ink">For him</h2>
+          <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">For him</h2>
           <p className="mt-3 text-[16px] leading-relaxed text-ink">{guide.forHim}</p>
         </div>
       </div>
 
       {/* Fabric & color, with the guide's actual palette rendered as swatches */}
       <section className="mt-24 sm:mt-28">
-        <h2 className="font-display text-[24px] font-medium text-ink">Fabric & color</h2>
+        <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">Fabric & color</h2>
         <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-ink">{guide.fabricAndColor}</p>
         {guide.palette?.length > 0 && (
           <div className="mt-5 flex gap-3">
@@ -119,7 +119,7 @@ export default function GuidePage({ params }) {
       </section>
 
       <section className="mt-16 max-w-2xl">
-        <h2 className="font-display text-[24px] font-medium text-ink">Weather & setting notes</h2>
+        <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">Weather & setting notes</h2>
         <p className="mt-3 text-[16px] leading-relaxed text-ink">{guide.contextNotes}</p>
       </section>
 
@@ -127,7 +127,7 @@ export default function GuidePage({ params }) {
 
       {/* What to avoid — editorial callout */}
       <section className="glass mt-24 rounded-xl3 p-8 sm:mt-28 sm:p-10">
-        <h2 className="font-display text-[24px] font-medium text-ink">What to avoid</h2>
+        <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">What to avoid</h2>
         <ul className="mt-4 space-y-3">
           {guide.avoid.map((item) => (
             <li key={item} className="flex gap-3 text-[16px] leading-relaxed text-ink">
@@ -141,7 +141,7 @@ export default function GuidePage({ params }) {
       <div className="mt-16">
         <Link
           href="/register"
-          className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02]"
+          className="inline-flex items-center gap-1.5 rounded-[10px] bg-accent px-5 py-2.5 text-[14px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
         >
           Try helloModa
           <ArrowRight size={15} />
@@ -149,7 +149,7 @@ export default function GuidePage({ params }) {
       </div>
 
       <div className="mt-16">
-        <h2 className="font-display text-[18px] font-medium text-ink">Other occasions</h2>
+        <h2 className="font-display text-[18px] font-semibold tracking-[-0.03em] text-ink">Other occasions</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {guides
             .filter((g) => g.slug !== guide.slug)

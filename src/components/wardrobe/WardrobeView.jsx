@@ -47,9 +47,9 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Header */}
-      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-white/40 px-6 py-5 sm:px-8">
+      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line px-6 py-5 sm:px-8">
         <div>
-          <h1 className="font-display text-[26px] font-medium leading-tight text-ink">
+          <h1 className="font-display text-[26px] font-semibold tracking-[-0.03em] leading-tight text-ink">
             Wardrobe
           </h1>
           <p className="mt-1 text-[13.5px] text-muted">
@@ -69,7 +69,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="flex h-11 items-center gap-1.5 rounded-full bg-accent px-4 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.03]"
+            className="flex h-11 items-center gap-1.5 rounded-[12px] bg-accent px-4 text-[14px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
           >
             <Plus size={17} />
             Add item
@@ -80,14 +80,14 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
       <ClosetStats items={items} />
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/40 px-6 py-3.5 sm:px-8">
+      <div className="flex flex-wrap items-center gap-2 border-b border-line px-6 py-3.5 sm:px-8">
         {wardrobeCategories.map((c) => (
           <button
             key={c}
             onClick={() => setCategory(c)}
             className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
               category === c
-                ? "bg-accent text-white shadow-soft"
+                ? "bg-accent text-canvas shadow-soft"
                 : "glass-soft text-muted hover:text-accent-deep"
             }`}
           >
@@ -99,7 +99,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
           onClick={() => setFavOnly((v) => !v)}
           className={`ml-auto rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
             favOnly
-              ? "bg-accent text-white shadow-soft"
+              ? "bg-accent text-canvas shadow-soft"
               : "glass-soft text-muted hover:text-accent-deep"
           }`}
         >
@@ -125,7 +125,7 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
             {/* Upload tile */}
             <button
               onClick={() => setModalOpen(true)}
-              className="group grid aspect-[3/4] place-items-center rounded-xl2 border border-dashed border-accent-soft bg-white/30 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/50 hover:text-accent-deep"
+              className="group grid aspect-[3/4] place-items-center rounded-xl2 border border-dashed border-accent-soft bg-white/[0.04] text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/[0.05] hover:text-accent-deep"
             >
               <span className="text-center">
                 <span className="glass-circle mx-auto grid h-12 w-12 place-items-center rounded-full transition-transform group-hover:scale-105">

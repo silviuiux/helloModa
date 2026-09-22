@@ -1,40 +1,41 @@
 /** @type {import('tailwindcss').Config} */
+// Design system — "organic intelligence" (2026-09-22 redesign, see
+// docs/08-changelog.md). Dark-first warm canvas, one amber accent, a
+// geometric sans for authority, an editorial serif for the looks
+// themselves, mono for anything that behaves like data. Every color is a
+// solid hex on purpose: the app leans on Tailwind opacity modifiers
+// (`border-line/70`, `bg-accent-tint/70`), which only work on alpha-free
+// values.
 export default {
   content: ["./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        // Light lavender-gray field + paper surfaces
-        canvas: "#efedf4",
-        paper: "#ffffff",
-        // Lavender surface scale (tints, pills, placeholders)
-        lav: {
-          50: "#f6f4fb",
-          100: "#efedf4",
-          200: "#e6e2f1",
-          300: "#d8d2ec",
-          400: "#c3b8e6",
-          500: "#a789f4",
-        },
-        // Purple-tinted ink for text (softened)
-        ink: "#34304a",
-        muted: "#8c89a0",
-        faint: "#b2afc0",
-        // Purple accent — primary actions + CTAs
+        // Warm near-black field + slightly lifted surfaces
+        canvas: "#0f0e0c",
+        paper: "#171512",
+        ink: "#ece8e1",
+        muted: "#9c968c",
+        faint: "#625d55",
+        // Single accent: industrial amber. `deep` is the brighter,
+        // text-legible variant on dark; `soft` is for hairline borders;
+        // `tint` is an amber-warmed surface (e.g. the user's own bubble).
         accent: {
-          DEFAULT: "#a789f4",
-          deep: "#8c6ae2",
-          soft: "#cdbef7",
-          tint: "#ece6fb",
+          DEFAULT: "#d4a853",
+          deep: "#e8c47a",
+          soft: "#6e5a33",
+          tint: "#231d14",
         },
-        line: "#e7e3f1",
-        hair: "#f0edf7",
+        line: "#2a2621",
+        hair: "#1c1a16",
       },
       fontFamily: {
-        display: ['Fraunces', 'Iowan Old Style', 'Georgia', 'serif'],
-        script: ['"Yuyu Short"', 'cursive'],
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        display: ['"Plus Jakarta Sans"', "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        // The look titles — was a handwritten script face; now an editorial
+        // serif, the one soft/organic voice in an otherwise sharp system.
+        script: ['"Instrument Serif"', "Georgia", "serif"],
+        sans: ['"Plus Jakarta Sans"', "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        mono: ['"IBM Plex Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
       },
       letterSpacing: {
         label: "0.16em",
@@ -44,42 +45,52 @@ export default {
         content: "1160px",
       },
       borderRadius: {
-        xl2: "20px",
-        xl3: "28px",
-        // Chat "speech bubble" corner: rounded everywhere except the
-        // bottom-left, which stays square as a tail/anchor point. For
-        // LARGE surfaces only — photos, hero images, big cards (roughly
-        // 250px+ tall) — where 128px is comfortably under half the box and
-        // reads as a deliberate large rounded corner.
-        bubble: "128px 128px 128px 0px",
-        // Same idea, mirrored: square top-right instead. Large surfaces
-        // only, same reasoning as `bubble`.
-        "bubble-reply": "128px 0px 128px 128px",
-        // Small-element version of the same shape: text bubbles, buttons,
-        // chips (roughly 30-90px tall). 128px on something that short gets
-        // clamped to exactly half its height, which is a full semicircle —
-        // it reads as a pill/circle, not a rounded square (caught
-        // 2026-09-22, direct request). 14px stays visibly less than half
-        // the height of even the smallest chip in the app (~32px), so the
-        // corner is a deliberate small curve, not a clamp artifact.
-        "bubble-sm": "14px 14px 14px 0px",
-        "bubble-reply-sm": "14px 0px 14px 14px",
+        xl2: "16px",
+        xl3: "24px",
+        // Speaker corner, kept from the previous system but sharpened:
+        // rounded everywhere except one near-square corner — bottom-left
+        // when you speak, top-right when helloModa answers. Large surfaces.
+        bubble: "28px 28px 28px 6px",
+        "bubble-reply": "28px 6px 28px 28px",
+        // Small elements (text bubbles, buttons, chips) — well under half
+        // their height, so they read as rounded squares, not pills.
+        "bubble-sm": "14px 14px 14px 4px",
+        "bubble-reply-sm": "14px 4px 14px 14px",
       },
       boxShadow: {
-        panel: "0 1px 2px rgba(43,40,64,0.04), 0 18px 44px -22px rgba(43,40,64,0.26)",
-        soft: "0 1px 2px rgba(43,40,64,0.04), 0 10px 26px -16px rgba(43,40,64,0.22)",
-        lift: "0 2px 4px rgba(43,40,64,0.05), 0 30px 60px -26px rgba(43,40,64,0.34)",
-        glass: "0 14px 44px -18px rgba(43,40,64,0.30), inset 0 1px 0 rgba(255,255,255,0.7)",
+        panel: "0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 60px -28px rgba(0,0,0,0.8)",
+        soft: "0 1px 0 rgba(255,255,255,0.05) inset, 0 12px 30px -16px rgba(0,0,0,0.7)",
+        lift: "0 1px 0 rgba(255,255,255,0.06) inset, 0 34px 70px -30px rgba(0,0,0,0.9)",
+        glass: "0 1px 0 rgba(255,255,255,0.06) inset, 0 18px 50px -24px rgba(0,0,0,0.75)",
+        glow: "0 0 0 1px rgba(212,168,83,0.35), 0 0 32px -6px rgba(212,168,83,0.45)",
       },
       keyframes: {
+        // Everything "materializes" rather than slides — a small rise plus
+        // a blur that resolves, which reads as organic without bouncing.
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+          "0%": { opacity: "0", transform: "translateY(10px)", filter: "blur(6px)" },
+          "100%": { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+        },
+        "word-in": {
+          "0%": { opacity: "0", filter: "blur(5px)", transform: "translateY(3px)" },
+          "100%": { opacity: "1", filter: "blur(0)", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        // (The orb's morph/drift/breathe keyframes live in globals.css —
+        // they're referenced from plain CSS, and Tailwind only emits
+        // keyframes that some `animate-*` utility actually uses.)
+        // Image-generation skeleton — a soft light sweep, never a spinner.
+        shimmer: {
+          "0%": { backgroundPosition: "-120% 0" },
+          "100%": { backgroundPosition: "220% 0" },
         },
         pulse_dot: {
-          "0%": { boxShadow: "0 0 0 0 rgba(25,163,107,0.45)" },
-          "70%": { boxShadow: "0 0 0 7px rgba(25,163,107,0)" },
-          "100%": { boxShadow: "0 0 0 0 rgba(25,163,107,0)" },
+          "0%": { boxShadow: "0 0 0 0 rgba(212,168,83,0.5)" },
+          "70%": { boxShadow: "0 0 0 7px rgba(212,168,83,0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(212,168,83,0)" },
         },
         // Landing-page occasion marquee — the track renders its children
         // twice, so -50% lands exactly on the seam and loops invisibly.
@@ -89,7 +100,10 @@ export default {
         },
       },
       animation: {
-        "fade-up": "fade-up 0.5s cubic-bezier(0.2,0.7,0.2,1) both",
+        "fade-up": "fade-up 0.7s cubic-bezier(0.2,0.7,0.2,1) both",
+        "fade-in": "fade-in 0.6s ease both",
+        "word-in": "word-in 0.55s cubic-bezier(0.2,0.7,0.2,1) both",
+        shimmer: "shimmer 2.4s cubic-bezier(0.4,0,0.2,1) infinite",
         "pulse-dot": "pulse_dot 2.4s infinite",
         marquee: "marquee 90s linear infinite",
       },

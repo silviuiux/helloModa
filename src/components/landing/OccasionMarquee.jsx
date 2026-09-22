@@ -18,12 +18,10 @@ export default function OccasionMarquee() {
     <div className="relative w-full overflow-hidden py-2">
       <div className="animate-marquee flex w-max gap-4 hover:[animation-play-state:paused]">
         {track.map((o, i) => (
-          // 4:5 at 300px, close to the real carousel card's proportions —
-          // the 128px corner needs a surface this size to read as a corner
-          // rather than collapsing the tile into a blob.
+          // 4:5 at 300px, close to the real carousel card's proportions.
           <div
             key={`${o.slug}-${i}`}
-            className="group relative aspect-[4/5] w-[300px] shrink-0 overflow-hidden rounded-bubble shadow-soft"
+            className="group relative aspect-[4/5] w-[300px] shrink-0 overflow-hidden rounded-bubble border border-line shadow-soft"
           >
             <ImageWithFallback
               src={`/occasions/${o.slug}-hero.jpg`}
@@ -33,7 +31,7 @@ export default function OccasionMarquee() {
             />
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
-              style={{ background: "linear-gradient(to top, rgba(255,255,255,0.92), transparent)" }}
+              style={{ background: "linear-gradient(to top, rgba(15,14,12,0.88), transparent)" }}
             />
             <span className="absolute bottom-3 left-4 text-[12.5px] font-medium text-ink">
               {o.label}

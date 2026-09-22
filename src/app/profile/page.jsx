@@ -29,9 +29,6 @@ export default async function ProfilePage() {
   return (
     <div
       className="min-h-screen w-full"
-      style={{
-        background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
-      }}
     >
       <ProfileForm profile={profile} avatarUrl={avatarUrl} userEmail={user.email} usage={usage} />
     </div>

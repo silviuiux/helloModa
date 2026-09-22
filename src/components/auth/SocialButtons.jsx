@@ -54,7 +54,7 @@ export default function SocialButtons() {
             disabled
             title={`${p.name} sign-in — coming soon`}
             aria-label={`${p.name} sign-in (coming soon)`}
-            className="grid h-11 cursor-not-allowed place-items-center rounded-xl2 border border-line bg-white/50 text-ink/60 opacity-70"
+            className="grid h-11 cursor-not-allowed place-items-center rounded-xl2 border border-line bg-white/[0.04] text-ink/60 opacity-70"
           >
             {p.icon}
           </button>

@@ -33,7 +33,7 @@ function dbRowToItem(row) {
     name: row.name,
     brand: row.brand,
     category: row.category,
-    color: row.color_hex || "#e4e2f0",
+    color: row.color_hex || "#2c2925",
     icon: ICON_BY_CATEGORY[row.category] || "hanger",
     tags: row.tags || [],
     fav: row.is_favorite,
@@ -60,6 +60,8 @@ export default function AppShell({
   const [activeConversationId, setActiveConversationId] = useState(initialActiveConversationId);
   const [messages, setMessages] = useState(initialMessages || []);
   const [thinking, setThinking] = useState(false);
+  // True while the composer has text in it — the welcome orb "listens".
+  const [composing, setComposing] = useState(false);
   const [isSwitching, startSwitching] = useTransition();
   const [avatarProfiles] = useState(initialAvatarProfiles || []);
   // Defaults to "styling for myself" (or nothing, if no avatar is set up
@@ -202,7 +204,13 @@ export default function AppShell({
         return;
       }
 
-      setMessages((prev) => [...prev.filter((m) => m.id !== tempId), data.userMessage, data.message]);
+      // `fresh` makes MessageBubble stream the narrative in word by word —
+      // only for a reply that just arrived, never for loaded history.
+      setMessages((prev) => [
+        ...prev.filter((m) => m.id !== tempId),
+        data.userMessage,
+        { ...data.message, fresh: true },
+      ]);
       track("chat_message_sent", { is_new_conversation: !activeConversationId });
 
       if (!activeConversationId && data.conversationId) {
@@ -231,14 +239,14 @@ export default function AppShell({
   return (
     <div
       className="relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink"
-      style={{
-        background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
-      }}
     >
       <Suspense fallback={null}>
         <ConversationFromQuery onConversationId={handleSelectConversation} />
       </Suspense>
       <main className="relative flex min-h-0 flex-1 flex-col">
+        {/* Keyed on the view so switching chat <-> wardrobe is a soft
+            materialize (fade + blur resolve), not a hard cut. */}
+        <div key={view} className="animate-fade-in flex min-h-0 flex-1 flex-col">
         {view === "chat" ? (
           <ChatView
             wardrobe={wardrobe}
@@ -250,6 +258,7 @@ export default function AppShell({
             isSwitching={isSwitching}
             userEmail={userEmail}
             userDisplayName={userDisplayName}
+            composing={composing}
           />
         ) : (
           <WardrobeView
@@ -261,6 +270,7 @@ export default function AppShell({
             onLogWear={logWear}
           />
         )}
+        </div>
       </main>
       <BottomBar
         view={view}
@@ -278,6 +288,7 @@ export default function AppShell({
         avatarProfiles={avatarProfiles}
         activeAvatarId={activeAvatarId}
         onSelectAvatar={setActiveAvatarId}
+        onDraftChange={setComposing}
       />
     </div>
   );

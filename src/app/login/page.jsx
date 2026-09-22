@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Sparkle } from "@/components/Icons.jsx";
+import Orb from "@/components/Orb.jsx";
 import SocialButtons from "@/components/auth/SocialButtons.jsx";
 
 export default function LoginPage() {
@@ -38,17 +38,13 @@ export default function LoginPage() {
   return (
     <div
       className="grid min-h-screen place-items-center p-6"
-      style={{
-        background:
-          "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
-      }}
     >
       <div className="glass w-full max-w-sm rounded-xl3 p-7">
         <div className="text-center">
-          <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-accent text-white shadow-soft">
-            <Sparkle size={18} />
-          </span>
-          <h1 className="mt-4 font-display text-[24px] font-medium text-ink">helloModa</h1>
+          <div className="mx-auto grid w-fit place-items-center py-2">
+            <Orb size={48} />
+          </div>
+          <h1 className="mt-5 font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">helloModa</h1>
           <p className="mt-1.5 text-[13.5px] text-muted">Private beta — sign in to continue.</p>
         </div>
 
@@ -64,7 +60,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
-              className="h-11 w-full rounded-xl2 border border-line bg-white/70 px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
+              className="h-11 w-full rounded-xl2 border border-line bg-white/[0.04] px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
             />
             <input
               required
@@ -73,12 +69,12 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               autoComplete="current-password"
-              className="h-11 w-full rounded-xl2 border border-line bg-white/70 px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
+              className="h-11 w-full rounded-xl2 border border-line bg-white/[0.04] px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
             />
             <button
               type="submit"
               disabled={status === "loading"}
-              className="h-11 w-full rounded-xl2 bg-accent text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep disabled:opacity-60"
+              className="h-11 w-full rounded-xl2 bg-accent text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep disabled:opacity-60"
             >
               {status === "loading" ? "Signing in…" : "Sign in"}
             </button>

@@ -4,6 +4,74 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Full redesign: "organic intelligence" (app + landing page)
+
+Direct request: a complete redesign of the app and landing page — super minimalist but friendly,
+an organic AI interface with organic animated elements and loaders, smooth transitions between
+states, a conversation that feels natural, while staying sharp, futuristic and minimal. Built
+against Silviu's taste system (dark-first, typographic authority, glass materiality, mono data
+labels, one accent, restrained motion) — which the previous light-lavender/purple identity, Inter
+body face and script display face all contradicted, so this is a from-the-tokens-up change, not a
+reskin.
+
+**The concept: organic inside, precise outside.** One warm, living element — the orb — set in an
+otherwise dark, sharp, mono-labelled interface.
+
+- **Design tokens rebuilt** (`tailwind.config.js`, `globals.css`, `layout.jsx`): warm near-black
+  canvas (`#0f0e0c`) with an atmospheric amber haze instead of a flat fill; warm off-white ink;
+  one industrial-amber accent (`#d4a853`) used sparingly; dark glass. Plus Jakarta Sans (display
+  + body, replacing Fraunces/Inter), Instrument Serif for the look titles (replacing the
+  handwritten Yuyu Short), IBM Plex Mono kept for data labels. All colors stay alpha-free hex so
+  the codebase's existing opacity modifiers (`border-line/70`, `bg-accent-tint/70`) keep working.
+  Speaker corners kept but sharpened: 28px/6px on large surfaces, 14px/4px on small ones.
+  Primary buttons are 10–12px rounded rectangles with dark text on amber (pills are for tags).
+- **The orb** (`src/components/Orb.jsx`, CSS in `globals.css`): a morphing amber body inside a
+  crisp 1px ring. Three states — `idle` (breathes), `listening` (swells, ring brightens),
+  `thinking` (tightens, an inner ripple surfaces). State changes only touch transitionable
+  properties (scale/opacity/filter/border-color) and never an animation's duration, because
+  changing duration mid-cycle makes the blob visibly jump — so every state change is a ~0.9s
+  blend. Pure CSS, no canvas/WebGL or animation library. Its `morph`/`drift`/`breathe` keyframes
+  live in `globals.css` rather than the Tailwind config, since Tailwind only emits keyframes an
+  `animate-*` utility actually uses.
+- **Organic loaders, never spinners**: `ThinkingLine` is the orb in its thinking state with
+  phrases that dissolve into each other; outfit-image generation shows a dark plate with a slow
+  warm light sweep and the orb (`OutfitHero` `pending`), and the finished painting resolves in
+  from a blur once it has actually loaded (not when its URL arrives).
+- **Conversation choreography**: everything materializes (rise + blur-resolve) instead of
+  sliding; a freshly arrived reply streams in word by word, and its actions and quick replies
+  wait for the stream to finish (verified: opacity 0 mid-stream, 1 after). The welcome orb
+  listens while you type and thinks while a reply is made (verified in the DOM: both orbs switch
+  to `listening` on input). The composer floats over a fade instead of a hard bar edge, glows
+  amber on focus, and its send button only lights up with a draft. Chat ↔ wardrobe crossfades.
+- **Landing page** rebuilt around an immersive-object hero: the orb (cycling through its real
+  states, with a live `state:` readout) with four NASA-poster callouts on hairlines whose dots
+  are computed to sit on the ring, then a massive tight-tracked headline bottom-left and the one
+  CTA bottom-right — all above a 900px fold. New trust band, larger statements, a "Presence"
+  specimen card showing the three orb states, closing CTA with the orb, multi-column footer.
+  "Details" copy updated so the page's claims about its own design stay true (no more "128px",
+  "script" or "handwritten face").
+- **Sweep**: every surface moved to the dark system — wardrobe, profile, avatars, outfits,
+  login/register, guides, global error — via one rule-based pass (translucent white → faint light
+  lifts, white fades → canvas fades, `text-white` on amber → dark text), with special cases where
+  a naive swap would break contrast: modal scrims (`bg-ink/30` would now lay a pale haze over the
+  app), and wardrobe cards, whose controls and labels sit on real garment-colour swatches that
+  can be light. `GarmentArt` fallbacks became fine light linework with amber detail dots on dark
+  plates; `EditorialPlate` palettes were re-graded dark.
+- **Two pre-existing bugs surfaced by the redesign and fixed**: on first load with no messages,
+  `ChatView`'s auto-scroll-to-bottom pushed the entire welcome (now the orb) out of view — it now
+  stays at the top until there's a thread; and hero geometry on phones (a CSS `scale()` doesn't
+  shrink the layout box, so the orb overflowed its cell off-centre).
+
+**Verification**: `npm run build` clean. Public pages (landing, login, guides) screenshotted
+with Playwright at 1440×900 and 390×844 — no page errors, no horizontal overflow on mobile. The
+signed-in chat, composer states, image skeleton and wardrobe were verified through a temporary
+local-only page under the already-public `/what-to-wear/` path rendering the real components
+with sample data — deleted before commit, never shipped, and no auth/middleware change made to do
+it. **Fonts are unverified visually**: this sandbox can't reach Google Fonts, so every screenshot
+shows fallback faces — Plus Jakarta Sans and Instrument Serif need a look on a real deploy.
+
+---
+
 ## 2026-09-22 — Usage metering + free/Pro plumbing
 
 Follow-up to a monetization brainstorm: before any revenue model works, this app needed the thing

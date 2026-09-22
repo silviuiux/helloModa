@@ -21,12 +21,10 @@ function Frame({ children }) {
   return <div className="h-full w-full p-6 sm:p-8">{children}</div>;
 }
 
-// Small tiles use rounded-xl2 (20px), matching what the real
-// WardrobeItemCard and RecommendationCards actually use — the 128px
-// rounded-bubble is the app's language for *large* surfaces only (the hero
-// photo, the occasion cards). Chat bubbles and buttons use the smaller
-// rounded-bubble-sm token instead (tailwind.config.js) — 128px on
-// anything under ~250px tall just clamps to a pill/circle.
+// Small tiles use rounded-xl2, matching what the real WardrobeItemCard and
+// RecommendationCards use. rounded-bubble is for large surfaces (the hero
+// photo, the occasion cards); chat bubbles and buttons use rounded-bubble-sm
+// (tailwind.config.js).
 function Tile({ slug, type, label, matched }) {
   return (
     <div className="relative min-w-0">
@@ -42,7 +40,7 @@ function Tile({ slug, type, label, matched }) {
           fallback={<GarmentArt type={type} />}
         />
         {matched && (
-          <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-accent text-white shadow-soft">
+          <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-accent text-canvas shadow-soft">
             <Check size={11} />
           </span>
         )}
@@ -129,7 +127,7 @@ export function SceneLook() {
             <span className="rounded-bubble-sm border border-line px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-muted">
               Retry
             </span>
-            <span className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-white shadow-soft">
+            <span className="flex items-center gap-1.5 rounded-bubble-sm bg-accent px-4 py-1.5 text-[10px] font-medium uppercase tracking-label text-canvas shadow-soft">
               <Hanger size={11} />
               Find outfit
             </span>

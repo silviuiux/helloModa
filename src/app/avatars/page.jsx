@@ -31,9 +31,6 @@ export default async function AvatarsPage() {
   return (
     <div
       className="min-h-screen w-full"
-      style={{
-        background: "radial-gradient(125% 100% at 16% 4%, #f6f5f9 0%, #eeecf3 50%, #e8e5ef 100%)",
-      }}
     >
       <AvatarsView profiles={profiles} selfDefaults={selfProfile} maxAvatars={maxAvatars} />
     </div>

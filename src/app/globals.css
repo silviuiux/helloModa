@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
@@ -14,57 +14,74 @@ body,
 
 body {
   margin: 0;
-  background: #e7e3f1;
+  background: #0f0e0c;
+  color: #ece8e1;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* ---- Glass / visionOS HUD surfaces (light + subtle) ---- */
-.glass {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(26px) saturate(170%);
-  -webkit-backdrop-filter: blur(26px) saturate(170%);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: 0 12px 40px -22px rgba(60, 58, 84, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-.glass-soft {
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-.glass-panel {
-  background: rgba(255, 255, 255, 0.26);
-  backdrop-filter: blur(20px) saturate(155%);
-  -webkit-backdrop-filter: blur(20px) saturate(155%);
-}
-.glass-circle {
-  background: rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 5px 14px -5px rgba(60, 58, 84, 0.32);
+::selection {
+  background: rgba(212, 168, 83, 0.35);
+  color: #fff8ea;
 }
 
-/* Thin, cool scrollbars inside panels */
+/* ---- Atmosphere --------------------------------------------------------
+   The canvas is an environment, not a flat fill: a low amber haze from the
+   top-left (where the conversation begins) and a faint cool counter-light
+   bottom-right. Fixed, so it reads as a room the content moves through. */
+.app-canvas {
+  background-color: #0f0e0c;
+  background-image:
+    radial-gradient(60% 55% at 10% 0%, rgba(212, 168, 83, 0.1), transparent 70%),
+    radial-gradient(45% 40% at 100% 100%, rgba(130, 150, 170, 0.06), transparent 70%);
+  background-attachment: fixed;
+}
+
+/* ---- Glass (dark) ---- */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 50px -24px rgba(0, 0, 0, 0.75);
+}
+.glass-soft {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.glass-panel {
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+}
+.glass-circle {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Thin, quiet scrollbars */
 .scroll-area {
   scrollbar-width: thin;
-  scrollbar-color: #d8d2ec transparent;
+  scrollbar-color: #2e2a24 transparent;
 }
 .scroll-area::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 .scroll-area::-webkit-scrollbar-thumb {
-  background: #ddd6ef;
+  background: #2e2a24;
   border-radius: 999px;
 }
 .scroll-area::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* Tiny uppercase data label */
+/* Tiny uppercase data label — the "instrument reading" voice */
 .label {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10.5px;
@@ -72,22 +89,187 @@ body {
   text-transform: uppercase;
 }
 
-/* Fine film grain — keeps large flat areas on the landing page from
-   reading as dead gradient. Inline SVG turbulence, so no image request. */
+/* Fine film grain over large flat areas. Inline SVG turbulence, so no
+   image request; soft-light on dark instead of multiply on light. */
 .grain::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.35;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  opacity: 0.28;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
-/* Motion opt-out: the marquee and reveal animations are decoration, the
-   scrollytelling step changes are content and deliberately still run. */
+/* ---- The orb --------------------------------------------------------------
+   helloModa's presence (src/components/Orb.jsx): an organic, always-moving
+   body inside a crisp 1px geometric ring — the "organic intelligence inside
+   instrument precision" idea the whole redesign hangs on.
+
+   States (idle / listening / thinking) change ONLY transitionable
+   properties — scale, opacity, filter, border-color. The shape animations
+   themselves never change speed, because swapping animation-duration
+   mid-cycle makes the blob visibly jump; this way every state change is a
+   smooth ~0.9s blend instead. */
+@keyframes morph {
+  0%,
+  100% {
+    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  }
+  25% {
+    border-radius: 61% 39% 45% 55% / 55% 36% 64% 45%;
+  }
+  50% {
+    border-radius: 38% 62% 56% 44% / 62% 58% 42% 38%;
+  }
+  75% {
+    border-radius: 55% 45% 36% 64% / 43% 60% 40% 57%;
+  }
+}
+@keyframes drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.orb {
+  position: relative;
+  width: var(--orb-size, 96px);
+  height: var(--orb-size, 96px);
+  flex-shrink: 0;
+}
+.orb__halo {
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(212, 168, 83, 0.32), rgba(212, 168, 83, 0) 72%);
+  filter: blur(8px);
+  opacity: 0.5;
+  animation: breathe 6s ease-in-out infinite;
+  transition: opacity 0.9s ease;
+}
+.orb__body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #1b1812;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  animation: morph 14s ease-in-out infinite;
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.9s ease;
+}
+.orb__blob {
+  position: absolute;
+  inset: -30%;
+  animation-name: drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.orb__blob--a {
+  background:
+    radial-gradient(circle at 32% 30%, #f3dca3 0%, rgba(243, 220, 163, 0) 36%),
+    radial-gradient(circle at 68% 58%, #d4a853 0%, rgba(212, 168, 83, 0) 46%),
+    radial-gradient(circle at 38% 82%, #7a4e22 0%, rgba(122, 78, 34, 0) 52%);
+  animation-duration: 18s;
+}
+.orb__blob--b {
+  background:
+    radial-gradient(circle at 66% 24%, rgba(236, 232, 225, 0.8) 0%, rgba(236, 232, 225, 0) 28%),
+    radial-gradient(circle at 24% 68%, #b8863d 0%, rgba(184, 134, 61, 0) 42%);
+  mix-blend-mode: screen;
+  filter: blur(4px);
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+.orb__ripple {
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 240, 205, 0.9), rgba(255, 240, 205, 0) 65%);
+  filter: blur(6px);
+  opacity: 0;
+  animation: morph 3.2s ease-in-out infinite, breathe 1.6s ease-in-out infinite;
+  transition: opacity 0.8s ease;
+}
+.orb__ring {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 168, 83, 0.16);
+  transition: border-color 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.orb[data-state="listening"] .orb__body {
+  transform: scale(1.06);
+}
+.orb[data-state="listening"] .orb__halo {
+  opacity: 0.8;
+}
+.orb[data-state="listening"] .orb__ring {
+  border-color: rgba(212, 168, 83, 0.38);
+  transform: scale(1.04);
+}
+.orb[data-state="thinking"] .orb__body {
+  transform: scale(0.94);
+  filter: saturate(1.25) brightness(1.12);
+}
+.orb[data-state="thinking"] .orb__halo {
+  opacity: 1;
+}
+.orb[data-state="thinking"] .orb__ripple {
+  opacity: 0.75;
+}
+.orb[data-state="thinking"] .orb__ring {
+  border-color: rgba(212, 168, 83, 0.5);
+  transform: scale(1.1);
+}
+/* At tiny inline sizes (composer, reply marker) the ring is just noise and
+   the halo is pulled in tight; the moving body carries the state. */
+.orb--mini .orb__halo {
+  inset: -30%;
+}
+.orb--mini .orb__ring {
+  display: none;
+}
+
+/* ---- Organic skeleton ------------------------------------------------------
+   Image-generation placeholder: a dark plate with a slow warm light sweep.
+   Never a spinner. */
+.skeleton-organic {
+  background-color: #16140f;
+  background-image: linear-gradient(
+    100deg,
+    rgba(212, 168, 83, 0) 20%,
+    rgba(212, 168, 83, 0.09) 45%,
+    rgba(243, 220, 163, 0.12) 50%,
+    rgba(212, 168, 83, 0.09) 55%,
+    rgba(212, 168, 83, 0) 80%
+  );
+  background-size: 60% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Motion opt-out: decoration stops, content changes still happen (just
+   without the flourish). */
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .orb__halo,
+  .orb__body,
+  .orb__blob,
+  .orb__ripple,
+  .animate-shimmer {
     animation: none !important;
+  }
+  .animate-fade-up,
+  .animate-word-in,
+  .animate-fade-in {
+    animation-duration: 1ms !important;
   }
 }

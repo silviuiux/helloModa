@@ -124,12 +124,12 @@ export default function AddItemModal({ open, onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" onClick={handleCancel} />
+      <div className="absolute inset-0 bg-canvas/75 backdrop-blur-md" onClick={handleCancel} />
       <form
         onSubmit={submit}
         className="glass animate-fade-up relative w-full max-w-md rounded-xl3 p-6"
       >
-        <h3 className="font-display text-[22px] font-medium text-ink">Add wardrobe item</h3>
+        <h3 className="font-display text-[22px] font-semibold tracking-[-0.03em] text-ink">Add wardrobe item</h3>
         <p className="mt-1 text-[13px] text-muted">
           Snap a photo and helloModa fills in the details — or log it manually.
         </p>
@@ -137,7 +137,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
         <div className="mt-5 space-y-4">
           <Field label="Photo">
             <label className="flex cursor-pointer items-center gap-3">
-              <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/40">
+              <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/[0.04]">
                 {previewUrl ? (
                   <img src={previewUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -238,7 +238,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
           <button
             type="submit"
             disabled={analyzing}
-            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
           >
             <Plus size={16} />
             Add item
@@ -249,10 +249,10 @@ export default function AddItemModal({ open, onClose, onAdd }) {
       <style>{`
         .input{
           width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.7); border:1px solid #e7e3f1; color:#2b2840;
+          background:rgba(255,255,255,0.03); border:1px solid #2a2621; color:#ece8e1;
           font-size:14px; outline:none;
         }
-        .input:focus{ border-color:#a789f4; box-shadow:0 0 0 3px rgba(167,137,244,0.18); }
+        .input:focus{ border-color:#6e5a33; box-shadow:0 0 0 3px rgba(212,168,83,0.16); }
       `}</style>
     </div>
   );

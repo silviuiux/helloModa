@@ -18,7 +18,7 @@ const EUR = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR",
 // behavior if it's visible right where they're deciding what to wear.
 export default function WardrobeItemCard({ item, onToggleFav, onRemove, onSetPrice, onLogWear }) {
   const dark = isDark(item.color);
-  const tone = dark ? "text-white/90" : "text-ink/70";
+  const tone = dark ? "text-ink/90" : "text-canvas/70";
   const [editingPrice, setEditingPrice] = useState(false);
   const [priceInput, setPriceInput] = useState(
     item.priceCents != null ? (item.priceCents / 100).toString() : ""
@@ -56,7 +56,7 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove, onSetPri
         onClick={() => onToggleFav(item.id)}
         aria-label={item.fav ? "Remove from favorites" : "Add to favorites"}
         className={`absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full transition-colors ${
-          item.fav ? "bg-accent text-white shadow-soft" : "glass-circle text-ink"
+          item.fav ? "bg-accent text-canvas shadow-soft" : "bg-canvas/70 text-ink backdrop-blur-md"
         }`}
       >
         <Heart size={15} />
@@ -64,14 +64,14 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove, onSetPri
       <button
         onClick={() => onRemove(item.id)}
         aria-label="Remove item"
-        className="glass-circle absolute left-2 top-2 grid h-8 w-8 place-items-center rounded-full text-ink opacity-0 transition-all group-hover:opacity-100"
+        className="absolute left-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-canvas/70 text-ink opacity-0 backdrop-blur-md transition-all group-hover:opacity-100"
       >
         <Dots size={15} />
       </button>
 
       {/* frosted label overlay */}
-      <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10"
-        style={{ background: "linear-gradient(to top, rgba(255,255,255,0.9) 42%, rgba(255,255,255,0))" }}>
+      <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-14"
+        style={{ background: "linear-gradient(to top, rgba(15,14,12,0.96) 62%, rgba(15,14,12,0))" }}>
         <p className="label text-faint">{item.category}</p>
         <p className="mt-0.5 truncate text-[13.5px] font-medium text-ink">{item.name}</p>
         <p className="mt-0.5 text-[12px] text-muted">{item.brand}</p>
@@ -80,7 +80,7 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove, onSetPri
           <button
             onClick={() => onLogWear(item.id)}
             title="Log a wear"
-            className="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium text-muted transition-colors hover:bg-white/60 hover:text-accent-deep"
+            className="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium text-muted transition-colors hover:bg-white/[0.05] hover:text-accent-deep"
           >
             <Check size={11} />
             {item.wearCount > 0 ? `Worn ${item.wearCount}×` : "Log a wear"}
@@ -104,7 +104,7 @@ export default function WardrobeItemCard({ item, onToggleFav, onRemove, onSetPri
                 value={priceInput}
                 onChange={(e) => setPriceInput(e.target.value)}
                 onBlur={savePrice}
-                className="w-16 rounded-md border border-line bg-white/80 px-1.5 py-0.5 text-[11px] text-ink outline-none focus:border-accent"
+                className="w-16 rounded-md border border-line bg-white/[0.04] px-1.5 py-0.5 text-[11px] text-ink outline-none focus:border-accent"
               />
             </form>
           ) : item.priceCents != null ? (

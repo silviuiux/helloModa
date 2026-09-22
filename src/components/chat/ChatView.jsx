@@ -18,7 +18,9 @@ export default function ChatView({
   isSwitching = false,
   userEmail,
   userDisplayName,
+  composing = false,
 }) {
+  const orbState = thinking ? "thinking" : composing ? "listening" : "idle";
   const scrollRef = useRef(null);
   const prevCountRef = useRef(0);
 
@@ -38,6 +40,14 @@ export default function ChatView({
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+    // Nothing in the thread yet: stay at the top, where the greeting and
+    // the orb are. (Scrolling to the bottom here used to push the whole
+    // welcome out of view on first load, leaving only the prompt chips.)
+    if (messages.length === 0 && !thinking) {
+      prevCountRef.current = 0;
+      el.scrollTo({ top: 0, behavior: "auto" });
+      return;
+    }
     const isBulkLoad = Math.abs(messages.length - prevCountRef.current) > 1;
     prevCountRef.current = messages.length;
     el.scrollTo({ top: el.scrollHeight, behavior: isBulkLoad ? "auto" : "smooth" });
@@ -60,9 +70,21 @@ export default function ChatView({
           occasion cards, and example prompts stay reachable by scrolling up
           even mid-conversation, instead of disappearing after the first
           message. */}
-      <EmptyState userEmail={userEmail} userDisplayName={userDisplayName} onPrompt={onQuickReply} />
+      <EmptyState
+        userEmail={userEmail}
+        userDisplayName={userDisplayName}
+        onPrompt={onQuickReply}
+        orbState={orbState}
+      />
       {hasMessages && (
         <div className="mx-auto w-full max-w-content space-y-32 px-4 pb-[33vh] pt-32 sm:px-6">
+          {/* A hairline + mono marker between the welcome and the thread,
+              so the conversation reads as starting somewhere. */}
+          <div className="animate-fade-in flex items-center gap-4" aria-hidden="true">
+            <span className="h-px flex-1 bg-line" />
+            <span className="label text-faint">conversation</span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
           {messages.map((m) => (
             <MessageBubble
               key={m.id}

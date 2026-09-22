@@ -84,7 +84,7 @@ export default function LandingChatDemo() {
     setTurns((prev) => [...prev, { id: `demo-user-${key}`, role: "user", text: script.prompt }]);
     setPending(true);
     timeoutRef.current = setTimeout(() => {
-      setTurns((prev) => [...prev, script.reply]);
+      setTurns((prev) => [...prev, { ...script.reply, fresh: true }]);
       setPending(false);
     }, 1100);
   }

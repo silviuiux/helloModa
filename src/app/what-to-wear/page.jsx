@@ -23,7 +23,7 @@ export default function GuidesIndexPage() {
 
   return (
     <GuideLayout>
-      <h1 className="mt-6 font-display text-[38px] font-medium leading-[0.98] text-ink sm:text-[56px]">
+      <h1 className="mt-6 font-display text-[38px] font-semibold tracking-[-0.03em] leading-[0.98] text-ink sm:text-[56px]">
         What to wear, by occasion
       </h1>
       <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
@@ -34,7 +34,7 @@ export default function GuidesIndexPage() {
 
       {categories.map((category, i) => (
         <section key={category} className={i === 0 ? "mt-16 sm:mt-20" : "mt-24 sm:mt-28"}>
-          <h2 className="font-display text-[22px] font-medium text-ink">{category}</h2>
+          <h2 className="font-display text-[22px] font-semibold tracking-[-0.03em] text-ink">{category}</h2>
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {guides
               .filter((g) => g.category === category)
@@ -47,7 +47,7 @@ export default function GuidesIndexPage() {
                       className="h-full w-full"
                     />
                   </div>
-                  <h3 className="mt-4 font-display text-[20px] font-medium text-ink group-hover:text-accent-deep">
+                  <h3 className="mt-4 font-display text-[20px] font-semibold tracking-[-0.03em] text-ink group-hover:text-accent-deep">
                     {g.occasion}
                   </h3>
                   <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{g.hook}</p>

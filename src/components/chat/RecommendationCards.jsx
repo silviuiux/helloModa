@@ -58,7 +58,7 @@ function ProductCard({ card, onToggleSave, saved }) {
           aria-label={saved ? "Saved to wardrobe" : "Save to wardrobe"}
           aria-pressed={saved}
           className={`absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full transition-transform hover:scale-105 active:scale-95 ${
-            saved ? "bg-accent text-white shadow-soft" : "glass-circle text-ink"
+            saved ? "bg-accent text-canvas shadow-soft" : "glass-circle text-ink"
           }`}
         >
           <Heart size={15} />

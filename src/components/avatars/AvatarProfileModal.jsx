@@ -190,9 +190,9 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4">
-      <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-canvas/75 backdrop-blur-md" onClick={onClose} />
       <div className="glass animate-fade-up relative my-8 w-full max-w-lg rounded-xl3 p-6">
-        <h3 className="font-display text-[22px] font-medium text-ink">
+        <h3 className="font-display text-[22px] font-semibold tracking-[-0.03em] text-ink">
           {savedProfile ? `Edit ${savedProfile.display_name}` : isSelf ? "Set up your avatar" : "Add a family member"}
         </h3>
         <p className="mt-1 text-[13px] text-muted">
@@ -221,7 +221,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
                     type="button"
                     onClick={() => setFields((f) => ({ ...f, gender: f.gender === g ? "" : g }))}
                     className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
-                      fields.gender === g ? "bg-accent text-white shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
+                      fields.gender === g ? "bg-accent text-canvas shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
                     }`}
                   >
                     {g}
@@ -253,7 +253,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
                     setFields((f) => ({ ...f, build: f.build === b.key ? "" : b.key }));
                   }}
                   className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
-                    fields.build === b.key ? "bg-accent text-white shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
+                    fields.build === b.key ? "bg-accent text-canvas shadow-soft" : "glass-soft text-muted hover:text-accent-deep"
                   }`}
                 >
                   {b.label}
@@ -269,7 +269,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
           </div>
 
           <div className="flex items-center gap-3 pt-1">
-            <button type="submit" disabled={saveStatus === "saving"} className="rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep disabled:opacity-60">
+            <button type="submit" disabled={saveStatus === "saving"} className="rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep disabled:opacity-60">
               {saveStatus === "saving" ? "Saving…" : "Save details"}
             </button>
             {saveStatus === "error" && <p className="text-[12.5px] text-red-500">{saveError}</p>}
@@ -283,7 +283,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
           </p>
 
           <div className="mt-4 flex items-start gap-4">
-            <div className="relative grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/40">
+            <div className="relative grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/[0.04]">
               {currentAvatarUrl ? (
                 <img src={currentAvatarUrl} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -314,7 +314,7 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
                     type="button"
                     onClick={handleGenerate}
                     disabled={!consent || generating}
-                    className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2 text-[13.5px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2 text-[13.5px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {generating ? (
                       "Painting…"
@@ -349,10 +349,10 @@ export default function AvatarProfileModal({ open, onClose, profile, isSelf, sel
       <style>{`
         .input{
           width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.7); border:1px solid #e7e3f1; color:#2b2840;
+          background:rgba(255,255,255,0.03); border:1px solid #2a2621; color:#ece8e1;
           font-size:14px; outline:none;
         }
-        .input:focus{ border-color:#a789f4; box-shadow:0 0 0 3px rgba(167,137,244,0.18); }
+        .input:focus{ border-color:#6e5a33; box-shadow:0 0 0 3px rgba(212,168,83,0.16); }
       `}</style>
     </div>
   );

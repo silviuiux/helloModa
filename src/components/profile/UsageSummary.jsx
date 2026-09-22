@@ -12,7 +12,7 @@ function Meter({ label, used, limit }) {
         </span>
       </div>
       {!unlimited && (
-        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/60">
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.04]">
           <div
             className={`h-full rounded-full ${atLimit ? "bg-red-400" : "bg-accent"}`}
             style={{ width: `${pct}%` }}
@@ -34,7 +34,7 @@ export default function UsageSummary({ usage }) {
   return (
     <section className="glass rounded-xl3 p-5 sm:p-6">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-[17px] font-medium text-ink">This month</h2>
+        <h2 className="font-display text-[17px] font-semibold tracking-[-0.03em] text-ink">This month</h2>
         <span className="label text-accent-deep">{usage.plan === "pro" ? "Pro" : "Free"}</span>
       </div>
       <div className="mt-4 space-y-4">

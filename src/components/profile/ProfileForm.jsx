@@ -119,7 +119,7 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
           <Home size={17} />
         </Link>
         <div>
-          <h1 className="font-display text-[26px] font-medium leading-tight text-ink">Your profile</h1>
+          <h1 className="font-display text-[26px] font-semibold tracking-[-0.03em] leading-tight text-ink">Your profile</h1>
           <p className="mt-0.5 text-[13.5px] text-muted">{userEmail}</p>
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <Section title="Photo & name">
           <div className="flex items-center gap-4">
-            <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border border-dashed border-accent-soft bg-white/40">
+            <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border border-dashed border-accent-soft bg-white/[0.04]">
               {avatarPreview ? (
                 <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -168,7 +168,7 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
                   onClick={() => setGender(gender === g ? "" : g)}
                   className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
                     gender === g
-                      ? "bg-accent text-white shadow-soft"
+                      ? "bg-accent text-canvas shadow-soft"
                       : "glass-soft text-muted hover:text-accent-deep"
                   }`}
                 >
@@ -232,7 +232,7 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
           <button
             type="submit"
             disabled={status === "saving"}
-            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-5 py-2.5 text-[14px] font-medium text-white shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-5 py-2.5 text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
           >
             {status === "saved" && <Check size={16} />}
             {status === "saving" ? "Saving…" : status === "saved" ? "Saved" : "Save profile"}
@@ -244,10 +244,10 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
       <style>{`
         .input{
           width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.7); border:1px solid #e7e3f1; color:#2b2840;
+          background:rgba(255,255,255,0.03); border:1px solid #2a2621; color:#ece8e1;
           font-size:14px; outline:none;
         }
-        .input:focus{ border-color:#a789f4; box-shadow:0 0 0 3px rgba(167,137,244,0.18); }
+        .input:focus{ border-color:#6e5a33; box-shadow:0 0 0 3px rgba(212,168,83,0.16); }
       `}</style>
     </div>
   );
@@ -256,7 +256,7 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
 function Section({ title, hint, children }) {
   return (
     <section className="glass rounded-xl3 p-5 sm:p-6">
-      <h2 className="font-display text-[17px] font-medium text-ink">{title}</h2>
+      <h2 className="font-display text-[17px] font-semibold tracking-[-0.03em] text-ink">{title}</h2>
       {hint && <p className="mt-1 text-[12.5px] text-muted">{hint}</p>}
       <div className="mt-4">{children}</div>
     </section>
@@ -316,7 +316,7 @@ function TagField({ values, onChange, suggestions = [], placeholder }) {
             setDraft("");
           }}
           placeholder={placeholder}
-          className="h-9 min-w-[10rem] flex-1 rounded-full bg-white/60 px-3.5 text-[13px] text-ink placeholder:text-faint focus:outline-none"
+          className="h-9 min-w-[10rem] flex-1 rounded-full bg-white/[0.04] px-3.5 text-[13px] text-ink placeholder:text-faint focus:outline-none"
         />
       </div>
       {remainingSuggestions.length > 0 && (

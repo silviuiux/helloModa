@@ -17,11 +17,15 @@ import ImageWithFallback from "../ImageWithFallback.jsx";
 
 // Colour stories borrowed from the same vocabulary as src/data/guides.js's
 // `palette` field, so the landing page and the guides feel related.
+// Dark, warm-graded versions (2026-09-22 redesign) — the three plate stops
+// stay near-black so the plates sit in the page's colour temperature; the
+// fourth stop is the story's own hue, used only for the low bloom and the
+// swatch dots.
 const PALETTES = {
-  dusk: ["#efe8f6", "#d8cdee", "#bfb0e4", "#8c6ae2"],
-  sand: ["#f6f1e8", "#e8dcc8", "#d9c7a8", "#b79b74"],
-  vine: ["#f2f2ec", "#dfe3d2", "#c3cdb4", "#8fa07c"],
-  slate: ["#f1f2f6", "#dfe2ec", "#c4c9dd", "#8e95b4"],
+  dusk: ["#221c22", "#171317", "#0f0d0f", "#a0869a"],
+  sand: ["#241e15", "#18140e", "#100e0a", "#c9a46a"],
+  vine: ["#1b1e16", "#12150f", "#0d0f0b", "#8fa07c"],
+  slate: ["#1a1d22", "#121418", "#0d0e11", "#8e95b4"],
 };
 
 export default function EditorialPlate({
@@ -49,7 +53,7 @@ export default function EditorialPlate({
             {/* light blooms — depth, so the plate isn't a flat wash */}
             <div
               className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full opacity-70"
-              style={{ background: "radial-gradient(circle, rgba(255,255,255,0.85), transparent 70%)" }}
+              style={{ background: "radial-gradient(circle, rgba(212,168,83,0.22), transparent 70%)" }}
             />
             <div
               className="pointer-events-none absolute -bottom-24 -left-10 h-64 w-64 rounded-full opacity-50"
@@ -86,7 +90,7 @@ export default function EditorialPlate({
                 {colors.map((c) => (
                   <span
                     key={c}
-                    className="h-2.5 w-2.5 rounded-full ring-1 ring-inset ring-white/60"
+                    className="h-2.5 w-2.5 rounded-full ring-1 ring-inset ring-white/20"
                     style={{ background: c }}
                   />
                 ))}

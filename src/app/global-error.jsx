@@ -22,8 +22,8 @@ export default function GlobalError({ error, reset }) {
             padding: "24px",
             fontFamily: "system-ui, sans-serif",
             textAlign: "center",
-            background: "#eeecf3",
-            color: "#2b2840",
+            background: "#0f0e0c",
+            color: "#ece8e1",
           }}
         >
           <div>
@@ -36,9 +36,9 @@ export default function GlobalError({ error, reset }) {
               style={{
                 marginTop: 16,
                 padding: "10px 20px",
-                borderRadius: 999,
-                background: "#8b5cf6",
-                color: "white",
+                borderRadius: 12,
+                background: "#d4a853",
+                color: "#0f0e0c",
                 border: "none",
                 fontSize: 14,
                 cursor: "pointer",

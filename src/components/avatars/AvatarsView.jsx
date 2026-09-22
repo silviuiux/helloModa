@@ -11,7 +11,7 @@ function AddTile({ label, sublabel, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="group grid aspect-[3/4] place-items-center rounded-bubble border border-dashed border-accent-soft bg-white/30 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/50 hover:text-accent-deep"
+      className="group grid aspect-[3/4] place-items-center rounded-bubble border border-dashed border-accent-soft bg-white/[0.04] text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/[0.05] hover:text-accent-deep"
     >
       <span className="text-center">
         <span className="glass-circle mx-auto grid h-12 w-12 place-items-center rounded-full transition-transform group-hover:scale-105">

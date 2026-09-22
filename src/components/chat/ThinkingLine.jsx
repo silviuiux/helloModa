@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Orb from "../Orb.jsx";
 
 // Fashion-flavored synonyms for "thinking" — cycles while the stylist works,
 // instead of a static label. Purely decorative text, no meaning attached to
@@ -28,24 +29,32 @@ const PHRASES = [
   "Steaming out the wrinkles",
 ];
 
-export default function ThinkingLine() {
+// The orb in its thinking state carries the "working" signal; the phrase
+// beside it dissolves into the next one (blur-resolve, not a hard swap) so
+// the whole thing reads as one continuous, calm motion rather than a
+// ticking status line. Never a spinner.
+export default function ThinkingLine({ className = "" }) {
   const startIndex = useRef(Math.floor(Math.random() * PHRASES.length));
   const [index, setIndex] = useState(startIndex.current);
 
   useEffect(() => {
     const id = setInterval(() => {
       setIndex((prev) => (prev + 1) % PHRASES.length);
-    }, 1500);
+    }, 1900);
     return () => clearInterval(id);
   }, []);
 
   return (
-    <p
-      key={index}
-      className="animate-fade-up mt-4 text-[15px] leading-relaxed text-accent-deep"
-      aria-live="polite"
-    >
-      {PHRASES[index]}…
-    </p>
+    <div className={`animate-fade-up flex items-center gap-4 ${className}`}>
+      <Orb size={30} state="thinking" mini />
+      <p
+        key={index}
+        className="animate-word-in text-[15px] leading-relaxed text-muted"
+        aria-live="polite"
+      >
+        {PHRASES[index]}
+        <span className="text-accent">…</span>
+      </p>
+    </div>
   );
 }

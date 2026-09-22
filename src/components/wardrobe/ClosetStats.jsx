@@ -3,7 +3,7 @@ const EUR = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR",
 function Stat({ value, label, hint }) {
   return (
     <div className="min-w-[120px]">
-      <p className="font-display text-[19px] font-medium leading-none text-ink">{value}</p>
+      <p className="font-display text-[19px] font-semibold tracking-[-0.03em] leading-none text-ink">{value}</p>
       <p className="label mt-1.5 text-faint">{label}</p>
       {hint && <p className="mt-0.5 text-[11px] text-muted">{hint}</p>}
     </div>
@@ -28,7 +28,7 @@ export default function ClosetStats({ items }) {
   const neverWorn = items.filter((it) => it.wearCount === 0).length;
 
   return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-white/40 bg-white/20 px-6 py-4 sm:px-8">
+    <div className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-line bg-white/[0.04] px-6 py-4 sm:px-8">
       <Stat
         value={priced.length ? EUR.format(wardrobeValueCents / 100) : "—"}
         label="Wardrobe value"

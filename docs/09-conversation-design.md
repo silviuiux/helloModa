@@ -14,21 +14,20 @@ Each assistant turn is a single, focused outfit recommendation — not a grid of
 interchangeable product cards. A turn has:
 
 1. **Title** — a short (1–4 word) evocative phrase, e.g. "Vineyard wedding,"
-   "Chic direction," "West coast ease." Rendered in a script/handwritten
-   display face (`font-script`, currently **Yuyu Short**, free on Google
-   Fonts — swapped 2026-09-21, twice: Bonheur Royale → Mr De Haviland →
-   Yuyu Short, each by direct request; swap the `script` token in
-   `tailwind.config.js` again if the brand face changes further). **Yuyu
-   Short's lowercase glyphs render as slim uppercase-style caps** (it's
-   designed that way, not a bug) — worth a visual check against real
-   lowercase titles like "vineyard wedding" once deployed, since this
-   project's copy is lowercase-first. Large, as the turn's visual anchor.
-   This is
-   the *only* place the script face is used now — the "thinking" line
-   (below) was moved to the body font 2026-09-21, since a cursive face reads
-   badly at small status-text sizes.
+   "Chic direction," "West coast ease." Rendered in the `font-script` token —
+   since the 2026-09-22 redesign an editorial serif, **Instrument Serif**,
+   not a handwritten face (history: Bonheur Royale → Mr De Haviland → Yuyu
+   Short → Instrument Serif; swap the `script` token in `tailwind.config.js`
+   if it changes again). It's the one soft, organic voice in an otherwise
+   sharp sans + mono system. Large, as the turn's visual anchor. Preceded by
+   a small speaker marker: a mini orb (`Orb.jsx`) + the mono label
+   "helloModa"; the orb sits in its thinking state until the image settles.
 2. **Narrative** — 2–4 sentences, editorial voice, explaining the direction
-   and why it answers the occasion/mood/constraint the user gave.
+   and why it answers the occasion/mood/constraint the user gave. A reply
+   that just arrived (`message.fresh`, set by `AppShell.handleSend`) streams
+   in word by word (blur-resolve, capped at ~2.5s total); the actions row and
+   quick-reply chips are held until the stream finishes, so the turn unfolds
+   in order. History loaded from the DB renders instantly, never replayed.
 3. **Hero visual** — one image representing the outfit in its setting, laid
    out **beside** the title/narrative in a two-column split (`sm:grid-cols-2`
    in `MessageBubble.jsx`) — image left, content right. Collapses to a
@@ -72,13 +71,15 @@ interchangeable product cards. A turn has:
 
 ## Bubble corner language
 
-Two mirrored `borderRadius` tokens (`tailwind.config.js`), each 128px on
-three corners and square on the fourth — at typical element sizes 128px
-exceeds half the box, so it just reads as "fully rounded" on the open
-corners, with one sharp corner as a directional "tail":
+Mirrored `borderRadius` tokens (`tailwind.config.js`), rounded on three
+corners with one near-square corner as a directional "tail". Sharpened in
+the 2026-09-22 redesign (was 128px, which clamped small elements into pills):
+large surfaces (`rounded-bubble` / `-reply`) use 28px with a 6px tail
+corner, small elements (`rounded-bubble-sm` / `-reply-sm`) 14px with a 4px
+tail — so every element reads as a rounded square, never a pill:
 
 - **`rounded-bubble`** (square bottom-left) — the user's message bubble
-  (always **left-aligned**, filled purple, `bg-accent-tint`), the outfit
+  (always **left-aligned**, amber-warmed `bg-accent-tint`), the outfit
   hero image, and in-chat buttons/chips.
 - **`rounded-bubble-reply`** (square top-right, mirrored) — a text-only
   assistant reply (always **right-aligned**, outlined not filled). Today
@@ -118,8 +119,15 @@ conversation, new or old, always reaches it again:
 - A second scrollable row of example prompt chips below the cards. Tapping
   either a card or a chip sends that prompt as the next message in whatever
   conversation is currently open — it does not start a new one.
-- Greeting headline uses the same `font-script` face as turn titles (Yuyu
-  Short as of 2026-09-21, previously `font-display`).
+- The orb (`Orb.jsx`) leads the welcome as helloModa's presence, and is
+  live: it breathes at rest, swells while the composer has text in it
+  (`listening`, wired `BottomBar onDraftChange` → `AppShell composing` →
+  `ChatView` → `EmptyState`), and tightens while a reply is being made
+  (`thinking`). The view stays scrolled to the top while the thread is
+  empty, so the orb and greeting are what you land on.
+- Greeting headline: "hello, {name}." in the heavy display sans, with
+  "what are we dressing for?" beneath it in the italic serif (2026-09-22;
+  previously the whole greeting was in the script face).
 
 **Vertical rhythm**: generous spacing between top-level sections — 128px
 (`mt-32`/`space-y-32`/`pt-32`, Tailwind's default `32` spacing step, no
