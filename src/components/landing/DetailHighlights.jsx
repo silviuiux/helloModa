@@ -1,7 +1,7 @@
 "use client";
 
 import GarmentArt from "../GarmentArt.jsx";
-import Reveal from "./Reveal.jsx";
+import Reveal from "../Reveal.jsx";
 
 // Specimen cards, not feature bullets. Each one renders the actual detail
 // live rather than describing it — the corner geometry uses the real

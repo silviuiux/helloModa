@@ -98,7 +98,10 @@ plus retention features.
   before the legal/consent flow is right).
 - Calendar sync (Google first) + proactive nudges (needs a scheduled job, not just reactive chat).
 - Closet analytics: cost-per-wear, wardrobe value — straightforward once wardrobe data exists.
-- Style Journal ("Vibe Cards") — mostly a UI/data-modeling feature on top of existing conversation data.
+- ✅ **Style Journal ("Vibe Cards"), shipped 2026-09-22:** `/outfits` (existing "Outfit history"
+  list) redesigned into an editorial card grid grouped by month, reusing `conversations.title`
+  (already the field this was meant to power, per `04-data-model.md`) and `created_at` — no new
+  columns needed, confirming the roadmap's "mostly UI" framing.
 
 **Exit criteria:** Recommended-to-buy items are real matched inventory, not just category
 guesses; retention features are live for private beta users.

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Sparkle, ArrowRight, Hanger } from "@/components/Icons.jsx";
 import EditorialPlate from "@/components/landing/EditorialPlate.jsx";
-import Reveal from "@/components/landing/Reveal.jsx";
+import Reveal from "@/components/Reveal.jsx";
 import StickyStage from "@/components/landing/StickyStage.jsx";
 import OccasionMarquee from "@/components/landing/OccasionMarquee.jsx";
 import DetailHighlights from "@/components/landing/DetailHighlights.jsx";

@@ -1,47 +1,35 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Home } from "../Icons.jsx";
-import { addWardrobeItem } from "../../actions/wardrobe.js";
-import { cardToWardrobeItem } from "../../lib/look.js";
-import OutfitHistoryRow from "./OutfitHistoryRow.jsx";
+import Reveal from "../Reveal.jsx";
+import VibeCard from "./VibeCard.jsx";
+
+const MONTH_FORMAT = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
+
+// Groups rows into "September 2026" / "August 2026" / ... buckets, newest
+// first — rows arrive already sorted newest-first from listOutfitHistory(),
+// so this only needs to notice when the month changes, not re-sort.
+function groupByMonth(rows) {
+  const groups = [];
+  let current = null;
+  for (const row of rows) {
+    const key = row.createdAt ? MONTH_FORMAT.format(new Date(row.createdAt)) : "Undated";
+    if (!current || current.key !== key) {
+      current = { key, rows: [] };
+      groups.push(current);
+    }
+    current.rows.push(row);
+  }
+  return groups;
+}
 
 export default function OutfitHistoryList({ rows }) {
-  // Session-only "saved" feedback for the heart button — mirrors the same
-  // simplification AppShell.jsx's chat view already has (see
-  // ChatView.jsx's savedIds), not a durable per-card marker. This page has
-  // no shared wardrobe state to check against (it's a standalone route, not
-  // part of AppShell), so a save here is a fire-and-forget add rather than
-  // a toggle.
-  const [savedIds, setSavedIds] = useState(new Set());
-
-  async function handleSave(card) {
-    if (savedIds.has(card.id)) return;
-    setSavedIds((prev) => new Set(prev).add(card.id));
-    try {
-      const item = cardToWardrobeItem(card);
-      await addWardrobeItem({
-        name: item.name,
-        brand: item.brand,
-        category: item.category,
-        color: item.color,
-        tags: item.tags,
-        imagePath: null,
-      });
-    } catch (err) {
-      console.error("Failed to save piece to wardrobe:", err);
-      setSavedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(card.id);
-        return next;
-      });
-    }
-  }
+  const groups = groupByMonth(rows);
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
-      <div className="mb-16 flex items-center gap-3">
+      <div className="mb-4 flex items-center gap-3">
         <Link
           href="/"
           aria-label="Back to helloModa"
@@ -53,15 +41,27 @@ export default function OutfitHistoryList({ rows }) {
           hello—Outfits
         </h1>
       </div>
+      <p className="mb-14 text-[14px] text-muted">
+        Your style journal — every look, kept.
+      </p>
 
       {rows.length === 0 ? (
         <p className="text-[14px] text-muted">
           No outfits yet — start a conversation and your looks will show up here.
         </p>
       ) : (
-        <div className="divide-y divide-line">
-          {rows.map((row) => (
-            <OutfitHistoryRow key={row.id} row={row} onSavePiece={handleSave} savedIds={savedIds} />
+        <div className="space-y-14">
+          {groups.map((group) => (
+            <section key={group.key}>
+              <p className="label mb-5 text-faint">{group.key}</p>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5">
+                {group.rows.map((row, i) => (
+                  <Reveal key={row.id} delay={(i % 6) * 60}>
+                    <VibeCard row={row} />
+                  </Reveal>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}

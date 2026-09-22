@@ -176,6 +176,7 @@ export async function listOutfitHistory() {
         id: c.id,
         title: c.title || rec.title || "Untitled outfit",
         narrative: message.content,
+        createdAt: c.created_at,
         coverImageUrl: rec.generated_image_url
           ? await signLookImageUrl(supabase, rec.generated_image_url)
           : null,

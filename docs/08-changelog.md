@@ -4,6 +4,42 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-22 — Style Journal: /outfits redesigned into "Vibe Cards"
+
+Picked up the next roadmap item (`03-roadmap.md` Phase 3): "Style Journal ('Vibe Cards') —
+mostly a UI/data-modeling feature on top of existing conversation data." `/outfits` already
+existed as a functional but plain divided-row list (`OutfitHistoryList.jsx`/`OutfitHistoryRow.jsx`,
+shipped 2026-09-21); this redesigns it into the editorial card treatment the rest of the app
+already uses (`EmptyState.jsx`'s occasion carousel), rather than adding a second, differently-named
+feature.
+
+- **New `VibeCard.jsx`** — one big `aspect-[4/5]` tile per look: cover photo (or the `GarmentArt`
+  fallback, same graceful-degradation pattern as everywhere else), a bottom gradient with the
+  conversation's title in `font-script` and its date, and a small piece-count chip. Sized large
+  enough (well over 250px tall in every breakpoint) that `rounded-bubble`'s 128px corner is the
+  correct large-surface token — see the "squared corners" fix directly above; this is exactly the
+  kind of element that should stay on the large token, not move to `-sm`.
+- **`OutfitHistoryList.jsx` rewritten** to group rows into month buckets ("September 2026", …)
+  over a responsive 2/3-column grid, each group revealed with the existing `Reveal.jsx`
+  scroll-reveal (moved from `components/landing/` to `components/` — it was already generic,
+  now genuinely shared between the landing page and this page rather than landing-only).
+  `OutfitHistoryRow.jsx` is removed; its per-piece expand/save affordance is dropped rather than
+  ported, since it was awkward in a grid and duplicated the piece-level save action
+  `RecommendationCards` already offers once a card is clicked into its conversation
+  (`/?conversation=<id>`) — that's still one click away, just not inline on the journal itself.
+- **`listOutfitHistory()` (`actions/conversations.js`)** now also returns each row's
+  `createdAt`, needed for the month grouping and the per-card date. Considered also surfacing
+  `outfit_recommendations.occasion` as a tag on each card, but that column is defined in the
+  schema and never actually written by `/api/chat` — decided against building UI around a field
+  that would always render empty; `conversations.title` (the field `04-data-model.md` already
+  says this feature was meant to use) carries the card instead.
+
+Not yet screenshot-verified in this sandbox — `/outfits` sits behind the same invite-only auth
+gate as the rest of the signed-in app (`src/middleware.js`), same caveat as `MessageBubble.jsx`
+above. `npm run build` passes with no errors.
+
+---
+
 ## 2026-09-22 — Small elements: squared corners, not pills
 
 Direct request: on small elements (chat bubbles, buttons, chips — roughly 30–90px tall), the
