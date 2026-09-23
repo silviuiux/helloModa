@@ -35,7 +35,12 @@ function StreamedText({ text, className }) {
   );
 }
 
-export default function MessageBubble({ message, onToggleSave, savedIds, onQuickReply }) {
+const SWATCHES = ["#8b6cf0", "#f4a5c5", "#7ab2eb", "#6ed5a8", "#e8b94a"];
+
+// `moodboard` (design exploration, branch design/chat-moodboard): only
+// ChatView.jsx passes this — the landing demo, StageVisuals, and
+// GuideShowcase reuse this same component and stay on the shipped look.
+export default function MessageBubble({ message, onToggleSave, savedIds, onQuickReply, moodboard = false }) {
   const [showPieces, setShowPieces] = useState(false);
   const isUser = message.role === "user";
   const { imageUrl, settled, errorMessage } = useOutfitImage({
@@ -50,6 +55,19 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   const afterStream = message.fresh ? streamTiming(message.narrative).total + 250 : 0;
 
   if (isUser) {
+    if (moodboard) {
+      // The user's brief as a pinned sticky note, not a chat bubble.
+      return (
+        <div className="animate-fade-up">
+          <div
+            className="moodboard-sticky inline-block max-w-sm px-5 py-4"
+            style={{ transform: "rotate(-2deg)" }}
+          >
+            <span className="moodboard-marker text-[19px] leading-snug text-ink">{message.text}</span>
+          </div>
+        </div>
+      );
+    }
     // Left-aligned, violet-tinted, near-square bottom-left corner — the
     // opposite speaker corner from helloModa's replies, so who's talking
     // reads from shape alone.
@@ -67,12 +85,120 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   // quota message) gets the mirrored outlined bubble instead of the full
   // image+title+narrative layout below.
   if (!message.title && !message.heroPrompt) {
+    if (moodboard) {
+      return (
+        <div className="animate-fade-up flex items-start justify-end gap-3">
+          <div
+            className="moodboard-sticky moodboard-sticky--sky max-w-sm px-5 py-4"
+            style={{ transform: "rotate(1.5deg)" }}
+          >
+            <span className="moodboard-marker text-[18px] leading-snug text-ink">{message.narrative}</span>
+          </div>
+          <Orb size={22} mini className="mt-2.5" />
+        </div>
+      );
+    }
     return (
       <div className="animate-fade-up flex items-start justify-end gap-3">
         <div className="max-w-md rounded-bubble-reply-sm border border-line bg-paper/80 px-5 py-3.5 sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.narrative}</p>
         </div>
         <Orb size={22} mini className="mt-2.5" />
+      </div>
+    );
+  }
+
+  if (moodboard) {
+    return (
+      <div className="animate-fade-up space-y-10">
+        <div className="grid gap-10 sm:grid-cols-2 sm:items-start sm:gap-16">
+          <div className="mx-auto w-full max-w-[340px] sm:mx-0">
+            <OutfitHero
+              imageUrl={imageUrl}
+              pending={!settled}
+              errorMessage={settled ? errorMessage : null}
+              seed={message.recommendationId || message.id}
+              moodboard
+            />
+          </div>
+
+          <div className="flex flex-col pt-4">
+            <div className="flex items-center gap-2.5">
+              <Orb size={18} mini state={settled ? "idle" : "thinking"} />
+              <span className="moodboard-stamp px-3 py-1">helloModa</span>
+            </div>
+
+            {message.title && (
+              <h2
+                className="moodboard-marker animate-fade-up mt-4 text-[46px] leading-[0.9] text-ink sm:text-[54px]"
+                style={{ animationDelay: message.fresh ? "120ms" : "0ms" }}
+              >
+                {message.title}
+              </h2>
+            )}
+
+            <div className="mt-3 flex items-center gap-2">
+              {SWATCHES.map((c) => (
+                <span key={c} className="moodboard-swatch" style={{ background: c }} />
+              ))}
+            </div>
+
+            {message.narrative &&
+              (message.fresh ? (
+                <StreamedText text={message.narrative} className="mt-5 font-sans text-[15.5px] leading-[1.7] text-ink/85" />
+              ) : (
+                <p className="mt-5 font-sans text-[15.5px] leading-[1.7] text-ink/85">{message.narrative}</p>
+              ))}
+
+            {settled && (
+              <div
+                className="animate-fade-up mt-7 flex flex-wrap items-center gap-2.5"
+                style={{ animationDelay: `${afterStream}ms` }}
+              >
+                <button aria-label="Good match" className="moodboard-stamp grid h-9 w-9 place-items-center">
+                  <ThumbsUp size={14} />
+                </button>
+                <button aria-label="Not for me" className="moodboard-stamp grid h-9 w-9 place-items-center">
+                  <ThumbsDown size={14} />
+                </button>
+                <button className="moodboard-stamp px-4 py-2">Restyle</button>
+                {message.pieces?.length > 0 && (
+                  <button
+                    onClick={() => setShowPieces((v) => !v)}
+                    className="moodboard-stamp moodboard-stamp--filled flex items-center gap-1.5 px-4 py-2"
+                  >
+                    <Hanger size={13} />
+                    {showPieces ? "Hide pieces" : "See the pieces"}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {settled && showPieces && (
+          <div className="animate-fade-up">
+            <RecommendationCards cards={message.pieces} onToggleSave={onToggleSave} savedIds={savedIds} />
+          </div>
+        )}
+
+        {settled && message.quickReplies?.length > 0 && (
+          <div className="flex flex-wrap gap-4">
+            {message.quickReplies.map((q, i) => (
+              <button
+                key={q}
+                onClick={() => onQuickReply?.(q)}
+                style={{
+                  animationDelay: `${afterStream + 120 + i * 70}ms`,
+                  transform: `rotate(${[-2.5, 2, -1.5, 3][i % 4]}deg)`,
+                }}
+                className={`moodboard-sticky moodboard-sticky${["", "--pink", "--mint", "--sky"][i % 4]} animate-fade-up max-w-[200px] px-4 py-3 text-left transition-transform duration-300 hover:!rotate-0`}
+              >
+                <span className="moodboard-marker text-[16px] leading-tight text-ink">{q}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   }

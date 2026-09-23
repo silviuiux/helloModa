@@ -371,16 +371,27 @@ export default function BottomBar({
     // cut off by a panel.
     <div
       className="relative z-20 -mt-10 shrink-0 px-3 pb-4 pt-10 sm:px-5 sm:pb-5"
-      style={{ background: "linear-gradient(to top, #f5f3fa 55%, rgba(245,243,250,0))" }}
+      style={{
+        background:
+          view === "chat"
+            ? "linear-gradient(to top, #efe8da 55%, rgba(239,232,218,0))"
+            : "linear-gradient(to top, #f5f3fa 55%, rgba(245,243,250,0))",
+      }}
     >
       <div className="mx-auto flex max-w-content flex-col gap-2 sm:flex-row sm:items-center">
         <div className="hidden shrink-0 items-center gap-2 sm:flex">{navIcons}</div>
 
         <form onSubmit={submit} className="order-first flex flex-1 items-center sm:order-none sm:mx-1">
           <div
-            className={`glass flex h-14 flex-1 items-center gap-3 rounded-[18px] pl-4 pr-2 transition-[box-shadow,border-color] duration-500 focus-within:border-accent-soft focus-within:shadow-glow ${
-              sending ? "border-accent-soft" : ""
-            }`}
+            className={
+              view === "chat"
+                ? `moodboard-card-field flex h-14 flex-1 items-center gap-3 rounded-lg pl-4 pr-2 transition-[box-shadow,border-color] duration-500 ${
+                    sending ? "border-ink/40" : ""
+                  }`
+                : `glass flex h-14 flex-1 items-center gap-3 rounded-[18px] pl-4 pr-2 transition-[box-shadow,border-color] duration-500 focus-within:border-accent-soft focus-within:shadow-glow ${
+                    sending ? "border-accent-soft" : ""
+                  }`
+            }
           >
             <Orb size={22} mini state={orbState} />
             <input
@@ -388,19 +399,29 @@ export default function BottomBar({
               onChange={(e) => setValue(e.target.value)}
               disabled={sending}
               placeholder={sending ? "styling your look…" : "Where are you going? An occasion, a mood, the weather…"}
-              className="h-full flex-1 bg-transparent text-[15px] text-ink placeholder:text-faint focus:outline-none disabled:cursor-not-allowed"
+              className={
+                view === "chat"
+                  ? "moodboard-marker h-full flex-1 bg-transparent text-[19px] text-ink placeholder:font-sans placeholder:text-[14px] placeholder:text-faint focus:outline-none disabled:cursor-not-allowed"
+                  : "h-full flex-1 bg-transparent text-[15px] text-ink placeholder:text-faint focus:outline-none disabled:cursor-not-allowed"
+              }
             />
             <button
               type="submit"
               aria-label="Send"
               disabled={sending || !hasDraft}
-              className={`grid h-10 w-10 shrink-0 place-items-center rounded-[12px] transition-all duration-300 disabled:cursor-not-allowed ${
-                hasDraft && !sending
-                  ? "bg-accent text-canvas hover:bg-accent-deep"
-                  : "bg-white/60 text-faint"
-              }`}
+              className={
+                view === "chat"
+                  ? `moodboard-stamp shrink-0 px-4 py-2 transition-opacity disabled:cursor-not-allowed disabled:opacity-40 ${
+                      hasDraft && !sending ? "moodboard-stamp--filled" : ""
+                    }`
+                  : `grid h-10 w-10 shrink-0 place-items-center rounded-[12px] transition-all duration-300 disabled:cursor-not-allowed ${
+                      hasDraft && !sending
+                        ? "bg-accent text-canvas hover:bg-accent-deep"
+                        : "bg-white/60 text-faint"
+                    }`
+              }
             >
-              <ArrowRight size={16} />
+              {view === "chat" ? "Send" : <ArrowRight size={16} />}
             </button>
           </div>
         </form>

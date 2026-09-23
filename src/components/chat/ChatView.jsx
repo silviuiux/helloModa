@@ -80,10 +80,10 @@ export default function ChatView({
         <div className="mx-auto w-full max-w-content space-y-32 px-4 pb-[33vh] pt-32 sm:px-6">
           {/* A hairline + mono marker between the welcome and the thread,
               so the conversation reads as starting somewhere. */}
-          <div className="animate-fade-in flex items-center gap-4" aria-hidden="true">
-            <span className="h-px flex-1 bg-line" />
-            <span className="label text-faint">conversation</span>
-            <span className="h-px flex-1 bg-line" />
+          <div className="animate-fade-in flex items-center justify-center" aria-hidden="true">
+            <span className="moodboard-stamp px-4 py-1.5" style={{ transform: "rotate(-1deg)" }}>
+              the conversation
+            </span>
           </div>
           {messages.map((m) => (
             <MessageBubble
@@ -92,9 +92,10 @@ export default function ChatView({
               onToggleSave={handleToggleSave}
               savedIds={savedIds}
               onQuickReply={onQuickReply}
+              moodboard
             />
           ))}
-          {thinking && <ThinkingLine />}
+          {thinking && <ThinkingLine moodboard />}
         </div>
       )}
     </div>

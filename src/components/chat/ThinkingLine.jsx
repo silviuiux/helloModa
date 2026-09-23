@@ -36,7 +36,9 @@ const PHRASES = [
 // beside it dissolves into the next one (blur-resolve, not a hard swap) so
 // the whole thing reads as one continuous, calm motion rather than a
 // ticking status line. Never a spinner.
-export default function ThinkingLine({ className = "" }) {
+// `moodboard` (design exploration, branch design/chat-moodboard): only
+// ChatView.jsx passes this — LandingChatDemo stays on the shipped look.
+export default function ThinkingLine({ className = "", moodboard = false }) {
   const startIndex = useRef(Math.floor(Math.random() * PHRASES.length));
   const [index, setIndex] = useState(startIndex.current);
 
@@ -52,7 +54,9 @@ export default function ThinkingLine({ className = "" }) {
       <Orb size={30} state="thinking" mini />
       <p
         key={index}
-        className="animate-word-in text-[15px] leading-relaxed text-muted"
+        className={
+          moodboard ? "animate-word-in moodboard-marker text-[19px] text-ink" : "animate-word-in text-[15px] leading-relaxed text-muted"
+        }
         aria-live="polite"
       >
         {PHRASES[index]}

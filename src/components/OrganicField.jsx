@@ -26,6 +26,9 @@ const CELL_COLORS = [
 const CONFIG = {
   page: { cells: 5, spores: 22, cellSize: [34, 58], unit: "vmax", cellDur: [55, 90], sporeDur: [28, 48], filaments: 3 },
   plate: { cells: 4, spores: 12, cellSize: [55, 85], unit: "%", cellDur: [9, 16], sporeDur: [7, 13], filaments: 2 },
+  // design/chat-moodboard: a few slow dust motes, no cells/filaments — the
+  // collage itself carries the page, this is just a trace of ambient life.
+  dust: { cells: 0, spores: 7, cellSize: [0, 0], unit: "vmax", cellDur: [60, 60], sporeDur: [50, 80], filaments: 0 },
 };
 
 // A soft sine wave spanning two tile widths so translateX(-50%) loops
@@ -43,7 +46,7 @@ function wavePath(amp, periods, y) {
 
 export default function OrganicField({ variant = "page", className = "" }) {
   const c = CONFIG[variant] || CONFIG.page;
-  const fixed = variant === "page";
+  const fixed = variant === "page" || variant === "dust";
 
   return (
     <div

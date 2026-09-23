@@ -17,17 +17,25 @@ import OrganicField from "../OrganicField.jsx";
 //   neither  -> a placeholder photo (src/lib/placeholder.js, seeded per
 //               message so it's stable), plus the failure reason if there
 //               was one (most often the free-plan quota message)
-export default function OutfitHero({ imageUrl, pending = false, errorMessage, seed }) {
+//
+// `moodboard` (design exploration, branch design/chat-moodboard): swaps the
+// rounded glass-ish frame for a torn-edge cut-out pinned inside a white
+// polaroid frame with a strip of washi tape (globals.css's "MOODBOARD"
+// section) — a styling effect, not real background removal; see that
+// section's note.
+export default function OutfitHero({ imageUrl, pending = false, errorMessage, seed, moodboard = false }) {
   const [loaded, setLoaded] = useState(false);
 
-  return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-bubble border border-line bg-paper">
+  const media = (
+    <>
       {pending && !imageUrl && (
         <div className="skeleton-organic animate-shimmer absolute inset-0 grid place-items-center">
-          <OrganicField variant="plate" />
+          {!moodboard && <OrganicField variant="plate" />}
           <div className="relative flex flex-col items-center gap-5">
             <Orb size={64} state="thinking" />
-            <span className="label text-faint">painting your look</span>
+            <span className={moodboard ? "moodboard-stamp px-3 py-1" : "label text-faint"}>
+              painting your look
+            </span>
           </div>
         </div>
       )}
@@ -53,6 +61,21 @@ export default function OutfitHero({ imageUrl, pending = false, errorMessage, se
           <p className="pointer-events-auto text-[12.5px] leading-snug text-white/90">{errorMessage}</p>
         </div>
       )}
+    </>
+  );
+
+  if (moodboard) {
+    return (
+      <div className="moodboard-frame relative" style={{ transform: "rotate(-1.5deg)" }}>
+        <span className="moodboard-tape moodboard-tape--violet" />
+        <div className="moodboard-torn relative aspect-[4/5] w-full overflow-hidden">{media}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-bubble border border-line bg-paper">
+      {media}
     </div>
   );
 }

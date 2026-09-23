@@ -239,9 +239,21 @@ export default function AppShell({
 
   return (
     <div
-      className="relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink"
+      className={`relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink ${
+        view === "chat" ? "moodboard-canvas" : ""
+      }`}
     >
-      <OrganicField />
+      {/* Design exploration, branch design/chat-moodboard: a corkboard
+          canvas + fine paper grain replaces the shipped violet atmosphere
+          on the chat view only — wardrobe keeps the shipped OrganicField. */}
+      {view === "chat" ? (
+        <>
+          <div className="moodboard-grain" />
+          <OrganicField variant="dust" />
+        </>
+      ) : (
+        <OrganicField />
+      )}
       <Suspense fallback={null}>
         <ConversationFromQuery onConversationId={handleSelectConversation} />
       </Suspense>
