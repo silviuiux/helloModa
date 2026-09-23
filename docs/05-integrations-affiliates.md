@@ -39,6 +39,32 @@ generalists above; verify directly rather than assuming Awin/Rakuten coverage.
    doesn't carry.
 4. Leave 2Performant/eMAG alone until the conflict-of-interest review is done.
 
+## Zalando — next retailer, staged 2026-09-23
+
+Direct request: get Zalando products showing up, "even if they're not affiliate links."
+Correction worth recording: there is no non-affiliate Zalando catalog to pull from — the only
+two legitimate sources are Zalando as an **Awin advertiser** or Zalando's own **direct Partner
+Program** (`partner.zalando.com`, may give better data access — apply to both, use whichever
+approves first). Both are affiliate programs by nature; "not bothering with the commission" is
+fine, "not an affiliate relationship" isn't accurate, so the product copy shouldn't claim that.
+Scraping their storefront instead is explicitly the one thing `06-risks-legal.md` says to avoid,
+regardless of monetization — not an option here.
+
+The code is staged and ready, mirroring the Italist pipeline exactly (it's retailer-agnostic by
+design — `scripts/lib/syncAwinProducts.mjs` doesn't know or care which advertiser it's syncing):
+
+- `scripts/sync-products-zalando.mjs` — manual/backfill entry point
+- `src/app/api/cron/sync-products-zalando/route.js` — nightly trigger, offset 30 minutes from
+  Italist's in `vercel.json` so they don't overlap
+- Both need `AWIN_ZALANDO_FEED_URL` once Zalando is an approved Awin advertiser (or an
+  equivalent env var + a one-line tweak if the Partner Program's feed format differs)
+
+**Not done yet, blocked on you:** applying for Zalando on Awin (or direct), and — if you're on
+Vercel's Hobby plan — checking its cron-job limits before this second nightly job is live; Hobby
+plans have historically capped both job count and how often a job can fire. Once
+`AWIN_ZALANDO_FEED_URL` exists, `node scripts/sync-products-zalando.mjs --embed-limit 30000` is
+the same one-command backfill Italist got.
+
 ## Ingestion pipeline — live for Italist, 2026-09-21
 
 Italist approved the Awin partnership; this is the first real advertiser, so the pipeline

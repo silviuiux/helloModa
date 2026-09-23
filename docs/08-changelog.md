@@ -4,6 +4,29 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-23 — Stage Zalando as the next Awin retailer
+
+Direct request: "could we use some live feed of recommended products even if theyre not
+affiliate links? i would be interested in [Zalando] products at first." Zalando turned out to
+have no non-affiliate path — the only two legitimate sources for their catalog are an Awin
+listing or Zalando's own direct Partner Program, both affiliate programs by nature. Scraping
+their storefront is the one thing `06-risks-legal.md` already says to avoid, unaffected by
+whether it's monetized. Correction relayed to the user before building anything.
+
+Staged, not live — code mirrors the Italist pipeline exactly, since it was already built
+retailer-agnostic (`scripts/lib/syncAwinProducts.mjs` takes any retailer slug + feed URL):
+
+- `scripts/sync-products-zalando.mjs` — manual/backfill entry point
+- `src/app/api/cron/sync-products-zalando/route.js` — nightly trigger
+- `vercel.json` — added the cron entry, offset 30 minutes from Italist's
+
+Needs `AWIN_ZALANDO_FEED_URL` once Zalando approves as an Awin advertiser (or the direct
+Partner Program, with a small format tweak if its feed shape differs) — the same blocker
+Italist had before it went live. Also flagged: if the Vercel project is on the Hobby plan,
+check its cron-job limits before this second nightly job is expected to actually fire.
+
+---
+
 ## 2026-09-22 — Fix: CLIP embeddings never worked (blocks Awin product linking)
 
 The Awin product links in recommendations never appeared, so I checked the live database:
