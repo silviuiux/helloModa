@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import MessageBubble from "./MessageBubble.jsx";
 import EmptyState from "./EmptyState.jsx";
 import ThinkingLine from "./ThinkingLine.jsx";
+import EditorialMasthead from "./EditorialMasthead.jsx";
 import { cardToWardrobeItem } from "../../lib/look.js";
 
 // See docs/09-conversation-design.md: one outfit direction per turn, no
@@ -70,6 +71,7 @@ export default function ChatView({
           occasion cards, and example prompts stay reachable by scrolling up
           even mid-conversation, instead of disappearing after the first
           message. */}
+      <EditorialMasthead />
       <EmptyState
         userEmail={userEmail}
         userDisplayName={userDisplayName}
@@ -81,9 +83,9 @@ export default function ChatView({
           {/* A hairline + mono marker between the welcome and the thread,
               so the conversation reads as starting somewhere. */}
           <div className="animate-fade-in flex items-center gap-4" aria-hidden="true">
-            <span className="h-px flex-1 bg-line" />
-            <span className="label text-faint">conversation</span>
-            <span className="h-px flex-1 bg-line" />
+            <span className="editorial-rule flex-1" />
+            <span className="editorial-caption">The conversation</span>
+            <span className="editorial-rule flex-1" />
           </div>
           {messages.map((m) => (
             <MessageBubble
@@ -92,9 +94,10 @@ export default function ChatView({
               onToggleSave={handleToggleSave}
               savedIds={savedIds}
               onQuickReply={onQuickReply}
+              editorial
             />
           ))}
-          {thinking && <ThinkingLine />}
+          {thinking && <ThinkingLine editorial />}
         </div>
       )}
     </div>

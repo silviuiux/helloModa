@@ -36,7 +36,9 @@ const PHRASES = [
 // beside it dissolves into the next one (blur-resolve, not a hard swap) so
 // the whole thing reads as one continuous, calm motion rather than a
 // ticking status line. Never a spinner.
-export default function ThinkingLine({ className = "" }) {
+// `editorial` (design exploration, branch design/chat-editorial): only
+// ChatView.jsx passes this — LandingChatDemo stays on the shipped look.
+export default function ThinkingLine({ className = "", editorial = false }) {
   const startIndex = useRef(Math.floor(Math.random() * PHRASES.length));
   const [index, setIndex] = useState(startIndex.current);
 
@@ -49,10 +51,14 @@ export default function ThinkingLine({ className = "" }) {
 
   return (
     <div className={`animate-fade-up flex items-center gap-4 ${className}`}>
-      <Orb size={30} state="thinking" mini />
+      <Orb size={editorial ? 20 : 30} state="thinking" mini />
       <p
         key={index}
-        className="animate-word-in text-[15px] leading-relaxed text-muted"
+        className={
+          editorial
+            ? "animate-word-in editorial-caption"
+            : "animate-word-in text-[15px] leading-relaxed text-muted"
+        }
         aria-live="polite"
       >
         {PHRASES[index]}

@@ -2,6 +2,11 @@
 
 import { Suspense, useEffect, useState, useTransition } from "react";
 import OrganicField from "@/components/OrganicField.jsx";
+// Design exploration, branch design/chat-editorial: a plain paper grain
+// replaces the shipped violet-haze/particle atmosphere on the chat view
+// only — the "secondary AI elements" brief means the ambient motion steps
+// back, not that it disappears everywhere (wardrobe keeps the shipped
+// OrganicField).
 import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
@@ -239,9 +244,11 @@ export default function AppShell({
 
   return (
     <div
-      className="relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink"
+      className={`relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink ${
+        view === "chat" ? "editorial-canvas" : ""
+      }`}
     >
-      <OrganicField />
+      {view === "chat" ? <div className="editorial-grain" /> : <OrganicField />}
       <Suspense fallback={null}>
         <ConversationFromQuery onConversationId={handleSelectConversation} />
       </Suspense>

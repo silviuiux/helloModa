@@ -555,3 +555,98 @@ body {
   width: 200%;
   animation: filament var(--dur, 60s) linear infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EDITORIAL — design exploration, branch design/chat-editorial
+   Chat page only, additive — nothing here replaces the tokens/classes
+   above, so the rest of the app is unaffected while this is evaluated.
+
+   Direction: fashion-magazine print language — a warm paper canvas, a
+   masthead nameplate, serif headlines carrying the voice instead of the
+   sans, numbered photo captions, hairline rules, pull-quote treatment for
+   the stylist's narrative, underlined text-links instead of pill buttons.
+   The orb and its motion (the "AI element") steps back to a small
+   signature mark and a quiet caption line — present, but secondary to the
+   editorial layout, the opposite emphasis from the aurora exploration.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.editorial-canvas {
+  background-color: #faf8f3;
+  background-image: radial-gradient(120% 60% at 50% 0%, rgba(30, 26, 46, 0.03), transparent 60%);
+}
+/* Fine paper grain, heavier and warmer than the app's default `.grain`. */
+.editorial-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.editorial-rule {
+  height: 1px;
+  background: #1e1a2e;
+  opacity: 0.16;
+}
+.editorial-rule--heavy {
+  height: 2px;
+  background: #1e1a2e;
+  opacity: 0.85;
+}
+
+/* Small-caps, wide-tracked, mono — the "issue line" / caption voice. */
+.editorial-caption {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6b6680;
+}
+
+/* Serif carries the headline voice here instead of the sans display font. */
+.editorial-headline {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Drop cap on the stylist's narrative opening — CSS-only, no markup split
+   needed, so it works on any dynamic text node. */
+.editorial-dropcap::first-letter {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 3.4em;
+  font-weight: 400;
+  line-height: 0.72;
+  float: left;
+  padding: 0.03em 0.08em 0 0;
+  color: #1e1a2e;
+}
+
+/* Underlined text-link, replacing the pill/glass button language for this
+   page's secondary actions. */
+.editorial-link {
+  position: relative;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1e1a2e;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(30, 26, 46, 0.3);
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.editorial-link:hover {
+  border-color: #1e1a2e;
+  color: #6a4bd8;
+}
+
+/* Composer: a plain underlined field, not a glass pill. */
+.editorial-input-row {
+  border-bottom: 1px solid rgba(30, 26, 46, 0.22);
+  transition: border-color 0.3s ease;
+}
+.editorial-input-row:focus-within {
+  border-color: #1e1a2e;
+}

@@ -17,17 +17,27 @@ import OrganicField from "../OrganicField.jsx";
 //   neither  -> a placeholder photo (src/lib/placeholder.js, seeded per
 //               message so it's stable), plus the failure reason if there
 //               was one (most often the free-plan quota message)
-export default function OutfitHero({ imageUrl, pending = false, errorMessage, seed }) {
+//
+// `editorial` (design exploration, branch design/chat-editorial): swaps
+// the rounded glass-ish frame for a sharp-cornered hairline one, and turns
+// off the ambient organic field in the skeleton, matching that direction's
+// "secondary AI elements" brief — only the orb + caption carry the
+// working state, not decorative motion.
+export default function OutfitHero({ imageUrl, pending = false, errorMessage, seed, editorial = false }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-bubble border border-line bg-paper">
+    <div
+      className={`relative aspect-[4/5] w-full overflow-hidden bg-paper ${
+        editorial ? "border border-ink/20" : "rounded-bubble border border-line"
+      }`}
+    >
       {pending && !imageUrl && (
         <div className="skeleton-organic animate-shimmer absolute inset-0 grid place-items-center">
-          <OrganicField variant="plate" />
+          {!editorial && <OrganicField variant="plate" />}
           <div className="relative flex flex-col items-center gap-5">
             <Orb size={64} state="thinking" />
-            <span className="label text-faint">painting your look</span>
+            <span className={editorial ? "editorial-caption" : "label text-faint"}>painting your look</span>
           </div>
         </div>
       )}

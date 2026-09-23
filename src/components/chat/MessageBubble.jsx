@@ -35,7 +35,12 @@ function StreamedText({ text, className }) {
   );
 }
 
-export default function MessageBubble({ message, onToggleSave, savedIds, onQuickReply }) {
+// `editorial` (design exploration, branch design/chat-editorial): only
+// ChatView.jsx passes this — the landing demo, StageVisuals, and
+// GuideShowcase reuse this same component and stay on the shipped look, so
+// this direction is genuinely scoped to the real chat page, not just
+// whichever surface happens to render MessageBubble.
+export default function MessageBubble({ message, onToggleSave, savedIds, onQuickReply, editorial = false }) {
   const [showPieces, setShowPieces] = useState(false);
   const isUser = message.role === "user";
   const { imageUrl, settled, errorMessage } = useOutfitImage({
@@ -50,6 +55,19 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   const afterStream = message.fresh ? streamTiming(message.narrative).total + 250 : 0;
 
   if (isUser) {
+    if (editorial) {
+      // "Your brief" — a magazine epigraph, not a chat bubble: a quoted
+      // line under a small-caps section label, left-aligned to the text
+      // column rather than boxed.
+      return (
+        <div className="animate-fade-up">
+          <p className="editorial-caption">Your brief</p>
+          <p className="editorial-headline mt-2 max-w-2xl text-[26px] italic leading-snug text-ink">
+            “{message.text}”
+          </p>
+        </div>
+      );
+    }
     // Left-aligned, violet-tinted, near-square bottom-left corner — the
     // opposite speaker corner from helloModa's replies, so who's talking
     // reads from shape alone.
@@ -67,12 +85,108 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   // quota message) gets the mirrored outlined bubble instead of the full
   // image+title+narrative layout below.
   if (!message.title && !message.heroPrompt) {
+    if (editorial) {
+      return (
+        <div className="animate-fade-up">
+          <p className="editorial-caption">A note from helloModa</p>
+          <div className="editorial-rule mt-2 max-w-2xl" />
+          <p className="mt-3 max-w-2xl font-sans text-[15px] leading-relaxed text-ink">{message.narrative}</p>
+        </div>
+      );
+    }
     return (
       <div className="animate-fade-up flex items-start justify-end gap-3">
         <div className="max-w-md rounded-bubble-reply-sm border border-line bg-paper/80 px-5 py-3.5 sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.narrative}</p>
         </div>
         <Orb size={22} mini className="mt-2.5" />
+      </div>
+    );
+  }
+
+  if (editorial) {
+    return (
+      <div className="animate-fade-up space-y-6">
+        <div className="grid gap-8 sm:grid-cols-2 sm:items-start sm:gap-14">
+          <div>
+            <OutfitHero
+              imageUrl={imageUrl}
+              pending={!settled}
+              errorMessage={settled ? errorMessage : null}
+              seed={message.recommendationId || message.id}
+              editorial
+            />
+            {message.title && (
+              <p className="editorial-caption mt-3">
+                Fig. {String((message.id || "0").length % 9 || 1).padStart(2, "0")} — {message.title}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <p className="editorial-caption">The look</p>
+
+            {message.title && (
+              <h2
+                className="editorial-headline animate-fade-up mt-3 text-[44px] leading-[0.98] text-ink sm:text-[52px]"
+                style={{ animationDelay: message.fresh ? "120ms" : "0ms" }}
+              >
+                {message.title}
+              </h2>
+            )}
+
+            {message.narrative &&
+              (message.fresh ? (
+                <StreamedText
+                  text={message.narrative}
+                  className="editorial-dropcap mt-5 font-sans text-[15.5px] leading-[1.75] text-ink/85"
+                />
+              ) : (
+                <p className="editorial-dropcap mt-5 font-sans text-[15.5px] leading-[1.75] text-ink/85">
+                  {message.narrative}
+                </p>
+              ))}
+
+            <p className="editorial-caption mt-5">Styled by helloModa</p>
+
+            {settled && (
+              <div
+                className="animate-fade-up mt-6 flex flex-wrap items-center gap-6"
+                style={{ animationDelay: `${afterStream}ms` }}
+              >
+                <button className="editorial-link">Good match</button>
+                <button className="editorial-link">Not for me</button>
+                <button className="editorial-link">Restyle</button>
+                {message.pieces?.length > 0 && (
+                  <button onClick={() => setShowPieces((v) => !v)} className="editorial-link text-accent-deep">
+                    {showPieces ? "Hide pieces" : "See the pieces →"}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {settled && showPieces && (
+          <div className="animate-fade-up">
+            <RecommendationCards cards={message.pieces} onToggleSave={onToggleSave} savedIds={savedIds} />
+          </div>
+        )}
+
+        {settled && message.quickReplies?.length > 0 && (
+          <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-[rgba(30,26,46,0.12)] pt-4">
+            {message.quickReplies.map((q, i) => (
+              <button
+                key={q}
+                onClick={() => onQuickReply?.(q)}
+                style={{ animationDelay: `${afterStream + 120 + i * 70}ms` }}
+                className="editorial-link animate-fade-up"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
