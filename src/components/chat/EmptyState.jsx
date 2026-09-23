@@ -85,7 +85,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt, orbSt
           <button
             key={c.slug}
             onClick={() => onPrompt(c.prompt)}
-            className="group relative aspect-square w-[78vw] shrink-0 overflow-hidden rounded-bubble border border-line bg-paper transition-[transform,border-color] duration-500 ease-out hover:-translate-y-1 hover:border-accent-soft sm:w-[508px]"
+            className="glass-aurora-soft group relative aspect-square w-[78vw] shrink-0 overflow-hidden rounded-bubble transition-transform duration-500 ease-out hover:-translate-y-1 sm:w-[508px]"
           >
             <PlaceholderImage
               src={`/occasions/${c.slug}-hero.jpg`}
@@ -114,7 +114,7 @@ export default function EmptyState({ userDisplayName, userEmail, onPrompt, orbSt
           <button
             key={p}
             onClick={() => onPrompt(p)}
-            className="shrink-0 whitespace-nowrap rounded-bubble-sm border border-line bg-paper/60 px-4 py-2 text-[13px] text-muted transition-colors hover:border-accent-soft hover:text-ink"
+            className="glass-aurora-soft shrink-0 whitespace-nowrap rounded-bubble-sm px-4 py-2 text-[13px] text-muted transition-colors hover:text-ink"
           >
             {p}
           </button>

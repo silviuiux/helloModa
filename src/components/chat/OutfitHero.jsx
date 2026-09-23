@@ -21,10 +21,10 @@ export default function OutfitHero({ imageUrl, pending = false, errorMessage, se
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-bubble border border-line bg-paper">
+    <div className="glass-aurora-soft relative aspect-[4/5] w-full overflow-hidden rounded-bubble">
       {pending && !imageUrl && (
         <div className="skeleton-organic animate-shimmer absolute inset-0 grid place-items-center">
-          <OrganicField variant="plate" />
+          <OrganicField variant="plate" palette="aurora" />
           <div className="relative flex flex-col items-center gap-5">
             <Orb size={64} state="thinking" />
             <span className="label text-faint">painting your look</span>

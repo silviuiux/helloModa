@@ -371,14 +371,21 @@ export default function BottomBar({
     // cut off by a panel.
     <div
       className="relative z-20 -mt-10 shrink-0 px-3 pb-4 pt-10 sm:px-5 sm:pb-5"
-      style={{ background: "linear-gradient(to top, #f5f3fa 55%, rgba(245,243,250,0))" }}
+      style={{
+        background:
+          view === "chat"
+            ? "linear-gradient(to top, #fbfaff 55%, rgba(251,250,255,0))"
+            : "linear-gradient(to top, #f5f3fa 55%, rgba(245,243,250,0))",
+      }}
     >
       <div className="mx-auto flex max-w-content flex-col gap-2 sm:flex-row sm:items-center">
         <div className="hidden shrink-0 items-center gap-2 sm:flex">{navIcons}</div>
 
         <form onSubmit={submit} className="order-first flex flex-1 items-center sm:order-none sm:mx-1">
           <div
-            className={`glass flex h-14 flex-1 items-center gap-3 rounded-[18px] pl-4 pr-2 transition-[box-shadow,border-color] duration-500 focus-within:border-accent-soft focus-within:shadow-glow ${
+            className={`${
+              view === "chat" ? "glass-aurora" : "glass"
+            } flex h-14 flex-1 items-center gap-3 rounded-[18px] pl-4 pr-2 transition-[box-shadow,border-color] duration-500 focus-within:border-accent-soft focus-within:shadow-glow ${
               sending ? "border-accent-soft" : ""
             }`}
           >

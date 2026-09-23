@@ -8,6 +8,12 @@
 //                   image-generation skeleton; smaller, quicker, denser, so
 //                   the wait itself looks alive.
 //
+// palette "violet" (default) — the shipped single-hue tone.
+// palette "aurora" — design exploration (branch design/chat-aurora-minimal,
+//                    globals.css's "AURORA MINIMAL" section): same
+//                    wander/spore/filament mechanics, cycled across a
+//                    blush/lavender/sky/mint palette instead of one violet.
+//
 // Positions come from a fixed pseudo-random sequence (not Math.random), so
 // server and client render identical markup.
 function rand(i, salt) {
@@ -41,9 +47,10 @@ function wavePath(amp, periods, y) {
   return d;
 }
 
-export default function OrganicField({ variant = "page", className = "" }) {
+export default function OrganicField({ variant = "page", palette = "violet", className = "" }) {
   const c = CONFIG[variant] || CONFIG.page;
   const fixed = variant === "page";
+  const aurora = palette === "aurora";
 
   return (
     <div
@@ -57,7 +64,7 @@ export default function OrganicField({ variant = "page", className = "" }) {
         return (
           <span
             key={`c${i}`}
-            className="organic-cell"
+            className={`organic-cell ${aurora ? "organic-cell--aurora" : ""}`}
             style={{
               width: `${size}${c.unit}`,
               height: `${size * (0.62 + rand(i, 2) * 0.3)}${c.unit}`,
@@ -88,7 +95,7 @@ export default function OrganicField({ variant = "page", className = "" }) {
           <path
             d={wavePath(14 + i * 8, 3 + i, 40)}
             fill="none"
-            stroke={i === 1 ? "rgba(255,255,255,0.9)" : "rgba(139,108,240,0.28)"}
+            stroke={aurora ? (i === 1 ? "rgba(255,255,255,0.9)" : "rgba(167,139,250,0.32)") : i === 1 ? "rgba(255,255,255,0.9)" : "rgba(139,108,240,0.28)"}
             strokeWidth="1"
             vectorEffect="non-scaling-stroke"
           />
@@ -101,7 +108,7 @@ export default function OrganicField({ variant = "page", className = "" }) {
         return (
           <span
             key={`s${i}`}
-            className={`organic-spore ${i % 3 === 0 ? "organic-spore--light" : ""}`}
+            className={`organic-spore ${aurora ? "organic-spore--aurora" : i % 3 === 0 ? "organic-spore--light" : ""}`}
             style={{
               width: s,
               height: s,

@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useTransition } from "react";
 import OrganicField from "@/components/OrganicField.jsx";
+import AuroraBackground from "@/components/AuroraBackground.jsx";
 import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
 import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
@@ -241,7 +242,20 @@ export default function AppShell({
     <div
       className="relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink"
     >
-      <OrganicField />
+      {/* Design exploration, branch design/chat-aurora-minimal: the chat
+          view gets the near-white multi-hue "aurora" atmosphere instead of
+          the shipped violet one; wardrobe is untouched while this is
+          evaluated. The solid backdrop div fully covers the body's
+          `.app-canvas` violet haze so the two don't show through each
+          other. */}
+      {view === "chat" ? (
+        <>
+          <div className="aurora-canvas fixed inset-0 z-0" />
+          <AuroraBackground />
+        </>
+      ) : (
+        <OrganicField />
+      )}
       <Suspense fallback={null}>
         <ConversationFromQuery onConversationId={handleSelectConversation} />
       </Suspense>

@@ -55,7 +55,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
     // reads from shape alone.
     return (
       <div className="animate-fade-up">
-        <div className="max-w-md rounded-bubble-sm border border-accent-soft/60 bg-accent-tint px-5 py-3.5 sm:max-w-lg">
+        <div className="glass-aurora max-w-md rounded-bubble-sm px-5 py-3.5 sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.text}</p>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
   if (!message.title && !message.heroPrompt) {
     return (
       <div className="animate-fade-up flex items-start justify-end gap-3">
-        <div className="max-w-md rounded-bubble-reply-sm border border-line bg-paper/80 px-5 py-3.5 sm:max-w-lg">
+        <div className="glass-aurora-soft max-w-md rounded-bubble-reply-sm px-5 py-3.5 sm:max-w-lg">
           <p className="text-[15px] leading-relaxed text-ink">{message.narrative}</p>
         </div>
         <Orb size={22} mini className="mt-2.5" />
@@ -117,7 +117,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
               <ToolbarBtn icon={ThumbsUp} label="Good match" />
               <ToolbarBtn icon={ThumbsDown} label="Not for me" />
               <span className="mx-1 h-4 w-px bg-line" aria-hidden="true" />
-              <button className="rounded-bubble-sm border border-line px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:border-accent-soft hover:text-ink">
+              <button className="glass-aurora-soft rounded-bubble-sm px-5 py-2 text-[11px] font-medium uppercase tracking-label text-muted transition-colors hover:text-ink">
                 Restyle
               </button>
               {message.pieces?.length > 0 && (
@@ -147,7 +147,7 @@ export default function MessageBubble({ message, onToggleSave, savedIds, onQuick
               key={q}
               onClick={() => onQuickReply?.(q)}
               style={{ animationDelay: `${afterStream + 120 + i * 70}ms` }}
-              className="animate-fade-up rounded-bubble-sm border border-line bg-paper/60 px-4 py-2 text-[13px] text-muted transition-colors hover:border-accent-soft hover:text-ink"
+              className="glass-aurora-soft animate-fade-up rounded-bubble-sm px-4 py-2 text-[13px] text-muted transition-colors hover:text-ink"
             >
               {q}
             </button>

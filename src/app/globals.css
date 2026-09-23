@@ -555,3 +555,122 @@ body {
   width: 200%;
   animation: filament var(--dur, 60s) linear infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AURORA MINIMAL — design exploration, branch design/chat-aurora-minimal
+   Chat page only, additive: nothing here replaces the tokens/classes above,
+   so the rest of the app (landing, wardrobe, avatars, guides) is
+   unaffected while this is evaluated. If adopted, this section merges up
+   into the main system; if not, it deletes cleanly.
+
+   Direction: near-white canvas, several large very soft multi-hue "aurora"
+   blooms (blush / lavender / sky / mint) drifting slowly behind the
+   content, true glassmorphism cards (heavier blur, brighter tint, softer
+   diffuse shadow, bigger radius), and the existing organic-field particles
+   kept and re-tuned to carry the same multi-hue palette instead of a
+   single violet. Interactive elements (buttons, focus rings) stay on the
+   one violet accent — only the atmosphere and materials go multi-hue, so
+   it doesn't read as a rainbow UI.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@keyframes aurora-drift-a {
+  0%, 100% { transform: translate(-6%, -4%) scale(1); }
+  50% { transform: translate(8%, 6%) scale(1.15); }
+}
+@keyframes aurora-drift-b {
+  0%, 100% { transform: translate(5%, -8%) scale(1.05); }
+  50% { transform: translate(-10%, 4%) scale(0.95); }
+}
+@keyframes aurora-drift-c {
+  0%, 100% { transform: translate(-4%, 6%) scale(0.95); }
+  50% { transform: translate(6%, -10%) scale(1.1); }
+}
+@keyframes aurora-drift-d {
+  0%, 100% { transform: translate(6%, 4%) scale(1.1); }
+  50% { transform: translate(-8%, -6%) scale(0.9); }
+}
+
+.aurora-canvas {
+  position: relative;
+  background: #fbfaff;
+}
+.aurora-canvas__blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  pointer-events: none;
+  will-change: transform;
+  z-index: 0;
+}
+.aurora-canvas__blob--blush {
+  top: -10%;
+  left: -8%;
+  width: 46vw;
+  height: 46vw;
+  background: radial-gradient(closest-side, rgba(255, 200, 221, 0.65), transparent 72%);
+  animation: aurora-drift-a 26s ease-in-out infinite;
+}
+.aurora-canvas__blob--lavender {
+  top: 4%;
+  right: -12%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(closest-side, rgba(196, 181, 253, 0.6), transparent 72%);
+  animation: aurora-drift-b 32s ease-in-out infinite;
+}
+.aurora-canvas__blob--sky {
+  bottom: -14%;
+  left: 8%;
+  width: 42vw;
+  height: 42vw;
+  background: radial-gradient(closest-side, rgba(179, 217, 255, 0.55), transparent 72%);
+  animation: aurora-drift-c 29s ease-in-out infinite;
+}
+.aurora-canvas__blob--mint {
+  bottom: -8%;
+  right: 4%;
+  width: 38vw;
+  height: 38vw;
+  background: radial-gradient(closest-side, rgba(186, 240, 216, 0.5), transparent 72%);
+  animation: aurora-drift-d 35s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-canvas__blob {
+    animation: none !important;
+  }
+}
+
+/* True glass: brighter, more blurred, more saturated than the app's
+   existing .glass — meant to sit on top of a busy multi-hue background and
+   still read as one clean surface. */
+.glass-aurora {
+  background: rgba(255, 255, 255, 0.66);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 20px 60px -24px rgba(76, 29, 149, 0.18),
+    0 2px 8px -2px rgba(76, 29, 149, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.glass-aurora-soft {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Multi-hue restyle of the organic-field particles (OrganicField.jsx's
+   `variant="aurora"`) — same wander/spore/filament mechanics, warmer,
+   larger, dreamier palette instead of one violet tone. */
+.organic-cell--aurora:nth-of-type(5n+1) { background: radial-gradient(closest-side, rgba(255, 200, 221, 0.5), transparent) !important; }
+.organic-cell--aurora:nth-of-type(5n+2) { background: radial-gradient(closest-side, rgba(196, 181, 253, 0.45), transparent) !important; }
+.organic-cell--aurora:nth-of-type(5n+3) { background: radial-gradient(closest-side, rgba(179, 217, 255, 0.45), transparent) !important; }
+.organic-cell--aurora:nth-of-type(5n+4) { background: radial-gradient(closest-side, rgba(186, 240, 216, 0.4), transparent) !important; }
+.organic-cell--aurora:nth-of-type(5n+5) { background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), transparent) !important; }
+
+.organic-spore--aurora:nth-of-type(4n+1) { background: rgba(244, 165, 197, 0.7) !important; box-shadow: 0 0 8px rgba(244, 165, 197, 0.5) !important; }
+.organic-spore--aurora:nth-of-type(4n+2) { background: rgba(167, 139, 250, 0.7) !important; box-shadow: 0 0 8px rgba(167, 139, 250, 0.5) !important; }
+.organic-spore--aurora:nth-of-type(4n+3) { background: rgba(122, 178, 235, 0.7) !important; box-shadow: 0 0 8px rgba(122, 178, 235, 0.5) !important; }
+.organic-spore--aurora:nth-of-type(4n+4) { background: rgba(110, 213, 168, 0.65) !important; box-shadow: 0 0 8px rgba(110, 213, 168, 0.5) !important; }
