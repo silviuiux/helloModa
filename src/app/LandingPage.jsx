@@ -376,7 +376,7 @@ export default function LandingPage() {
             <Wordmark />
             <p className="mt-5 max-w-xs text-[13.5px] leading-relaxed text-muted">
               The AI stylist that starts in your wardrobe — and paints the look on you. A
-              helloCorp company.
+              helloCorp company, live at hellomoda.shop.
             </p>
           </div>
           <div>
