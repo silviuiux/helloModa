@@ -1,11 +1,8 @@
 "use client";
 
 import { Suspense, useEffect, useState, useTransition } from "react";
-import OrganicField from "@/components/OrganicField.jsx";
-import BottomBar from "@/components/BottomBar.jsx";
-import ChatView from "@/components/chat/ChatView.jsx";
-import WardrobeView from "@/components/wardrobe/WardrobeView.jsx";
 import ConversationFromQuery from "@/components/ConversationFromQuery.jsx";
+import StudioLayout from "@/components/studio/StudioLayout.jsx";
 import {
   addWardrobeItem,
   toggleWardrobeFavorite,
@@ -237,61 +234,46 @@ export default function AppShell({
     ? `${lastAiMessage.title} — ${lastAiMessage.narrative}\n\nStyled by helloModa.`
     : undefined;
 
+  // Design exploration, branch design/chat-studio-sidebar: the whole signed-in surface is
+  // handed to one layout component as a single `shell` bundle — the same
+  // state and handlers as main (sending, history, avatars, wardrobe), only
+  // the layout around them changes. Nothing below this line touches data.
+  const shell = {
+    view,
+    setView,
+    wardrobe,
+    messages,
+    thinking,
+    isSwitching,
+    composing,
+    setComposing,
+    onSend: handleSend,
+    conversations,
+    activeConversationId,
+    onSelectConversation: handleSelectConversation,
+    onNewChat: handleNewChat,
+    userEmail,
+    userDisplayName,
+    onSignOut: signOut,
+    shareText,
+    avatarProfiles,
+    activeAvatarId,
+    onSelectAvatar: setActiveAvatarId,
+    wardrobeActions: {
+      onAdd: handleAdd,
+      onToggleFav: toggleFav,
+      onRemove: removeItem,
+      onSetPrice: setPrice,
+      onLogWear: logWear,
+    },
+  };
+
   return (
-    <div
-      className="relative flex h-screen w-full flex-col overflow-hidden font-sans text-ink"
-    >
-      <OrganicField />
+    <>
       <Suspense fallback={null}>
         <ConversationFromQuery onConversationId={handleSelectConversation} />
       </Suspense>
-      <main className="relative flex min-h-0 flex-1 flex-col">
-        {/* Keyed on the view so switching chat <-> wardrobe is a soft
-            materialize (fade + blur resolve), not a hard cut. */}
-        <div key={view} className="animate-fade-in flex min-h-0 flex-1 flex-col">
-        {view === "chat" ? (
-          <ChatView
-            wardrobe={wardrobe}
-            onWardrobeAdd={handleAdd}
-            onWardrobeRemove={removeItem}
-            messages={messages}
-            thinking={thinking}
-            onQuickReply={handleSend}
-            isSwitching={isSwitching}
-            userEmail={userEmail}
-            userDisplayName={userDisplayName}
-            composing={composing}
-          />
-        ) : (
-          <WardrobeView
-            items={wardrobe}
-            onAdd={handleAdd}
-            onToggleFav={toggleFav}
-            onRemove={removeItem}
-            onSetPrice={setPrice}
-            onLogWear={logWear}
-          />
-        )}
-        </div>
-      </main>
-      <BottomBar
-        view={view}
-        setView={setView}
-        wardrobeCount={wardrobe.length}
-        userEmail={userEmail}
-        onSignOut={signOut}
-        conversations={conversations}
-        activeConversationId={activeConversationId}
-        onSelectConversation={handleSelectConversation}
-        onNewChat={handleNewChat}
-        onSend={handleSend}
-        sending={thinking}
-        shareText={shareText}
-        avatarProfiles={avatarProfiles}
-        activeAvatarId={activeAvatarId}
-        onSelectAvatar={setActiveAvatarId}
-        onDraftChange={setComposing}
-      />
-    </div>
+      <StudioLayout shell={shell} />
+    </>
   );
 }
