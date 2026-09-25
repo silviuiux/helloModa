@@ -4,6 +4,53 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-09-25 — Three layout designs live on main at /design-01..03
+
+Direct request: the three layout explorations on `main`, but reachable at their own URLs so
+they can be compared against the current app. Every generation and link should work as normal.
+
+| Route | Layout | Came from branch |
+|---|---|---|
+| `/design-01` | **Studio**: every action in a collapsible side menu | `design/chat-studio-sidebar` |
+| `/design-02` | **Fitting Room**: dark conversation pane plus a large look canvas | `design/chat-fitting-room` |
+| `/design-03` | **Feed**: full-screen look cards with a side action column | `design/chat-feed` |
+
+`/` is unchanged. Its own bundle stays the same size, because the three layouts are
+code-split and never downloaded there.
+
+**How it's wired.**
+
+- **Shared data loading.** The server data loading moved out of `src/app/page.jsx` into
+  `src/lib/appShellData.js`. Both `/` and the design routes use it, so every layout starts
+  from identical data.
+- **One AppShell.** `AppShell` takes an optional `layout` prop, and the design routes pass
+  one. It hands the chosen layout the same state and handlers the shipped layout uses, so
+  these all behave exactly as on `/`:
+  - chat
+  - image generation
+  - usage quotas
+  - conversation history
+  - avatars
+  - wardrobe
+- **The routes themselves.** Each route (`src/app/design-0X/page.jsx`) is a thin wrapper
+  around `src/app/_design/DesignPage.jsx`, and is marked noindex.
+- **Switcher.** A small switcher pill (Main · 01 · 02 · 03) sits top-centre on desktop.
+
+**Links round-trip.** Each layout's Style journal link goes to `/outfits?from=design-0X`. From
+there, the back button and every look card return to that same design route. `?from=` is
+validated against `src/lib/designRoutes.js`, so an arbitrary value can't redirect anywhere; it
+falls back to `/`. `ConversationFromQuery` now clears the query string on whichever route it
+runs on, instead of always sending you to `/`.
+
+**Known gap.** The Profile and Avatars pages' back buttons still go to `/`.
+
+**Access.** Signed-out visitors to `/design-0X` are sent to `/login`, like the rest of the app.
+**Verified** at 1440px with a temporary harness rendering the real `AppShell` in each layout
+(removed before commit), and with local route checks (signed-out redirects). **Not verified**
+while signed in against production.
+
+---
+
 ## 2026-09-23 — Stage Zalando as the next Awin retailer
 
 Direct request: "could we use some live feed of recommended products even if theyre not

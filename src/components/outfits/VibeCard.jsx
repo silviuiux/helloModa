@@ -13,10 +13,10 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "num
 // ConversationFromQuery.jsx) where the full turn — including the per-piece
 // save/heart actions RecommendationCards already has — is still there; this
 // card doesn't duplicate that interaction, just gets you back to it.
-export default function VibeCard({ row }) {
+export default function VibeCard({ row, home = "/" }) {
   return (
     <Link
-      href={`/?conversation=${row.id}`}
+      href={`${home}?conversation=${row.id}`}
       className="group relative block aspect-[4/5] overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-1"
     >
       {row.coverImageUrl ? (

@@ -24,14 +24,14 @@ function groupByMonth(rows) {
   return groups;
 }
 
-export default function OutfitHistoryList({ rows }) {
+export default function OutfitHistoryList({ rows, home = "/" }) {
   const groups = groupByMonth(rows);
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
       <div className="mb-4 flex items-center gap-3">
         <Link
-          href="/"
+          href={home}
           aria-label="Back to helloModa"
           className="glass-circle grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
         >
@@ -57,7 +57,7 @@ export default function OutfitHistoryList({ rows }) {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5">
                 {group.rows.map((row, i) => (
                   <Reveal key={row.id} delay={(i % 6) * 60}>
-                    <VibeCard row={row} />
+                    <VibeCard row={row} home={home} />
                   </Reveal>
                 ))}
               </div>

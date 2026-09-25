@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, useTransition } from "react";
+import dynamic from "next/dynamic";
 import OrganicField from "@/components/OrganicField.jsx";
 import BottomBar from "@/components/BottomBar.jsx";
 import ChatView from "@/components/chat/ChatView.jsx";
@@ -16,6 +17,14 @@ import {
 import { getConversationMessages } from "@/actions/conversations";
 import { signOut } from "@/actions/auth";
 import { identifyUser, track } from "@/lib/analytics";
+
+// Alternative layouts for the /design-0X comparison routes, code-split so
+// "/" never downloads them.
+const ALT_LAYOUTS = {
+  studio: dynamic(() => import("@/components/studio/StudioLayout.jsx")),
+  fitting: dynamic(() => import("@/components/fitting/FittingRoomLayout.jsx")),
+  feed: dynamic(() => import("@/components/feed/FeedLayout.jsx")),
+};
 
 const ICON_BY_CATEGORY = {
   Tops: "shirt",
@@ -54,6 +63,10 @@ export default function AppShell({
   initialActiveConversationId,
   initialMessages,
   initialAvatarProfiles,
+  // Design-comparison routes (/design-01..03) pass a layout name; "/"
+  // passes nothing and renders the shipped layout below, unchanged.
+  layout = null,
+  basePath = "/",
 }) {
   const [view, setView] = useState("chat");
   const [wardrobe, setWardrobe] = useState(initialWardrobe.map(dbRowToItem));
@@ -236,6 +249,52 @@ export default function AppShell({
   const shareText = lastAiMessage
     ? `${lastAiMessage.title} — ${lastAiMessage.narrative}\n\nStyled by helloModa.`
     : undefined;
+
+  if (layout && ALT_LAYOUTS[layout]) {
+    const Layout = ALT_LAYOUTS[layout];
+    // One bundle of the same state and handlers the shipped layout uses —
+    // sending, image generation, history, avatars, wardrobe and quotas all
+    // behave identically; only the layout around them differs.
+    const shell = {
+      view,
+      setView,
+      wardrobe,
+      messages,
+      thinking,
+      isSwitching,
+      composing,
+      setComposing,
+      onSend: handleSend,
+      conversations,
+      activeConversationId,
+      onSelectConversation: handleSelectConversation,
+      onNewChat: handleNewChat,
+      userEmail,
+      userDisplayName,
+      onSignOut: signOut,
+      shareText,
+      avatarProfiles,
+      activeAvatarId,
+      onSelectAvatar: setActiveAvatarId,
+      // The style journal links back into *this* route, not "/".
+      journalHref: `/outfits?from=${encodeURIComponent(basePath.replace(/^\//, ""))}`,
+      wardrobeActions: {
+        onAdd: handleAdd,
+        onToggleFav: toggleFav,
+        onRemove: removeItem,
+        onSetPrice: setPrice,
+        onLogWear: logWear,
+      },
+    };
+    return (
+      <>
+        <Suspense fallback={null}>
+          <ConversationFromQuery onConversationId={handleSelectConversation} />
+        </Suspense>
+        <Layout shell={shell} />
+      </>
+    );
+  }
 
   return (
     <div
