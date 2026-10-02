@@ -54,16 +54,16 @@ export default function SocialButtons() {
             disabled
             title={`${p.name} sign-in — coming soon`}
             aria-label={`${p.name} sign-in (coming soon)`}
-            className="grid h-11 cursor-not-allowed place-items-center rounded-xl2 border border-line bg-white/60 text-ink/60 opacity-70"
+            className="grid h-11 cursor-not-allowed place-items-center rounded-full bg-white/60 text-[#2b2633]/60 opacity-60 ring-1 ring-[#2b2633]/10"
           >
             {p.icon}
           </button>
         ))}
       </div>
-      <div className="my-5 flex items-center gap-3">
-        <span className="h-px flex-1 bg-line" />
-        <span className="label text-faint">or use email</span>
-        <span className="h-px flex-1 bg-line" />
+      <div className="my-6 flex items-center gap-3">
+        <span className="h-px flex-1 bg-[#2b2633]/10" />
+        <span className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/40">or with email</span>
+        <span className="h-px flex-1 bg-[#2b2633]/10" />
       </div>
     </div>
   );

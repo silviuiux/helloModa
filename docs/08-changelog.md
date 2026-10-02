@@ -4,6 +4,59 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — Style journal becomes a dated timeline; sign-in/register and mobile hero redesigned
+
+Four direct requests.
+
+**1. Style journal as a timeline, with dates for looks**
+
+- **Database.** Migration `outfit_recommendations_event_date` adds a nullable `event_date date`.
+  - A date on or after today means the look is **booked** for that day.
+  - An earlier date means it was **worn** that day, so a booked look turns into a worn one once
+    its day passes, without anyone touching it.
+- **Server actions** in `src/actions/conversations.js`:
+  - `setLookDate(id, date | null)`, with the date format validated and scoped by RLS.
+  - `listJournalLooks()`: the latest look of every conversation, plus any kept or dated look,
+    including an earlier one in a thread.
+  - The old `listOutfitHistory`/`listKeptLooks`, `OutfitHistoryList` and `VibeCard` are
+    removed.
+- **New `JournalTimeline`** at `/outfits`, in the app's style. Under the headline "Every look,
+  *on its day.*", one line runs through time:
+  - **Coming up** first, soonest at the top.
+  - Then a **Today** marker.
+  - Then the past, grouped by month. Worn looks sit on the day they were worn; undated ones on
+    the day they were styled.
+- **Each entry:** the photo, a status ("Booked for Saturday 3 October", "Worn on…" or
+  "Styled on…"), the title and the original request.
+  - Actions: **Book it for a day** (opens the native date picker) and **Wore it today**; or
+    **Change the date** / **Clear**; plus **Keep** and **Open →**.
+  - Changes apply immediately and roll back if the save fails.
+- **Filters:** Everything, Coming up, Worn, Kept.
+- **Timezone.** "Today" is computed in the viewer's own timezone, so the timeline renders after
+  the page loads.
+
+**2. Sign in and register in the new design.** New `AuthLayout` on a shared `PaperPage` (the
+paper background, colour washes, grain, wordmark and header fade, also used by the journal):
+
+- **Headlines:** "Welcome back. *Where to next?*" and "You're invited. *Come get dressed.*"
+- **Form:** hairline fields instead of boxed inputs, a dark pill submit button, a quieter row of
+  the (still inactive) social sign-in buttons, and a header link to the other page.
+
+**3. Mobile home hero**
+
+- **Centred content.** The text is vertically centred again, on both the app's welcome and the
+  landing page.
+- **Blobs at the edges.** All five frame the content from the edges, larger and partly
+  off-screen, like photos half slid out of view.
+- **No captions on phones.** Captions are hidden there because they collided with the centred
+  text. Tapping a blob still starts that occasion in the app, or scrolls to the gallery on the
+  landing page.
+- **Overflow fix.** The cycling headline line ("the vineyard wedding.") overflowed a 390 px
+  screen. It now wraps on phones, with two lines' height reserved so nothing jumps, and stays
+  on one line from `sm` up.
+
+---
+
 ## 2026-10-02 — Public showcase looks; landing page redesigned to match the app; brand-friendly copy
 
 Three direct requests: make a few generated looks public so everyone can see what they look

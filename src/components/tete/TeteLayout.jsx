@@ -125,14 +125,14 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, o
   return (
     <section data-moment className="tete-moment relative min-h-[100svh] w-full">
       <BlobGallery items={picks} images={occasionImages} onPick={(o) => onSend(o.prompt)} />
-      <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[620px] flex-col justify-start px-6 pb-24 pt-28 text-center sm:justify-center sm:pt-32">
+      <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[620px] flex-col justify-center px-6 pb-24 pt-28 text-center sm:pt-32">
         <h1
           className="animate-fade-up font-script text-[52px] leading-[1] tracking-[-0.01em] text-[#2b2633] sm:text-[76px]"
           style={{ animationDelay: "120ms" }}
         >
           Dressed for
           <br />
-          <span key={line} className="animate-word-in inline-block whitespace-nowrap italic text-[#8f78e8]">
+          <span key={line} className="animate-word-in inline-block min-h-[2em] italic text-[#8f78e8] sm:min-h-0 sm:whitespace-nowrap">
             {COVER_LINES[line]}
           </span>
         </h1>

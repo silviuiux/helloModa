@@ -19,14 +19,15 @@ import PlaceholderImage from "../PlaceholderImage.jsx";
 // element itself makes browsers drop the rounded clip and show a square.
 
 // Positions in % of the welcome section, chosen to sit in the margins
-// around the centred text. On phones there are no margins, so three of
-// them (`m`) sit in a loose row under the text instead.
+// around the centred text. On phones there are no margins, so they frame
+// the content from the edges instead — larger, and partly off-screen, like
+// photographs half slid out of view (`m`: position + width in vw).
 const SLOTS = [
-  { left: 7, top: 15, w: 14, m: { left: 6, top: 66 } },
-  { left: 80, top: 9, w: 12, m: { left: 38, top: 71 } },
-  { left: 14, top: 55, w: 11, m: null },
-  { left: 75, top: 38, w: 15, m: { left: 69, top: 65 } },
-  { left: 29, top: 7, w: 8, m: null },
+  { left: 7, top: 15, w: 14, m: { left: -12, top: 5, w: 34 } },
+  { left: 80, top: 9, w: 12, m: { left: 74, top: 3, w: 34 } },
+  { left: 14, top: 55, w: 11, m: { left: -16, top: 68, w: 36 } },
+  { left: 75, top: 38, w: 15, m: { left: 80, top: 52, w: 32 } },
+  { left: 29, top: 7, w: 8, m: { left: 58, top: 82, w: 26 } },
 ];
 const TINTS = ["#e6dcff", "#ffe1d6", "#dce8ff", "#f9dbe7", "#efe6ff"];
 
@@ -54,6 +55,7 @@ export default function BlobGallery({ items, images = {}, onPick, cta = "Style t
     if (!root) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isTouch = window.matchMedia("(hover: none)").matches;
+    const isNarrow = window.matchMedia("(max-width: 639px)").matches;
     let raf = 0;
     let px = -9999;
     let py = -9999;
@@ -128,7 +130,10 @@ export default function BlobGallery({ items, images = {}, onPick, cta = "Style t
         const wash = washRefs.current[i];
         if (wash) wash.style.opacity = String((0.9 * (1 - v)).toFixed(3));
         const cap = capRefs.current[i];
-        if (cap) {
+        // Phones: the blobs hang off the edges and their captions would
+        // collide with the centred text, so they stay image-only there.
+        if (cap && isNarrow) cap.style.opacity = "0";
+        else if (cap) {
           cap.style.opacity = String(Math.max(0, (v - 0.35) / 0.65).toFixed(3));
           cap.style.transform = `translateY(${((1 - v) * 8).toFixed(1)}px)`;
         }
@@ -152,10 +157,11 @@ export default function BlobGallery({ items, images = {}, onPick, cta = "Style t
   }, []);
 
   return (
-    <div ref={rootRef} className="pointer-events-none absolute inset-0">
+    // overflow-hidden: on phones the blobs deliberately hang off the edges.
+    <div ref={rootRef} className="pointer-events-none absolute inset-0 overflow-hidden">
       {SLOTS.map((s, i) => {
         const item = items[i];
-        if (!item || (narrow && !s.m)) return null;
+        if (!item) return null;
         const pos = narrow ? s.m : s;
         return (
           <button
@@ -168,7 +174,7 @@ export default function BlobGallery({ items, images = {}, onPick, cta = "Style t
             style={{
               left: `${pos.left}%`,
               top: `${pos.top}%`,
-              width: narrow ? "25vw" : `clamp(${touch ? 92 : 110}px, ${s.w}vw, 230px)`,
+              width: narrow ? `${s.m.w}vw` : `clamp(${touch ? 92 : 110}px, ${s.w}vw, 230px)`,
               willChange: "transform",
             }}
           >
@@ -199,7 +205,11 @@ export default function BlobGallery({ items, images = {}, onPick, cta = "Style t
             </span>
             <span
               ref={(el) => (capRefs.current[i] = el)}
-              className="mt-2 block text-center font-script text-[15px] italic leading-tight text-[#2b2633] opacity-0 sm:mt-3 sm:text-[17px]"
+              // On phones a blob hangs off one edge, so its caption hugs
+              // the side that's actually on screen.
+              className={`mt-2 block font-script text-[15px] italic leading-tight text-[#2b2633] opacity-0 sm:mt-3 sm:text-[17px] ${
+                narrow && pos.left < 0 ? "text-right" : narrow && pos.left + s.m.w > 100 ? "text-left" : "text-center"
+              }`}
             >
               {item.label}
               <span className="mt-0.5 block font-sans text-[10px] not-italic uppercase tracking-[0.2em] text-[#2b2633]/45">

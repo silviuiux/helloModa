@@ -147,7 +147,7 @@ function Hero({ images }) {
         cta="See the looks ↓"
         onPick={() => document.getElementById("looks")?.scrollIntoView({ behavior: "smooth" })}
       />
-      <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[680px] flex-col justify-start px-6 pb-24 pt-28 text-center sm:justify-center sm:pt-32">
+      <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[680px] flex-col justify-center px-6 pb-24 pt-28 text-center sm:pt-32">
         <p className={`animate-fade-in ${meta}`}>Your AI stylist · private beta</p>
         <h1
           className="animate-fade-up mt-6 font-script text-[52px] leading-[1] tracking-[-0.01em] sm:text-[84px]"
@@ -155,7 +155,7 @@ function Hero({ images }) {
         >
           Dressed for
           <br />
-          <span key={line} className="animate-word-in inline-block whitespace-nowrap italic text-[#8f78e8]">
+          <span key={line} className="animate-word-in inline-block min-h-[2em] italic text-[#8f78e8] sm:min-h-0 sm:whitespace-nowrap">
             {COVER_LINES[line]}
           </span>
         </h1>

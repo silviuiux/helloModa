@@ -13,7 +13,7 @@ const CATEGORY_TO_TYPE = {
   Accessories: "accessory",
 };
 
-// Shared by getConversationMessages and listOutfitHistory — one
+// Shared by getConversationMessages — one
 // outfit_recommendation_items row -> the card shape RecommendationCards.jsx
 // expects. `products` (real Awin-matched pieces, docs/05-integrations-
 // affiliates.md) don't carry this app's own top/bottoms/dress/... type —
@@ -148,117 +148,80 @@ export async function setLookKept(recommendationId, kept) {
   if (!data) throw new Error("Look not found.");
 }
 
-// The journal's Kept section — every kept look, newest keep first, each
-// linking back into its own conversation. Not limited to the latest look
-// per conversation like listOutfitHistory: keeping an earlier look in a
-// thread is exactly the point.
-export async function listKeptLooks() {
+// Style journal timeline (2026-10-02): put a look on a day. A date on or
+// after today reads as "booked", an earlier one as "worn"; null clears it.
+// RLS (owner via message -> conversation) scopes the update.
+export async function setLookDate(recommendationId, date) {
+  if (!recommendationId) throw new Error("Missing look.");
+  if (date != null && !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Invalid date.");
   const supabase = await createClient();
-  const { data: recs, error } = await supabase
+  const { data, error } = await supabase
     .from("outfit_recommendations")
-    .select("id, title, generated_image_url, kept_at, messages(conversation_id, content)")
-    .not("kept_at", "is", null)
-    .order("kept_at", { ascending: false });
+    .update({ event_date: date })
+    .eq("id", recommendationId)
+    .select("id")
+    .maybeSingle();
   if (error) throw new Error(error.message);
-  if (!recs?.length) return [];
-
-  const { data: items, error: itemsError } = await supabase
-    .from("outfit_recommendation_items")
-    .select(
-      "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url)"
-    )
-    .in("recommendation_id", recs.map((r) => r.id));
-  if (itemsError) throw new Error(itemsError.message);
-
-  return Promise.all(
-    recs
-      .filter((r) => r.messages?.conversation_id)
-      .map(async (r) => ({
-        id: r.id,
-        conversationId: r.messages.conversation_id,
-        title: r.title || "Untitled look",
-        narrative: r.messages.content,
-        createdAt: r.kept_at,
-        kept: true,
-        coverImageUrl: r.generated_image_url ? await signLookImageUrl(supabase, r.generated_image_url) : null,
-        pieces: (items || []).filter((it) => it.recommendation_id === r.id).map(mapRecommendationItem),
-      }))
-  );
+  if (!data) throw new Error("Look not found.");
 }
 
-// Powers /outfits — one row per conversation, summarized by its most recent
-// outfit recommendation (the one whose generated image becomes the row's
-// cover photo). A conversation with no recommendation yet (e.g. abandoned
-// after the first message, before a reply landed) is skipped — nothing to
-// show as a row.
-export async function listOutfitHistory() {
+// Powers the /outfits timeline: every look worth remembering — the latest
+// look of each conversation, plus any look that was kept or given a date
+// (even an earlier one in a thread). One entry per look, unsorted; the
+// timeline orders them by date.
+export async function listJournalLooks() {
   const supabase = await createClient();
 
   const conversations = await listConversations();
   if (!conversations.length) return [];
-  const conversationIds = conversations.map((c) => c.id);
+  const conversationById = new Map(conversations.map((c) => [c.id, c]));
 
   const { data: messages, error: messagesError } = await supabase
     .from("messages")
-    .select("id, conversation_id, content, created_at")
-    .in("conversation_id", conversationIds)
-    .eq("role", "assistant")
-    .order("created_at", { ascending: false });
+    .select("id, conversation_id, created_at")
+    .in("conversation_id", [...conversationById.keys()])
+    .eq("role", "assistant");
   if (messagesError) throw new Error(messagesError.message);
   if (!messages?.length) return [];
+  const messageById = new Map(messages.map((m) => [m.id, m]));
 
   const { data: recs, error: recsError } = await supabase
     .from("outfit_recommendations")
-    .select("id, message_id, title, generated_image_url")
-    .in(
-      "message_id",
-      messages.map((m) => m.id)
-    );
+    .select("id, message_id, title, generated_image_url, kept_at, event_date, created_at")
+    .in("message_id", [...messageById.keys()]);
   if (recsError) throw new Error(recsError.message);
-  const recByMessageId = new Map((recs || []).map((r) => [r.message_id, r]));
 
-  // messages are already newest-first — keep the first (=latest) message
-  // per conversation that actually has a matching recommendation.
   const latestByConversation = new Map();
-  for (const m of messages) {
-    if (latestByConversation.has(m.conversation_id)) continue;
-    const rec = recByMessageId.get(m.id);
-    if (rec) latestByConversation.set(m.conversation_id, { message: m, rec });
+  for (const r of recs || []) {
+    const conversationId = messageById.get(r.message_id)?.conversation_id;
+    const current = latestByConversation.get(conversationId);
+    if (!current || r.created_at > current.created_at) latestByConversation.set(conversationId, r);
   }
+  const latestIds = new Set([...latestByConversation.values()].map((r) => r.id));
+  const chosen = (recs || []).filter((r) => latestIds.has(r.id) || r.kept_at || r.event_date);
+  if (!chosen.length) return [];
 
-  const recIds = [...latestByConversation.values()].map((v) => v.rec.id);
-  let itemsByRec = new Map();
-  if (recIds.length) {
-    const { data: items, error: itemsError } = await supabase
-      .from("outfit_recommendation_items")
-      .select(
-        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url)"
-      )
-      .in("recommendation_id", recIds);
-    if (itemsError) throw new Error(itemsError.message);
-    for (const it of items || []) {
-      if (!itemsByRec.has(it.recommendation_id)) itemsByRec.set(it.recommendation_id, []);
-      itemsByRec.get(it.recommendation_id).push(it);
-    }
-  }
+  const { data: items } = await supabase
+    .from("outfit_recommendation_items")
+    .select("recommendation_id")
+    .in("recommendation_id", chosen.map((r) => r.id));
+  const pieceCount = new Map();
+  for (const it of items || []) pieceCount.set(it.recommendation_id, (pieceCount.get(it.recommendation_id) || 0) + 1);
 
-  const rows = await Promise.all(
-    conversations.map(async (c) => {
-      const entry = latestByConversation.get(c.id);
-      if (!entry) return null;
-      const { message, rec } = entry;
+  return Promise.all(
+    chosen.map(async (r) => {
+      const conversationId = messageById.get(r.message_id).conversation_id;
       return {
-        id: c.id,
-        title: c.title || rec.title || "Untitled outfit",
-        narrative: message.content,
-        createdAt: c.created_at,
-        coverImageUrl: rec.generated_image_url
-          ? await signLookImageUrl(supabase, rec.generated_image_url)
-          : null,
-        pieces: (itemsByRec.get(rec.id) || []).map(mapRecommendationItem),
+        id: r.id,
+        conversationId,
+        conversationTitle: conversationById.get(conversationId)?.title || null,
+        title: r.title || "Untitled look",
+        createdAt: r.created_at,
+        eventDate: r.event_date,
+        kept: Boolean(r.kept_at),
+        pieces: pieceCount.get(r.id) || 0,
+        coverImageUrl: r.generated_image_url ? await signLookImageUrl(supabase, r.generated_image_url) : null,
       };
     })
   );
-
-  return rows.filter(Boolean);
 }

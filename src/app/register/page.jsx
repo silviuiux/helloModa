@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Orb from "@/components/Orb.jsx";
+import AuthLayout, { AltLink, FIELD, SUBMIT } from "@/components/auth/AuthLayout.jsx";
 import SocialButtons from "@/components/auth/SocialButtons.jsx";
 import { registerWithInvite } from "@/actions/auth";
 import { track } from "@/lib/analytics";
@@ -43,81 +43,64 @@ export default function RegisterPage() {
   }
 
   return (
-    <div
-      className="grid min-h-screen place-items-center p-6"
+    <AuthLayout
+      eyebrow="Private beta"
+      title="You're invited."
+      accent="Come get dressed."
+      intro="Create your account and get your first look in minutes — styled from your own wardrobe, painted on you."
+      alt={<AltLink href="/login">Sign in</AltLink>}
     >
-      <div className="glass w-full max-w-sm rounded-xl3 p-7">
-        <div className="text-center">
-          <div className="mx-auto grid w-fit place-items-center py-2">
-            <Orb size={48} />
-          </div>
-          <h1 className="mt-5 font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">helloModa</h1>
-          <p className="mt-1.5 text-[13.5px] text-muted">
-            You&apos;re invited. Create your account and get styled in minutes.
+      {status === "confirm" ? (
+        <p className="font-script text-[22px] italic leading-snug text-[#2b2633]/75">
+          Check <span className="not-italic text-[#2b2633]">{email}</span> for a confirmation link, then sign in.
+        </p>
+      ) : (
+        <>
+          <SocialButtons />
+          <form onSubmit={handleSubmit} className="space-y-2">
+            <input
+              required
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              placeholder="Invite code"
+              autoComplete="off"
+              className={`${FIELD} font-script !text-[20px] italic tracking-wide`}
+            />
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              autoComplete="email"
+              className={FIELD}
+            />
+            <input
+              required
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (8+ characters)"
+              autoComplete="new-password"
+              minLength={8}
+              className={FIELD}
+            />
+            <button type="submit" disabled={status === "loading"} className={SUBMIT}>
+              {status === "loading" ? "Creating your account…" : "Create account"} <span aria-hidden="true">→</span>
+            </button>
+            {status === "error" && <p className="pt-2 text-[13px] text-[#c2577a]">{error}</p>}
+          </form>
+          <p className="mt-8 text-[13px] leading-relaxed text-[#2b2633]/45">
+            No code? helloModa is invite-only for now — ask whoever sent you here.
           </p>
-        </div>
-
-        <div className="mt-6">
-          {status === "confirm" ? (
-            <p className="text-center text-[14px] text-ink">
-              Check <span className="font-medium">{email}</span> for a confirmation link, then
-              sign in.
-            </p>
-          ) : (
-            <>
-              <SocialButtons />
-
-              <form onSubmit={handleSubmit} className="space-y-3 text-left">
-                <input
-                  required
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value)}
-                  placeholder="Invite code"
-                  autoComplete="off"
-                  className="label h-11 w-full rounded-xl2 border border-dashed border-accent-soft bg-accent-tint/40 px-4 text-[13px] tracking-normal text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
-                />
-                <input
-                  required
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  className="h-11 w-full rounded-xl2 border border-line bg-white/60 px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
-                />
-                <input
-                  required
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password (min. 8 characters)"
-                  autoComplete="new-password"
-                  minLength={8}
-                  className="h-11 w-full rounded-xl2 border border-line bg-white/60 px-4 text-[14px] text-ink placeholder:text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft"
-                />
-                <button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="h-11 w-full rounded-xl2 bg-accent text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep disabled:opacity-60"
-                >
-                  {status === "loading" ? "Creating account…" : "Create account"}
-                </button>
-                {status === "error" && <p className="text-[13px] text-red-500">{error}</p>}
-              </form>
-
-              <p className="mt-5 text-center text-[12.5px] leading-relaxed text-faint">
-                No code? helloModa is invite-only for now — ask whoever sent you here.
-              </p>
-              <p className="mt-3 text-center text-[13px] text-muted">
-                Already have an account?{" "}
-                <Link href="/login" className="font-medium text-accent-deep hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+          <p className="mt-3 text-[13.5px] text-[#2b2633]/55">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#2b2633] underline decoration-[#2b2633]/20 underline-offset-4 hover:decoration-[#8f78e8]">
+              Sign in
+            </Link>
+          </p>
+        </>
+      )}
+    </AuthLayout>
   );
 }
