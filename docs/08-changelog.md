@@ -4,6 +4,35 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — /design-07: background no longer follows the cursor; softer and more diffuse
+
+Direct request: "don't like how the whole thing follows my cursor … something even more organic
+and diffuse."
+
+Changes in `src/components/tete/PresenceLight.jsx`:
+
+- **No pointer tracking at all.** The pointermove listener is gone. The whole system now drifts
+  on its own slow path, built from summed sines with unrelated periods, so it never quite
+  repeats.
+- **Three nebulae** (lilac, peach, sky) replace the single bloom and the trailing haze. Each is
+  heavily blurred and wanders, turns and swells on its own rhythm, so the colour field keeps
+  shifting.
+- **The sun has no hard edge.** The crisp pearl sphere is replaced by a soft corona around three
+  blurred blobs that loosely orbit each other, so the sun's outline keeps changing. They drift
+  further apart as you type and circle faster while the stylist is thinking.
+- **Planets glow softly.**
+  - **No hard edge.** Each is a pure gradient glow with no box-shadow halo. An earlier version
+    read as hollow rings in testing.
+  - **Blur with distance.** Each is slightly blurred, more so on the far side of its orbit.
+  - **Comet tails.** Each now trails four fading ghost copies behind it along its orbit.
+- **Rings and dust are fainter.** Orbit rings are about half as visible, softly blurred, and no
+  longer dashed. The dust motes are soft gradients instead of hard dots.
+
+Typing still makes the system widen and spin faster, thinking still quickens it, and reduced
+motion still shows a single still frame.
+
+---
+
 ## 2026-10-02 — /design-07: the presence light becomes a small solar system
 
 Direct request: make the organic background animation more detailed and more visible, with a

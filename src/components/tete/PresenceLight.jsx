@@ -4,8 +4,9 @@ import { useEffect, useRef } from "react";
 
 // design-07 "Tête-à-tête": the stylist's presence, as a small pastel solar
 // system in a bright, airy room rather than an avatar or an orb widget.
-//  - the sun: a luminous pearl core in a lilac corona, inside a wide
-//    lilac/peach bloom, with a cooler sky-blue haze trailing behind;
+//  - the sun: a soft luminous heart of a few blurred blobs that drift apart
+//    and back together (its outline is never a circle), in a lilac corona,
+//    inside three nebulae — lilac, peach, sky — each wandering on its own;
 //  - planets: soft glowing bodies on tilted elliptical orbits, seen at an
 //    angle, so they pass *behind* the sun (smaller, dimmer) and swing in
 //    front of it (larger, brighter). Each orbit wobbles on its own slow,
@@ -13,9 +14,12 @@ import { useEffect, useRef } from "react";
 //    paths drift instead of tracing the same ellipse forever. One planet
 //    carries a moon; faint rings trace the current orbits;
 //  - dust: tiny motes drifting slowly in a wide halo.
-// The whole system leans toward the pointer (it turns to face you), swells
-// and spins up with each keystroke (`energyRef`, fed by the composer,
-// decays every frame) and quickens while the stylist is thinking.
+// It ignores the pointer entirely (direct request: following the cursor felt
+// mechanical). The system wanders on its own slow, never-repeating path and
+// everything is soft-edged — a blurred, shape-shifting sun, hazy planets
+// with fading trails, rings barely there. It swells and spins up with each
+// keystroke (`energyRef`, fed by the composer, decays every frame) and
+// quickens while the stylist is thinking.
 // One requestAnimationFrame loop writing transforms straight to the DOM —
 // no React re-renders per frame. A single still frame under
 // prefers-reduced-motion.
@@ -71,12 +75,31 @@ function makeSystem() {
 
 const SYSTEM = makeSystem();
 
+const TRAIL = 4; // ghost copies per planet — a soft comet tail
+
+// Slow, never-repeating wander from summed sines with unrelated periods.
+const wander = (t, f, ph) => Math.sin(t * f[0] + ph) * 0.6 + Math.sin(t * f[1] + ph * 1.7) * 0.4;
+
+const NEBULAE = [
+  { w: "92vmax", h: "80vmax", c: "rgba(196,178,255,0.5)", c2: "rgba(196,178,255,0.18)", f: [0.031, 0.047], amp: [70, 50], ph: 0.3 },
+  { w: "70vmax", h: "58vmax", c: "rgba(255,200,182,0.42)", c2: "rgba(255,200,182,0.14)", f: [0.023, 0.041], amp: [140, 90], ph: 2.1 },
+  { w: "66vmax", h: "62vmax", c: "rgba(186,214,255,0.4)", c2: "rgba(186,214,255,0.12)", f: [0.019, 0.037], amp: [160, 110], ph: 4.4 },
+];
+
+// The sun's heart: a few blurred blobs orbiting each other loosely.
+const HEART = [
+  { size: 13, c: "rgba(255,255,255,0.95)", r: 1.2, f: 0.11, ph: 0 },
+  { size: 11, c: "rgba(221,208,255,0.85)", r: 2.4, f: -0.08, ph: 2 },
+  { size: 10, c: "rgba(255,222,210,0.7)", r: 2.8, f: 0.07, ph: 4 },
+];
+
 export default function PresenceLight({ energyRef, thinking }) {
-  const bloomRef = useRef(null);
+  const nebulaRefs = useRef([]);
   const sunRef = useRef(null);
-  const driftRef = useRef(null);
+  const heartRefs = useRef([]);
   const ringsRef = useRef([]);
   const planetsRef = useRef([]);
+  const trailsRef = useRef([]);
   const moonRef = useRef(null);
   const dustRef = useRef([]);
   const thinkingRef = useRef(thinking);
@@ -86,17 +109,11 @@ export default function PresenceLight({ energyRef, thinking }) {
   }, [thinking]);
 
   useEffect(() => {
-    const bloom = bloomRef.current;
     const sun = sunRef.current;
-    const drift = driftRef.current;
-    if (!bloom || !sun || !drift) return;
+    if (!sun) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let raf = 0;
-    let tx = 0;
-    let ty = 0;
-    let x = 0;
-    let y = 0;
     // On a narrow phone the orbits may run past the edges — that's the
     // point; squeezing them into the width made the system look cramped.
     const measure = () => Math.min(window.innerWidth * 1.3, window.innerHeight) / 100;
@@ -106,11 +123,6 @@ export default function PresenceLight({ energyRef, thinking }) {
     let orbitT = 0;
     let last = performance.now();
     const start = last;
-
-    function onMove(e) {
-      tx = (e.clientX - window.innerWidth / 2) * 0.12;
-      ty = (e.clientY - window.innerHeight * 0.38) * 0.1;
-    }
     function onResize() {
       unit = measure();
     }
@@ -119,57 +131,84 @@ export default function PresenceLight({ energyRef, thinking }) {
       const t = (now - start) / 1000;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      x += (tx - x) * 0.035;
-      y += (ty - y) * 0.035;
       const energy = energyRef.current;
       energyRef.current = energy * 0.955;
       const isThinking = thinkingRef.current;
-      const breathe = isThinking ? 0.09 * Math.sin(t * 3.4) : 0.035 * Math.sin(t * 0.85);
-      orbitT += dt * (0.32 + energy * 1.4 + (isThinking ? 0.55 : 0));
+      const breathe = isThinking ? 0.08 * Math.sin(t * 2.6) : 0.035 * Math.sin(t * 0.6);
+      orbitT += dt * (0.26 + energy * 1.2 + (isThinking ? 0.45 : 0));
 
-      bloom.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${1 + breathe + energy * 0.22})`;
-      bloom.style.opacity = String(Math.min(1, 0.85 + energy * 0.15 + (isThinking ? 0.1 : 0)));
-      // The sky haze lags and counter-sways, so the light never sits still.
-      drift.style.transform = `translate3d(${-x * 0.6 + Math.sin(t * 0.21) * 60}px, ${-y * 0.4 + Math.cos(t * 0.17) * 40}px, 0) scale(${1 + breathe * 0.8})`;
+      // The whole system drifts on its own — a slow, lazy figure that
+      // never quite repeats.
+      const sx = wander(t, [0.043, 0.071], 0.8) * 34;
+      const sy = wander(t, [0.037, 0.059], 2.3) * 22;
 
-      const sx = x * 1.5;
-      const sy = y * 1.5;
-      sun.style.transform = `translate3d(${sx}px, ${sy}px, 0) scale(${1 + energy * 0.35 + breathe * 1.4})`;
-      sun.style.opacity = String(Math.min(1, 0.85 + energy * 0.15));
+      NEBULAE.forEach((n, i) => {
+        const el = nebulaRefs.current[i];
+        if (!el) return;
+        const nx = wander(t, n.f, n.ph) * n.amp[0];
+        const ny = wander(t, [n.f[1], n.f[0]], n.ph + 1) * n.amp[1];
+        const sc = 1 + breathe * (1 - i * 0.25) + energy * 0.12 + 0.06 * Math.sin(t * n.f[0] * 3 + n.ph);
+        el.style.transform = `translate3d(${nx}px, ${ny}px, 0) rotate(${(wander(t, n.f, n.ph + 3) * 14).toFixed(2)}deg) scale(${sc.toFixed(4)})`;
+      });
+
+      sun.style.transform = `translate3d(${sx}px, ${sy}px, 0) scale(${1 + energy * 0.3 + breathe * 1.4})`;
+      sun.style.opacity = String(Math.min(1, 0.8 + energy * 0.2 + (isThinking ? 0.1 : 0)));
+      HEART.forEach((h, i) => {
+        const el = heartRefs.current[i];
+        if (!el) return;
+        const a = t * h.f * (isThinking ? 3 : 1) + h.ph;
+        const r = h.r * unit * (1 + energy * 0.8 + 0.3 * Math.sin(t * 0.3 + h.ph));
+        el.style.transform = `translate3d(${Math.cos(a) * r}px, ${Math.sin(a) * r * 0.8}px, 0) scale(${1 + 0.12 * Math.sin(t * 0.5 + h.ph)})`;
+      });
 
       const spread = 1 + energy * 0.16 + (isThinking ? 0.05 * Math.sin(t * 1.7) : 0);
-      SYSTEM.planets.forEach((p, i) => {
-        const a = p.a * unit * spread * (1 + 0.07 * Math.sin(t * p.wa[0] + p.wp[0]) + 0.04 * Math.sin(t * p.wa[1] + p.wp[1]));
-        const b = a * p.ratio * (1 + 0.12 * Math.sin(t * p.wt[1] + p.wp[3]));
-        const tilt = p.tilt + 9 * Math.sin(t * p.wt[0] + p.wp[2]);
+      const sizeK = Math.min(1, Math.max(0.72, unit / 9));
+      const place = (p, th, tt) => {
+        const a = p.a * unit * spread * (1 + 0.07 * Math.sin(tt * p.wa[0] + p.wp[0]) + 0.04 * Math.sin(tt * p.wa[1] + p.wp[1]));
+        const b = a * p.ratio * (1 + 0.12 * Math.sin(tt * p.wt[1] + p.wp[3]));
+        const tilt = p.tilt + 9 * Math.sin(tt * p.wt[0] + p.wp[2]);
         const rad = (tilt * Math.PI) / 180;
-        const th = p.phase + orbitT * p.speed;
         const ex = a * Math.cos(th);
         const ey = b * Math.sin(th);
-        const px = sx + ex * Math.cos(rad) - ey * Math.sin(rad);
-        const py = sy + ex * Math.sin(rad) + ey * Math.cos(rad);
+        return { a, b, tilt, x: sx + ex * Math.cos(rad) - ey * Math.sin(rad), y: sy + ex * Math.sin(rad) + ey * Math.cos(rad) };
+      };
+
+      SYSTEM.planets.forEach((p, i) => {
+        const th = p.phase + orbitT * p.speed;
+        const pos = place(p, th, t);
         const depth = (Math.sin(th) + 1) / 2; // 0 = far side, 1 = near side
-        const scale = (0.62 + depth * 0.6) * Math.min(1, Math.max(0.72, unit / 9));
+        const scale = (0.62 + depth * 0.6) * sizeK;
+        const z = depth < 0.5 ? "1" : "3"; // passes behind the sun
 
         const ring = ringsRef.current[i];
         if (ring) {
-          ring.setAttribute("rx", a.toFixed(1));
-          ring.setAttribute("ry", b.toFixed(1));
-          ring.setAttribute("transform", `translate(${sx.toFixed(1)} ${sy.toFixed(1)}) rotate(${tilt.toFixed(2)})`);
+          ring.setAttribute("rx", pos.a.toFixed(1));
+          ring.setAttribute("ry", pos.b.toFixed(1));
+          ring.setAttribute("transform", `translate(${sx.toFixed(1)} ${sy.toFixed(1)}) rotate(${pos.tilt.toFixed(2)})`);
         }
         const el = planetsRef.current[i];
         if (el) {
-          el.style.transform = `translate3d(${px}px, ${py}px, 0) scale(${scale})`;
-          el.style.opacity = String(0.5 + depth * 0.5);
-          el.style.zIndex = depth < 0.5 ? "1" : "3"; // passes behind the sun
-          el.style.filter = depth < 0.35 ? `blur(${((0.35 - depth) * 4).toFixed(2)}px)` : "none";
+          el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(${scale})`;
+          el.style.opacity = String(0.45 + depth * 0.55);
+          el.style.zIndex = z;
+          el.style.filter = `blur(${(0.6 + (1 - depth) * 1.8).toFixed(2)}px)`;
+        }
+        // Fading ghosts a little further back along the orbit.
+        for (let k = 0; k < TRAIL; k++) {
+          const g = trailsRef.current[i * TRAIL + k];
+          if (!g) continue;
+          const back = (k + 1) * 0.09 * Math.sign(p.speed);
+          const gp = place(p, th - back, t);
+          g.style.transform = `translate3d(${gp.x}px, ${gp.y}px, 0) scale(${scale * (1 - (k + 1) * 0.14)})`;
+          g.style.opacity = String((0.45 + depth * 0.55) * (0.32 - k * 0.07));
+          g.style.zIndex = z;
         }
         if (p.moon && moonRef.current) {
-          const mt = orbitT * 3.1;
-          const mr = p.size * 1.9 * scale;
-          moonRef.current.style.transform = `translate3d(${px + Math.cos(mt) * mr}px, ${py + Math.sin(mt) * mr * 0.55}px, 0) scale(${scale})`;
-          moonRef.current.style.zIndex = el?.style.zIndex || "3";
-          moonRef.current.style.opacity = String(0.45 + depth * 0.5);
+          const mt = orbitT * 2.6;
+          const mr = p.size * 2 * scale;
+          moonRef.current.style.transform = `translate3d(${pos.x + Math.cos(mt) * mr}px, ${pos.y + Math.sin(mt) * mr * 0.55}px, 0) scale(${scale})`;
+          moonRef.current.style.zIndex = z;
+          moonRef.current.style.opacity = String(0.4 + depth * 0.5);
         }
       });
 
@@ -178,8 +217,8 @@ export default function PresenceLight({ energyRef, thinking }) {
         if (!el) return;
         const th = d.phase + t * d.speed;
         const rr = d.rad * unit;
-        el.style.transform = `translate3d(${x * 0.5 + Math.cos(th) * rr}px, ${y * 0.5 + Math.sin(th) * rr * d.ratio + Math.sin(t * 0.4 + d.bob) * 8}px, 0)`;
-        el.style.opacity = String(0.35 + 0.45 * (0.5 + 0.5 * Math.sin(t * 0.6 + d.bob)));
+        el.style.transform = `translate3d(${sx * 0.5 + Math.cos(th) * rr}px, ${sy * 0.5 + Math.sin(th) * rr * d.ratio + Math.sin(t * 0.4 + d.bob) * 10}px, 0)`;
+        el.style.opacity = String(0.25 + 0.5 * (0.5 + 0.5 * Math.sin(t * 0.5 + d.bob)));
       });
 
       if (!still) raf = requestAnimationFrame(frame);
@@ -189,12 +228,10 @@ export default function PresenceLight({ energyRef, thinking }) {
       frame(start);
       return;
     }
-    window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("resize", onResize);
     raf = requestAnimationFrame(frame);
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onMove);
       window.removeEventListener("resize", onResize);
     };
   }, [energyRef]);
@@ -202,35 +239,26 @@ export default function PresenceLight({ energyRef, thinking }) {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <div className="absolute left-1/2 top-[38%] h-0 w-0">
-        <div
-          ref={bloomRef}
-          className="absolute rounded-full"
-          style={{
-            left: "-45vmax",
-            top: "-45vmax",
-            width: "90vmax",
-            height: "90vmax",
-            background:
-              "radial-gradient(closest-side, rgba(196,178,255,0.5), rgba(255,206,190,0.3) 40%, rgba(253,252,250,0) 72%)",
-            opacity: 0.85,
-            willChange: "transform, opacity",
-          }}
-        />
-        <div
-          ref={driftRef}
-          className="absolute rounded-full"
-          style={{
-            left: "-10vmax",
-            top: "-30vmax",
-            width: "70vmax",
-            height: "60vmax",
-            background: "radial-gradient(closest-side, rgba(186,214,255,0.36), rgba(186,214,255,0) 70%)",
-            willChange: "transform",
-          }}
-        />
+        {NEBULAE.map((n, i) => (
+          <div
+            key={i}
+            ref={(el) => (nebulaRefs.current[i] = el)}
+            className="absolute"
+            style={{
+              left: `calc(${n.w} / -2 + ${(i - 1) * 9}vmax)`,
+              top: `calc(${n.h} / -2 + ${i === 0 ? 0 : -6 + i * 4}vmax)`,
+              width: n.w,
+              height: n.h,
+              borderRadius: "50%",
+              background: `radial-gradient(closest-side, ${n.c}, ${n.c2} 45%, rgba(253,252,250,0) 75%)`,
+              filter: "blur(18px)",
+              willChange: "transform",
+            }}
+          />
+        ))}
 
-        {/* Orbit rings — hairlines that follow each orbit's wobble. */}
-        <svg className="absolute overflow-visible" style={{ left: 0, top: 0, width: 1, height: 1, zIndex: 0 }}>
+        {/* Orbit rings — barely-there, blurred hairlines that follow each orbit's wobble. */}
+        <svg className="absolute overflow-visible" style={{ left: 0, top: 0, width: 1, height: 1, zIndex: 0, filter: "blur(0.6px)" }}>
           {SYSTEM.planets.map((p, i) => (
             <ellipse
               key={i}
@@ -240,52 +268,79 @@ export default function PresenceLight({ energyRef, thinking }) {
               rx={p.a * 8}
               ry={p.a * 8 * p.ratio}
               fill="none"
-              stroke="rgba(143,120,232,0.16)"
-              strokeWidth="1"
-              strokeDasharray={i % 3 === 1 ? "2 6" : undefined}
+              stroke="rgba(143,120,232,0.09)"
+              strokeWidth="1.2"
             />
           ))}
         </svg>
 
-        {/* The sun: corona + luminous pearl core. */}
+        {/* The sun: a wide corona around a heart of drifting, blurred blobs. */}
         <div ref={sunRef} className="absolute" style={{ left: 0, top: 0, zIndex: 2, willChange: "transform, opacity" }}>
           <div
             className="absolute rounded-full"
             style={{
-              left: "-17vmin",
-              top: "-17vmin",
-              width: "34vmin",
-              height: "34vmin",
-              background: "radial-gradient(closest-side, rgba(214,200,255,0.75), rgba(214,200,255,0.25) 55%, rgba(214,200,255,0) 100%)",
-              filter: "blur(6px)",
+              left: "-20vmin",
+              top: "-20vmin",
+              width: "40vmin",
+              height: "40vmin",
+              background: "radial-gradient(closest-side, rgba(214,200,255,0.7), rgba(214,200,255,0.22) 55%, rgba(214,200,255,0) 100%)",
+              filter: "blur(10px)",
             }}
           />
-          <div
-            className="absolute rounded-full"
-            style={{
-              left: "-5.5vmin",
-              top: "-5.5vmin",
-              width: "11vmin",
-              height: "11vmin",
-              background: "radial-gradient(circle at 38% 34%, #ffffff, #f1ebff 40%, #c9b8ff 78%, #b39cf7)",
-              boxShadow: "0 0 40px 12px rgba(255,255,255,0.9), 0 0 90px 30px rgba(185,164,255,0.45)",
-            }}
-          />
+          {HEART.map((h, i) => (
+            <div
+              key={i}
+              ref={(el) => (heartRefs.current[i] = el)}
+              className="absolute"
+              style={{
+                left: `-${h.size / 2}vmin`,
+                top: `-${h.size / 2}vmin`,
+                width: `${h.size}vmin`,
+                height: `${h.size}vmin`,
+                borderRadius: "50%",
+                background: `radial-gradient(closest-side, ${h.c}, rgba(255,255,255,0) 100%)`,
+                filter: "blur(7px)",
+                mixBlendMode: "screen",
+                willChange: "transform",
+              }}
+            />
+          ))}
         </div>
 
+        {SYSTEM.planets.map((p, i) =>
+          Array.from({ length: TRAIL }, (_, k) => (
+            <div
+              key={`${i}-t${k}`}
+              ref={(el) => (trailsRef.current[i * TRAIL + k] = el)}
+              className="absolute rounded-full"
+              style={{
+                left: -p.size / 2,
+                top: -p.size / 2,
+                width: p.size,
+                height: p.size,
+                background: `radial-gradient(closest-side, ${p.colors[1]}, transparent)`,
+                filter: "blur(3px)",
+                opacity: 0,
+                willChange: "transform, opacity",
+              }}
+            />
+          ))
+        )}
         {SYSTEM.planets.map((p, i) => (
           <div
             key={i}
             ref={(el) => (planetsRef.current[i] = el)}
             className="absolute rounded-full"
+            // Drawn 2.4x the body size with a pure gradient glow — no hard
+            // edge and no box-shadow halo (that read as a hollow ring).
             style={{
-              left: -p.size / 2,
-              top: -p.size / 2,
-              width: p.size,
-              height: p.size,
-              background: `radial-gradient(circle at 35% 32%, ${p.colors[0]}, ${p.colors[1]} 72%)`,
-              boxShadow: `0 0 ${p.size * 1.2}px ${p.size * 0.25}px ${p.colors[1]}66`,
-              willChange: "transform, opacity",
+              left: -p.size * 1.2,
+              top: -p.size * 1.2,
+              width: p.size * 2.4,
+              height: p.size * 2.4,
+              background: `radial-gradient(closest-side, ${p.colors[0]} 0%, ${p.colors[1]} 30%, ${p.colors[1]}55 55%, ${p.colors[1]}00 100%)`,
+              opacity: 0,
+              willChange: "transform, opacity, filter",
             }}
           />
         ))}
@@ -293,12 +348,13 @@ export default function PresenceLight({ energyRef, thinking }) {
           ref={moonRef}
           className="absolute rounded-full"
           style={{
-            left: -3,
-            top: -3,
-            width: 6,
-            height: 6,
-            background: "radial-gradient(circle at 35% 32%, #fff, #d6cbff)",
-            boxShadow: "0 0 8px 2px rgba(201,184,255,0.6)",
+            left: -4,
+            top: -4,
+            width: 8,
+            height: 8,
+            background: "radial-gradient(closest-side, #fff, #d6cbff 60%, rgba(214,203,255,0))",
+            filter: "blur(1px)",
+            opacity: 0,
             willChange: "transform, opacity",
           }}
         />
@@ -309,12 +365,13 @@ export default function PresenceLight({ energyRef, thinking }) {
             ref={(el) => (dustRef.current[i] = el)}
             className="absolute rounded-full"
             style={{
-              left: -d.size / 2,
-              top: -d.size / 2,
-              width: d.size,
-              height: d.size,
-              background: i % 2 ? "rgba(159,134,240,0.7)" : "rgba(255,185,158,0.75)",
-              boxShadow: "0 0 6px rgba(255,255,255,0.9)",
+              left: -d.size,
+              top: -d.size,
+              width: d.size * 2,
+              height: d.size * 2,
+              background: `radial-gradient(closest-side, ${i % 2 ? "rgba(159,134,240,0.8)" : "rgba(255,185,158,0.85)"}, transparent)`,
+              filter: "blur(0.6px)",
+              opacity: 0,
             }}
           />
         ))}
