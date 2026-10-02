@@ -2,7 +2,7 @@ import Link from "next/link";
 import { DESIGN_ROUTES } from "@/lib/designRoutes";
 
 // A small floating pill on the comparison routes only: jump between the
-// three designs and the current main app without retyping URLs. Plain
+// designs and the current main app without retyping URLs. Plain
 // links, so each route loads fresh from the same server data.
 export default function DesignSwitcher({ current }) {
   const items = [{ slug: "", name: "Main" }, ...DESIGN_ROUTES];

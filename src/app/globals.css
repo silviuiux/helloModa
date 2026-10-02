@@ -555,3 +555,54 @@ body {
   width: 200%;
   animation: filament var(--dur, 60s) linear infinite;
 }
+
+/* ── TÊTE-À-TÊTE — /design-07 (src/components/tete/) ─────────────────── */
+@keyframes tete-heart {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+  25% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -130%) scale(1); opacity: 0; }
+}
+.tete-heart { animation: tete-heart 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+
+/* What you just sent rises toward the stylist and dissolves. */
+@keyframes tete-send {
+  from { transform: none; opacity: 1; filter: none; }
+  to { transform: translateY(-140px) scale(0.92); opacity: 0; filter: blur(6px); }
+}
+.tete-send { animation: tete-send 0.75s ease-in forwards; }
+
+@keyframes tete-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.35); opacity: 1; }
+}
+.tete-breathe { animation: tete-breathe 2.4s ease-in-out infinite; }
+
+/* Depth of field is written inline by TeteLayout; this eases it, and
+   hovering a far-away moment brings it back into focus. */
+.tete-moment { transition: opacity 0.25s ease, filter 0.25s ease; }
+.tete-moment:hover { opacity: 1 !important; filter: none !important; }
+
+/* A generated look develops like a print: warm, dark, soft → itself. */
+.tete-develop {
+  filter: blur(18px) sepia(0.7) brightness(0.55) saturate(0.6);
+  transform: scale(1.04);
+  transition: filter 1.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 1.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.tete-develop[data-done="1"] { filter: none; transform: none; }
+
+.tete-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.tete-caret { caret-color: #c9b8ff; }
+
+.tete-grain {
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tete-develop { transition: none; }
+  .tete-breathe,
+  .tete-heart,
+  .tete-send { animation: none; }
+  .tete-send { opacity: 0; }
+}

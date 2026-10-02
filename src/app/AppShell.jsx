@@ -24,6 +24,7 @@ const ALT_LAYOUTS = {
   studio: dynamic(() => import("@/components/studio/StudioLayout.jsx")),
   fitting: dynamic(() => import("@/components/fitting/FittingRoomLayout.jsx")),
   feed: dynamic(() => import("@/components/feed/FeedLayout.jsx")),
+  tete: dynamic(() => import("@/components/tete/TeteLayout.jsx")),
 };
 
 const ICON_BY_CATEGORY = {
@@ -63,7 +64,7 @@ export default function AppShell({
   initialActiveConversationId,
   initialMessages,
   initialAvatarProfiles,
-  // Design-comparison routes (/design-01..03) pass a layout name; "/"
+  // Design-comparison routes (/design-0X) pass a layout name; "/"
   // passes nothing and renders the shipped layout below, unchanged.
   layout = null,
   basePath = "/",

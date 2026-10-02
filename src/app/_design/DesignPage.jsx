@@ -4,7 +4,7 @@ import { DESIGN_ROUTES } from "@/lib/designRoutes";
 import AppShell from "../AppShell.jsx";
 import DesignSwitcher from "./DesignSwitcher.jsx";
 
-// Shared body of /design-01, /design-02, /design-03: the real signed-in app
+// Shared body of the /design-0X routes: the real signed-in app
 // (same server data as "/", same AppShell state and handlers — chat, image
 // generation, history, avatars, wardrobe, quotas), rendered in one of the
 // alternative layouts for side-by-side comparison with main.

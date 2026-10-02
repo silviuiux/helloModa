@@ -4,6 +4,80 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — /design-07 "Tête-à-tête": an intimate one-to-one with the stylist
+
+Direct request: one more design at `/design-07`. The brief was "as interactive as possible,
+minimalist but immersive, personal and intimate chat with an ai assistant". It plugs into the
+same `layout` contract as `/design-01..03`, so chat, image generation, quotas, history,
+avatars, the wardrobe and the style journal all work exactly as on `/`. `/` is unchanged and
+its bundle is the same size (360 kB), because the layout is code-split.
+
+**The idea.** A dim, warm room where the stylist is a light rather than a chat widget.
+There's almost no chrome: the wordmark, a Menu button, and the conversation set in large
+serif type.
+
+**What's interactive.**
+
+- **Presence light** (`src/components/tete/PresenceLight.jsx`):
+  - a soft lilac bloom with a bright core that drifts toward your pointer
+  - swells with every keystroke
+  - breathes faster while the stylist is thinking
+  - one rAF loop writing straight to the DOM, so no React re-renders; static under reduced
+    motion
+- **Type anywhere.**
+  - Any printable key focuses the composer, a centred serif line whose hairline fills as you
+    write.
+  - Enter sends: your words rise toward the light and dissolve, then come back as a quote.
+  - Tab borrows the stylist's suggestions, so you can edit one before sending; Esc clears.
+- **Depth of field.** The moment you're reading is sharp. Everything else softens and dims
+  with distance from a focus line, recalculated per scroll frame, and hovering a faded moment
+  brings it back.
+- **Each look is a photograph you can handle** (`TiltLook.jsx`):
+  - it develops in, from warm, dark and blurred to full colour
+  - it tilts toward the pointer, with a glint
+  - tap or Enter turns it over to the pieces: "already in your wardrobe" for your own items,
+    otherwise the shop link and a save-to-wardrobe heart
+  - double-tap keeps it, with a heart
+  - Keep, The pieces, Restyle and Share also exist as plain buttons under every look, so
+    nothing is gesture-only
+- **One menu for everything else** (⌘K / Ctrl+K, or the Menu button):
+  - new conversation, wardrobe, style journal, share
+  - "Styling for" avatar chips
+  - the last six conversations, plus Profile, Avatars and Sign out
+- **Personal welcome.**
+  - A time-of-day greeting by first name ("Still up" late at night).
+  - "It's just the two of us…".
+  - Your last conversation quoted back with "Pick it back up →".
+  - Three occasions to start from.
+  - When styling for someone else's avatar, the welcome says so.
+
+**Notes.**
+
+- **Keep is local only.** Keep / double-tap is visual for now and isn't saved; it doesn't
+  feed the style journal yet.
+- **Restyle sends a real message.** It sends "Restyle this — show me a different direction
+  for the same occasion." through the normal chat, which costs a turn like any other message.
+- **Fix in `TiltLook`.** A look loaded from history can finish loading its image before React
+  hydrates, so the image is also checked directly on mount. Without that check it would stay
+  "developing" forever.
+- **New CSS.** It's all in a `tete-*` block in `globals.css`, with reduced-motion handling.
+- **Switcher.** The switcher pill now also lists 07.
+
+Verified with a temporary harness (not committed) that renders the real `AppShell` with
+`layout="tete"` and sample turns:
+
+- welcome, typing, send, thinking
+- a two-look thread
+- tilt, flip, double-tap keep
+- the ⌘K menu, Tab suggestion
+- a text-only error turn
+- phone at 390 px, with touch
+
+The sandbox blocks webfonts and placeholder photos, so the screenshots use fallback fonts and
+gradient plates.
+
+---
+
 ## 2026-09-25 — Three layout designs live on main at /design-01..03
 
 Direct request: the three layout explorations on `main`, but reachable at their own URLs so
