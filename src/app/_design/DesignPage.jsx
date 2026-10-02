@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { loadAppShellData } from "@/lib/appShellData";
 import { DESIGN_ROUTES } from "@/lib/designRoutes";
 import AppShell from "../AppShell.jsx";
-import DesignSwitcher from "./DesignSwitcher.jsx";
 
 // Shared body of the /design-0X routes: the real signed-in app
 // (same server data as "/", same AppShell state and handlers — chat, image
@@ -20,10 +19,7 @@ export default async function DesignPage({ slug }) {
   // belt-and-braces guard for the server render.
   if (!user) redirect("/login");
 
-  return (
-    <>
-      <AppShell {...props} layout={design.layout} basePath={`/${slug}`} />
-      <DesignSwitcher current={slug} />
-    </>
-  );
+  // No cross-links between versions (direct request 2026-10-02): each
+  // route stands on its own, as the real app would.
+  return <AppShell {...props} layout={design.layout} basePath={`/${slug}`} />;
 }

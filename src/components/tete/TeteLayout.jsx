@@ -105,14 +105,12 @@ function shuffled(arr) {
 }
 
 function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor }) {
-  const [dateLine, setDateLine] = useState("");
   const [line, setLine] = useState(0);
   const [touch, setTouch] = useState(false);
   // Data order on the server, shuffled after mount — no hydration mismatch.
   const [picks, setPicks] = useState(occasions.slice(0, 5));
 
   useEffect(() => {
-    setDateLine(new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }));
     setPicks(shuffled(occasions).slice(0, 5));
     setTouch(window.matchMedia("(hover: none)").matches);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -124,9 +122,8 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor })
     <section data-moment className="tete-moment relative min-h-[100svh] w-full">
       <BlobGallery items={picks} onPick={(o) => onSend(o.prompt)} />
       <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[620px] flex-col justify-start px-6 pb-24 pt-28 text-center sm:justify-center sm:pt-32">
-        <Whisper className="animate-fade-in">{dateLine || " "}</Whisper>
         <h1
-          className="animate-fade-up mt-6 font-script text-[52px] leading-[1] tracking-[-0.01em] text-[#2b2633] sm:text-[76px]"
+          className="animate-fade-up font-script text-[52px] leading-[1] tracking-[-0.01em] text-[#2b2633] sm:text-[76px]"
           style={{ animationDelay: "120ms" }}
         >
           Dressed for
@@ -188,25 +185,7 @@ function LookMoment({ message, isLatest, onSend, onKeepLook, onToggleSave, saved
 
   return (
     <section data-moment className="tete-moment mx-auto max-w-[620px] px-6 py-24">
-      <div className="animate-fade-up">
-        <TiltLook
-          image={image}
-          seed={message.recommendationId || message.id}
-          title={message.title}
-          pieces={pieces}
-          flipped={flipped}
-          onFlip={() => setFlipped((f) => !f)}
-          liked={liked}
-          onKeep={() => !liked && setKept(true)}
-          onToggleSave={onToggleSave}
-          savedIds={savedIds}
-        />
-        <p className="mt-4 text-center text-[11.5px] text-[#2b2633]/30">
-          {pieces.length ? "Turn it over for the pieces · double-tap to keep it" : "Double-tap to keep it"}
-        </p>
-      </div>
-
-      <div className="mt-14 text-center">
+      <div className="text-center">
         {message.title && (
           <h2
             className="animate-fade-up font-script text-[42px] leading-[1.02] sm:text-[52px]"
@@ -222,6 +201,29 @@ function LookMoment({ message, isLatest, onSend, onKeepLook, onToggleSave, saved
             className="mx-auto mt-5 max-w-[34rem] text-left text-[16.5px] leading-[1.8] text-[#2b2633]/75 sm:text-center"
           />
         )}
+      </div>
+
+      {/* The photograph comes *after* the words (direct request 2026-10-02):
+          you read the title and the reasoning while it's still developing. */}
+      <div
+        className="animate-fade-up mt-14"
+        style={{ animationDelay: message.fresh ? `${Math.max(300, after - 400)}ms` : "0ms" }}
+      >
+        <TiltLook
+          image={image}
+          seed={message.recommendationId || message.id}
+          title={message.title}
+          pieces={pieces}
+          flipped={flipped}
+          onFlip={() => setFlipped((f) => !f)}
+          liked={liked}
+          onKeep={() => !liked && setKept(true)}
+          onToggleSave={onToggleSave}
+          savedIds={savedIds}
+        />
+        <p className="mt-4 text-center text-[11.5px] text-[#2b2633]/30">
+          {pieces.length ? "Turn it over for the pieces · double-tap to keep it" : "Double-tap to keep it"}
+        </p>
       </div>
 
       {image.settled && (
@@ -556,6 +558,16 @@ export default function TeteLayout({ shell }) {
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Day and date, centred in the header. Set after mount so server and
+  // client markup match; short form on phones so it clears the wordmark.
+  const [today, setToday] = useState({ long: "", short: "" });
+  useEffect(() => {
+    const d = new Date();
+    setToday({
+      long: d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }),
+      short: d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }),
+    });
+  }, []);
 
   const name = firstName(userDisplayName, userEmail);
   const activeAvatar = avatarProfiles?.find((a) => a.id === activeAvatarId) || null;
@@ -659,6 +671,10 @@ export default function TeteLayout({ shell }) {
         <span className="pointer-events-auto flex items-center gap-2.5 font-script text-[22px] italic text-[#2b2633]/80">
           <span className="tete-breathe block h-2 w-2 rounded-full bg-[#8f78e8] shadow-[0_0_14px_4px_rgba(185,164,255,0.5)]" />
           helloModa
+        </span>
+        <span className="animate-fade-in absolute left-1/2 top-[33px] -translate-x-1/2 whitespace-nowrap text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">
+          <span className="sm:hidden">{today.short}</span>
+          <span className="hidden sm:inline">{today.long}</span>
         </span>
         <button
           onClick={() => setMenuOpen(true)}

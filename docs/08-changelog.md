@@ -4,6 +4,25 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — /design-07: date in the header, words before the photo; version switcher removed
+
+Direct requests:
+
+- **Day and date move into the header, centred** between the wordmark and Menu, as in the
+  editorial version's masthead.
+  - Desktop shows "Friday 2 October"; phones show "Fri, 2 Oct" so it clears the wordmark.
+  - It's set after the page loads, so the server and browser render the same markup.
+  - The date line above the welcome headline is gone.
+- **Links to the other UI versions are removed.** The floating "Main · 01 · 02 · 03 · 07"
+  switcher pill is deleted (`src/app/_design/DesignSwitcher.jsx`), so no design route links to
+  the others any more. The routes themselves (`/design-01..03`, `/design-07`) still exist.
+- **The generated image now comes after the title and description.** In each look, the title
+  and the reasoning come first and the photo card is below. For a fresh reply, the card fades
+  in near the end of the streamed text, so you're reading while the image is still being
+  generated. Keep / The pieces / Restyle / Share and the suggestions stay under the photo.
+
+---
+
 ## 2026-10-02 — /design-07: back to the clean light welcome, with photos as blobs that reveal on hover
 
 Direct request: drift back toward the first light versions. Minimalist, "just a few blob images
