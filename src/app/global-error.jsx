@@ -20,24 +20,26 @@ export default function GlobalError({ error, reset }) {
             placeItems: "center",
             minHeight: "100vh",
             padding: "24px",
-            fontFamily: "system-ui, sans-serif",
+            fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif',
             textAlign: "center",
-            background: "#f5f3fa",
-            color: "#1e1a2e",
+            background: "#fdfcfa",
+            color: "#2b2633",
           }}
         >
           <div>
-            <h1 style={{ fontSize: 20, fontWeight: 600 }}>That wasn&apos;t supposed to happen.</h1>
-            <p style={{ marginTop: 8, fontSize: 14, opacity: 0.7 }}>
+            <h1 style={{ fontFamily: '"Instrument Serif", Georgia, serif', fontSize: 40, fontWeight: 400, lineHeight: 1.05 }}>
+              That wasn&apos;t supposed to happen.
+            </h1>
+            <p style={{ marginTop: 14, fontSize: 15, opacity: 0.6, lineHeight: 1.6 }}>
               helloModa hit an unexpected snag. Try again — your wardrobe and looks are safe.
             </p>
             <button
               onClick={() => reset()}
               style={{
-                marginTop: 16,
-                padding: "10px 20px",
-                borderRadius: 12,
-                background: "#8b6cf0",
+                marginTop: 24,
+                padding: "12px 24px",
+                borderRadius: 999,
+                background: "#2b2633",
                 color: "white",
                 border: "none",
                 fontSize: 14,

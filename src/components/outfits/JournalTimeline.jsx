@@ -230,7 +230,7 @@ export default function JournalTimeline({ looks: initial, home = "/" }) {
       <div className="mx-auto max-w-[760px] px-6 pb-40 pt-32 sm:pt-40">
         <p className={META}>Your style journal</p>
         <h1 className="mt-5 font-script text-[48px] leading-[1] sm:text-[68px]">
-          Every look, <span className="italic text-[#8f78e8]">on its day.</span>
+          Every look, <span className="font-hand text-[#8f78e8]">on its day.</span>
         </h1>
         <p className="mt-6 max-w-lg text-[15.5px] leading-[1.7] text-[#2b2633]/60">
           Give a look a date to book it for an occasion. Once the day has passed, it’s marked as

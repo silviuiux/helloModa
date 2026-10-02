@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
-import { Home, Plus, X, Check } from "../Icons.jsx";
+import { Plus, X, Check } from "../Icons.jsx";
 import { resizeImageFile } from "../../lib/imageResize.js";
 import { createClient } from "../../lib/supabase/client.js";
 import { updateProfile } from "../../actions/profile.js";
@@ -109,33 +108,27 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mb-6 flex items-center gap-3">
-        <Link
-          href="/"
-          aria-label="Back to helloModa"
-          className="glass-circle grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
-        >
-          <Home size={17} />
-        </Link>
-        <div>
-          <h1 className="font-display text-[26px] font-semibold tracking-[-0.03em] leading-tight text-ink">Your profile</h1>
-          <p className="mt-0.5 text-[13.5px] text-muted">{userEmail}</p>
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-2xl px-6 pb-32 pt-28 sm:pt-36">
+      <p className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">{userEmail}</p>
+      <h1 className="mt-4 font-script text-[46px] leading-[1.02] text-[#2b2633] sm:text-[60px]">
+        Your profile, <span className="font-hand text-[#8f78e8]">your style.</span>
+      </h1>
+      <p className="mt-5 max-w-lg text-[15px] leading-[1.7] text-[#2b2633]/60">
+        The more helloModa knows about your fit and taste, the closer every look lands.
+      </p>
 
-      <div className="mb-6">
+      <div className="mb-6 mt-12">
         <UsageSummary usage={usage} />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-12">
         <Section title="Photo & name">
           <div className="flex items-center gap-4">
-            <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border border-dashed border-accent-soft bg-white/60">
+            <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border border-dashed border-[#8f78e8]/40 bg-white/60">
               {avatarPreview ? (
                 <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
               ) : (
-                <Plus size={20} className="text-muted" />
+                <Plus size={20} className="text-[#2b2633]/45" />
               )}
               <input
                 ref={fileInputRef}
@@ -168,8 +161,8 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
                   onClick={() => setGender(gender === g ? "" : g)}
                   className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
                     gender === g
-                      ? "bg-accent text-canvas shadow-soft"
-                      : "glass-soft text-muted hover:text-accent-deep"
+                      ? "bg-[#2b2633] text-white"
+                      : "bg-white/60 text-[#2b2633]/60 ring-1 ring-[#2b2633]/10 hover:text-[#2b2633]"
                   }`}
                 >
                   {g}
@@ -232,22 +225,21 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
           <button
             type="submit"
             disabled={status === "saving"}
-            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-5 py-2.5 text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+            className="flex items-center gap-1.5 rounded-full bg-[#2b2633] text-white transition-colors hover:bg-[#8f78e8] px-6 py-3 text-[14px] font-medium disabled:opacity-60"
           >
             {status === "saved" && <Check size={16} />}
             {status === "saving" ? "Saving…" : status === "saved" ? "Saved" : "Save profile"}
           </button>
-          {status === "error" && <p className="text-[13px] text-red-500">{error}</p>}
+          {status === "error" && <p className="text-[13px] text-[#c2577a]">{error}</p>}
         </div>
       </form>
 
       <style>{`
         .input{
-          width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.8); border:1px solid #e6e1f0; color:#1e1a2e;
-          font-size:14px; outline:none;
+          width:100%; height:42px; padding:0; border:0; border-bottom:1px solid rgba(43,38,51,0.15);
+          border-radius:0; background:transparent; color:#2b2633; font-size:15px; outline:none;
         }
-        .input:focus{ border-color:#8b6cf0; box-shadow:0 0 0 3px rgba(139,108,240,0.18); }
+        .input:focus{ border-bottom-color:#8f78e8; box-shadow:none; }
       `}</style>
     </div>
   );
@@ -255,10 +247,10 @@ export default function ProfileForm({ profile, avatarUrl, userEmail, usage }) {
 
 function Section({ title, hint, children }) {
   return (
-    <section className="glass rounded-xl3 p-5 sm:p-6">
-      <h2 className="font-display text-[17px] font-semibold tracking-[-0.03em] text-ink">{title}</h2>
-      {hint && <p className="mt-1 text-[12.5px] text-muted">{hint}</p>}
-      <div className="mt-4">{children}</div>
+    <section className="border-t border-[#2b2633]/10 pt-6">
+      <h2 className="font-script text-[30px] leading-none text-[#2b2633]">{title}</h2>
+      {hint && <p className="mt-2 text-[13px] text-[#2b2633]/50">{hint}</p>}
+      <div className="mt-6">{children}</div>
     </section>
   );
 }
@@ -266,7 +258,7 @@ function Section({ title, hint, children }) {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="label mb-1.5 block text-muted">{label}</span>
+      <span className="mb-1 block text-[10.5px] font-medium uppercase tracking-[0.22em] text-[#2b2633]/45">{label}</span>
       {children}
     </label>
   );
@@ -299,7 +291,7 @@ function TagField({ values, onChange, suggestions = [], placeholder }) {
         {values.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1.5 rounded-full bg-accent-tint px-3 py-1.5 text-[13px] font-medium text-accent-deep"
+            className="flex items-center gap-1.5 rounded-full bg-[#2b2633] px-3.5 py-1.5 text-[13px] text-white"
           >
             {tag}
             <button type="button" onClick={() => onChange(values.filter((v) => v !== tag))} aria-label={`Remove ${tag}`}>
@@ -316,7 +308,7 @@ function TagField({ values, onChange, suggestions = [], placeholder }) {
             setDraft("");
           }}
           placeholder={placeholder}
-          className="h-9 min-w-[10rem] flex-1 rounded-full bg-white/60 px-3.5 text-[13px] text-ink placeholder:text-faint focus:outline-none"
+          className="h-9 min-w-[10rem] flex-1 border-0 border-b border-[#2b2633]/15 bg-transparent px-0 text-[14px] text-[#2b2633] placeholder:text-[#2b2633]/35 focus:border-[#8f78e8] focus:outline-none focus:ring-0"
         />
       </div>
       {remainingSuggestions.length > 0 && (
@@ -326,7 +318,7 @@ function TagField({ values, onChange, suggestions = [], placeholder }) {
               key={s}
               type="button"
               onClick={() => addTag(s)}
-              className="rounded-full px-3 py-1.5 text-[12.5px] text-muted glass-soft hover:text-accent-deep"
+              className="rounded-full px-3 py-1.5 text-[12.5px] bg-white/60 text-[#2b2633]/60 ring-1 ring-[#2b2633]/10 hover:text-[#2b2633]"
             >
               + {s}
             </button>

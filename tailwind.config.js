@@ -35,6 +35,11 @@ export default {
         // The look titles — was a handwritten script face; now an editorial
         // serif, the one soft/organic voice in an otherwise sharp system.
         script: ['"Instrument Serif"', "Georgia", "serif"],
+        // The purple accent words in titles ("the first date.", "on its
+        // day.") — a readable, elegant hand, chosen by direct request
+        // 2026-10-02; self-hosted via @fontsource/dancing-script
+        // (src/app/layout.jsx).
+        hand: ['"Dancing Script"', '"Instrument Serif"', "cursive"],
         sans: ['"Plus Jakarta Sans"', "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         mono: ['"IBM Plex Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
       },

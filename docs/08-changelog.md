@@ -4,6 +4,80 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — A handwritten accent font, a written-out hero line, and the remaining pages redesigned
+
+Direct requests: find a readable, elegant handwritten font for the purple title words; make the
+hero's cycling occasion look handwritten; and redesign the remaining old-design pages.
+
+**Handwritten accent font: Dancing Script.**
+
+- **Choice.** I rendered eight candidates on our real phrases: Allura, Dancing Script, Ephesis,
+  Parisienne, Meow Script, Great Vibes, Petit Formal Script and Caveat. I suggested Parisienne;
+  you picked **Dancing Script**, the most legible of the elegant ones.
+- **Self-hosted.** It ships via `@fontsource/dancing-script` (weight 400), imported in
+  `src/app/layout.jsx`, so it doesn't depend on Google Fonts. It's exposed as the Tailwind
+  `font-hand` family.
+- **Where it's used.** The purple accent words in titles:
+  - the hero's cycling line
+  - "Then, the perfect match." and "Come get *dressed.*"
+  - "on its day." (journal), "Where to next?" and "Come get dressed." (auth)
+  - "ready to style." (wardrobe), "by occasion." and "skip." (guides)
+  - "your style." (profile), "you." (avatars)
+  - a few "Add a piece" style tile labels
+- **Where it isn't.** Long text stays in the serif, for readability.
+
+**The hero line is written out.**
+
+- **New `HandwrittenCycle`**, used on the app's welcome and the landing page. Each occasion line
+  is written out left to right in Dancing Script.
+- **How.** A soft-edged CSS mask (`.tete-write`) sweeps across it, timed to the line's length at
+  about 75 ms per character. The line holds for 1.7 s, fades out, and the next one is written.
+- **Reduced motion:** lines simply swap.
+- **Replaced:** the old 2.8 s interval cross-fade.
+
+**Wardrobe**: `WardrobeView`, `WardrobeItemCard`, `ClosetStats` and `AddItemModal` restyled.
+
+- **Header:** "5 pieces, *ready to style.*"
+- **Stats:** the three closet stats as serif numbers between hairlines.
+- **Controls:** text-tab categories with a violet underline, a ♥ Favourites toggle, a hairline
+  search field and a dark pill "Add a piece" button.
+- **Cards:**
+  - Photos (or colour swatches) with soft violet shadows and editorial captions underneath.
+  - The favourite and remove buttons appear on hover.
+  - "Log a wear", the styled count and price / cost-per-wear sit in one quiet line.
+- **Add a piece:** a white dialog with a serif title, hairline fields and pill buttons.
+- **In the app:** the wardrobe overlay uses the same header (wordmark, "Back to styling").
+- **Unchanged:** all behaviour, including search, filters, favourites, cost per wear, wear
+  logging, price editing and photo auto-tagging.
+
+**Occasion guides (`/what-to-wear` and each guide)** on the shared `PaperPage` chrome:
+
+- **Index:** "What to wear, *by occasion.*", with categories as small labels over hairlines and
+  guide cards using the photo treatment and serif titles.
+- **Guide pages:**
+  - small-caps breadcrumb
+  - serif title, with the intro in the italic serif
+  - "For her" / "For him" / "Fabric & colour" / "Weather & setting" as serif sections
+  - "What to *skip.*" between hairlines
+  - the example prompt in the hand font
+  - a dark pill call to action, and quieter "other occasions" chips
+
+**Profile and Avatars** on `PaperPage`, each with a "Back to styling" link:
+
+- **Profile:** "Your profile, *your style.*" Sections are separated by hairlines with serif
+  headings, fields are hairline inputs, and chips and buttons use the dark-pill style. The usage
+  meters are thin violet lines.
+- **Avatars:** "Styled on *you.*", with restyled cards, add tiles and the avatar editor dialog.
+
+**Error screen:** the global error page uses the paper background, the serif title and a dark
+pill "Try again" button.
+
+Checked in screenshots with sample data: wardrobe, avatars and profile through a temporary page
+(not committed), and the guides index and a guide page directly. The handwriting animation was
+checked frame by frame.
+
+---
+
 ## 2026-10-02 — Style journal becomes a dated timeline; sign-in/register and mobile hero redesigned
 
 Four direct requests.

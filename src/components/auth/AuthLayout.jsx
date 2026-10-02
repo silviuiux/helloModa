@@ -21,7 +21,7 @@ export default function AuthLayout({ eyebrow, title, accent, intro, children, al
           {accent && (
             <>
               <br />
-              <span className="italic text-[#8f78e8]">{accent}</span>
+              <span className="font-hand text-[#8f78e8]">{accent}</span>
             </>
           )}
         </h1>

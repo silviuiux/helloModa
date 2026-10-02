@@ -12,7 +12,7 @@ export default function AvatarCard({ profile, onEdit, onDelete }) {
   const summary = measurementSummary(profile);
 
   return (
-    <div className="group relative aspect-[3/4] overflow-hidden rounded-bubble shadow-soft">
+    <div className="group relative aspect-[3/4] overflow-hidden rounded-[18px] shadow-[0_30px_60px_-36px_rgba(90,70,160,0.45),0_0_0_1px_rgba(43,38,51,0.04)]">
       <button onClick={() => onEdit(profile)} className="absolute inset-0 h-full w-full text-left">
         {profile.avatar_image_signed_url ? (
           <img
@@ -21,9 +21,9 @@ export default function AvatarCard({ profile, onEdit, onDelete }) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="glass flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center">
-            <p className="text-[13px] font-medium text-accent-deep">No avatar painted yet</p>
-            <p className="text-[11.5px] text-muted">Tap to add a photo</p>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#f3eff8] px-4 text-center">
+            <p className="font-hand text-[20px] text-[#8f78e8]">No avatar painted yet</p>
+            <p className="text-[11.5px] text-[#2b2633]/50">Tap to add a photo</p>
           </div>
         )}
         <div
@@ -39,7 +39,7 @@ export default function AvatarCard({ profile, onEdit, onDelete }) {
       <button
         onClick={() => onDelete(profile)}
         aria-label={`Remove ${profile.display_name}`}
-        className="glass-circle absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full text-ink opacity-0 transition-all group-hover:opacity-100"
+        className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white/85 text-[#2b2633]/60 opacity-0 backdrop-blur-md transition-all hover:text-[#c2577a] group-hover:opacity-100"
       >
         <X size={14} />
       </button>

@@ -51,29 +51,29 @@ export default function GuidePage({ params }) {
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <nav className="mt-6 text-[13px] text-faint">
-        <Link href="/what-to-wear" className="hover:text-accent-deep">
-          Style guides
+      <nav className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">
+        <Link href="/what-to-wear" className="transition-colors hover:text-[#8f78e8]">
+          Occasion guides
         </Link>
-        <span className="mx-1.5">/</span>
-        <span className="text-muted">{guide.occasion}</span>
+        <span className="mx-2">·</span>
+        <span>{guide.occasion}</span>
       </nav>
 
       {/* Split hero: headline + hook on one side, full generated image on the other */}
-      <div className="mt-6 grid gap-10 sm:grid-cols-2 sm:items-center">
+      <div className="mt-8 grid gap-12 sm:grid-cols-2 sm:items-center">
         <div>
-          <p className="label text-accent-deep">{guide.category}</p>
-          <h1 className="mt-3 font-display text-[38px] font-semibold tracking-[-0.03em] leading-[0.98] text-ink sm:text-[54px]">
+          <p className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#8f78e8]">{guide.category}</p>
+          <h1 className="mt-4 font-script text-[42px] leading-[1.02] text-[#2b2633] sm:text-[60px]">
             {guide.title}
           </h1>
-          <p className="mt-6 font-script text-[26px] italic leading-tight text-ink/85 sm:text-[30px]">
+          <p className="mt-6 font-script text-[24px] italic leading-snug text-[#2b2633]/70 sm:text-[28px]">
             {guide.hook}
           </p>
         </div>
         <GuideHeroImage
           src={`/guides/${guide.slug}-hero.jpg`}
           alt={guide.title}
-          className="aspect-[4/5] rounded-xl3"
+          className="aspect-[4/5] rounded-[22px] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.45)]"
         />
       </div>
 
@@ -81,35 +81,35 @@ export default function GuidePage({ params }) {
           photos (not the hero photo again — repeating one image across the
           page would read as repetitive, not "lots of images") */}
       <div className="mt-24 grid gap-8 sm:mt-28 sm:grid-cols-2 sm:items-center">
-        <div className="aspect-[4/5] overflow-hidden rounded-xl3 sm:order-1">
+        <div className="aspect-[4/5] overflow-hidden rounded-[22px] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.4)] sm:order-1">
           <PlaceholderImage seed={`${guide.slug}-her`} width={800} height={1000} />
         </div>
         <div className="sm:order-2">
-          <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">For her</h2>
-          <p className="mt-3 text-[16px] leading-relaxed text-ink">{guide.forHer}</p>
+          <h2 className="font-script text-[34px] leading-none text-[#2b2633]">For her</h2>
+          <p className="mt-4 text-[16px] leading-[1.75] text-[#2b2633]/75">{guide.forHer}</p>
         </div>
       </div>
 
       <div className="mt-16 grid gap-8 sm:grid-cols-2 sm:items-center">
-        <div className="aspect-[4/5] overflow-hidden rounded-xl3 sm:order-2">
+        <div className="aspect-[4/5] overflow-hidden rounded-[22px] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.4)] sm:order-2">
           <PlaceholderImage seed={`${guide.slug}-him`} width={800} height={1000} />
         </div>
         <div className="sm:order-1">
-          <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">For him</h2>
-          <p className="mt-3 text-[16px] leading-relaxed text-ink">{guide.forHim}</p>
+          <h2 className="font-script text-[34px] leading-none text-[#2b2633]">For him</h2>
+          <p className="mt-4 text-[16px] leading-[1.75] text-[#2b2633]/75">{guide.forHim}</p>
         </div>
       </div>
 
       {/* Fabric & color, with the guide's actual palette rendered as swatches */}
       <section className="mt-24 sm:mt-28">
-        <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">Fabric & color</h2>
-        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-ink">{guide.fabricAndColor}</p>
+        <h2 className="font-script text-[34px] leading-none text-[#2b2633]">Fabric &amp; colour</h2>
+        <p className="mt-4 max-w-2xl text-[16px] leading-[1.75] text-[#2b2633]/75">{guide.fabricAndColor}</p>
         {guide.palette?.length > 0 && (
           <div className="mt-5 flex gap-3">
             {guide.palette.map((hex) => (
               <span
                 key={hex}
-                className="h-10 w-10 rounded-full shadow-soft ring-1 ring-inset ring-white/60"
+                className="h-11 w-11 rounded-full shadow-[0_10px_24px_-10px_rgba(43,38,51,0.35)] ring-1 ring-inset ring-white/60"
                 style={{ backgroundColor: hex }}
                 title={hex}
               />
@@ -119,19 +119,19 @@ export default function GuidePage({ params }) {
       </section>
 
       <section className="mt-16 max-w-2xl">
-        <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">Weather & setting notes</h2>
-        <p className="mt-3 text-[16px] leading-relaxed text-ink">{guide.contextNotes}</p>
+        <h2 className="font-script text-[34px] leading-none text-[#2b2633]">Weather &amp; setting</h2>
+        <p className="mt-4 text-[16px] leading-[1.75] text-[#2b2633]/75">{guide.contextNotes}</p>
       </section>
 
       <GuideShowcase guide={guide} />
 
       {/* What to avoid — editorial callout */}
-      <section className="glass mt-24 rounded-xl3 p-8 sm:mt-28 sm:p-10">
-        <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">What to avoid</h2>
+      <section className="mt-24 border-y border-[#2b2633]/10 py-10 sm:mt-28 sm:py-12">
+        <h2 className="font-script text-[34px] leading-none text-[#2b2633]">What to <span className="font-hand text-[#8f78e8]">skip.</span></h2>
         <ul className="mt-4 space-y-3">
           {guide.avoid.map((item) => (
-            <li key={item} className="flex gap-3 text-[16px] leading-relaxed text-ink">
-              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+            <li key={item} className="flex gap-3 text-[16px] leading-[1.7] text-[#2b2633]/75">
+              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8f78e8]" />
               {item}
             </li>
           ))}
@@ -141,7 +141,7 @@ export default function GuidePage({ params }) {
       <div className="mt-16">
         <Link
           href="/register"
-          className="inline-flex items-center gap-1.5 rounded-[10px] bg-accent px-5 py-2.5 text-[14px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
+          className="inline-flex items-center gap-2 rounded-full bg-[#2b2633] px-6 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#8f78e8]"
         >
           Get this styled for you
           <ArrowRight size={15} />
@@ -149,15 +149,15 @@ export default function GuidePage({ params }) {
       </div>
 
       <div className="mt-16">
-        <h2 className="font-display text-[18px] font-semibold tracking-[-0.03em] text-ink">Other occasions</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <h2 className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">Other occasions</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
           {guides
             .filter((g) => g.slug !== guide.slug)
             .map((g) => (
               <Link
                 key={g.slug}
                 href={`/what-to-wear/${g.slug}`}
-                className="glass-soft rounded-full px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-accent-deep"
+                className="rounded-full bg-white/60 px-4 py-1.5 text-[13px] text-[#2b2633]/60 ring-1 ring-[#2b2633]/10 transition-colors hover:text-[#2b2633] hover:ring-[#8f78e8]/50"
               >
                 {g.occasion}
               </Link>

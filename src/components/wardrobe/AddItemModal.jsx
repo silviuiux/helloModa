@@ -124,27 +124,27 @@ export default function AddItemModal({ open, onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      <div className="absolute inset-0 bg-ink/25 backdrop-blur-md" onClick={handleCancel} />
+      <div className="absolute inset-0 bg-[#fdfcfa]/70 backdrop-blur-xl" onClick={handleCancel} />
       <form
         onSubmit={submit}
-        className="glass animate-fade-up relative w-full max-w-md rounded-xl3 p-6"
+        className="animate-fade-up relative max-h-[92svh] w-full max-w-md overflow-y-auto rounded-[26px] bg-white p-7 text-[#2b2633] shadow-[0_60px_120px_-50px_rgba(90,70,160,0.45),0_0_0_1px_rgba(43,38,51,0.05)]"
       >
-        <h3 className="font-display text-[22px] font-semibold tracking-[-0.03em] text-ink">Add wardrobe item</h3>
-        <p className="mt-1 text-[13px] text-muted">
+        <h3 className="font-script text-[34px] leading-none">Add a <span className="font-hand text-[#8f78e8]">piece.</span></h3>
+        <p className="mt-3 text-[13.5px] leading-relaxed text-[#2b2633]/55">
           Snap a photo and helloModa fills in the rest — or add the details yourself.
         </p>
 
         <div className="mt-5 space-y-4">
           <Field label="Photo">
             <label className="flex cursor-pointer items-center gap-3">
-              <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl2 border border-dashed border-accent-soft bg-white/60">
+              <div className="relative grid h-20 w-16 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-dashed border-[#8f78e8]/40 bg-[#f7f4fb]">
                 {previewUrl ? (
                   <img src={previewUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
-                  <Plus size={18} className="text-muted" />
+                  <Plus size={18} className="text-[#2b2633]/45" />
                 )}
               </div>
-              <span className="text-[13px] text-muted">
+              <span className="text-[13.5px] text-[#2b2633]/60">
                 {analyzing
                   ? "Analyzing photo…"
                   : previewUrl
@@ -160,7 +160,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
                 className="sr-only"
               />
             </label>
-            {photoError && <p className="mt-1.5 text-[12px] text-red-500">{photoError}</p>}
+            {photoError && <p className="mt-1.5 text-[12px] text-[#c2577a]">{photoError}</p>}
           </Field>
 
           <Field label="Name">
@@ -202,8 +202,8 @@ export default function AddItemModal({ open, onClose, onAdd }) {
                   key={s}
                   type="button"
                   onClick={() => setColor(s)}
-                  className={`h-8 w-8 rounded-full ring-2 ring-offset-2 ring-offset-canvas transition ${
-                    color === s ? "ring-accent" : "ring-transparent"
+                  className={`h-8 w-8 rounded-full ring-2 ring-offset-2 ring-offset-white transition ${
+                    color === s ? "ring-[#8f78e8]" : "ring-transparent"
                   }`}
                   style={{ backgroundColor: s }}
                   aria-label={`Pick ${s}`}
@@ -223,7 +223,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
               placeholder="e.g. 89.00"
               className="input"
             />
-            <p className="mt-1 text-[11.5px] text-faint">Unlocks cost per wear for this piece. Optional — add it anytime.</p>
+            <p className="mt-1.5 text-[11.5px] text-[#2b2633]/40">Unlocks cost per wear for this piece. Optional — add it anytime.</p>
           </Field>
         </div>
 
@@ -231,14 +231,14 @@ export default function AddItemModal({ open, onClose, onAdd }) {
           <button
             type="button"
             onClick={handleCancel}
-            className="rounded-xl2 px-4 py-2.5 text-[14px] font-medium text-muted transition-colors hover:text-ink"
+            className="rounded-full px-4 py-2.5 text-[14px] text-[#2b2633]/55 transition-colors hover:text-[#2b2633]"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={analyzing}
-            className="flex items-center gap-1.5 rounded-xl2 bg-accent px-4 py-2.5 text-[14px] font-medium text-canvas shadow-soft transition-all hover:bg-accent-deep hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+            className="flex items-center gap-1.5 rounded-full bg-[#2b2633] px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#8f78e8] disabled:opacity-60"
           >
             <Plus size={16} />
             Add item
@@ -248,11 +248,10 @@ export default function AddItemModal({ open, onClose, onAdd }) {
 
       <style>{`
         .input{
-          width:100%; height:42px; padding:0 14px; border-radius:12px;
-          background:rgba(255,255,255,0.8); border:1px solid #e6e1f0; color:#1e1a2e;
-          font-size:14px; outline:none;
+          width:100%; height:42px; padding:0; border:0; border-bottom:1px solid rgba(43,38,51,0.15);
+          border-radius:0; background:transparent; color:#2b2633; font-size:15px; outline:none;
         }
-        .input:focus{ border-color:#8b6cf0; box-shadow:0 0 0 3px rgba(139,108,240,0.18); }
+        .input:focus{ border-bottom-color:#8f78e8; box-shadow:none; }
       `}</style>
     </div>
   );
@@ -261,7 +260,7 @@ export default function AddItemModal({ open, onClose, onAdd }) {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="label mb-1.5 block text-muted">{label}</span>
+      <span className="mb-1 block text-[10.5px] font-medium uppercase tracking-[0.22em] text-[#2b2633]/45">{label}</span>
       {children}
     </label>
   );

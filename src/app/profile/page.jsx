@@ -1,3 +1,5 @@
+import Link from "next/link";
+import PaperPage from "@/components/tete/PaperPage.jsx";
 import { createClient } from "@/lib/supabase/server";
 import { signAvatarUrl } from "@/lib/profileImages";
 import { getUsageSummary } from "@/lib/usage";
@@ -27,10 +29,17 @@ export default async function ProfilePage() {
   });
 
   return (
-    <div
-      className="min-h-screen w-full"
+    <PaperPage
+      right={
+        <Link
+          href="/"
+          className="rounded-full bg-white/70 px-4 py-2 text-[13px] text-[#2b2633] ring-1 ring-[#2b2633]/10 backdrop-blur-md transition-colors hover:ring-[#8f78e8]/50"
+        >
+          Back to styling
+        </Link>
+      }
     >
       <ProfileForm profile={profile} avatarUrl={avatarUrl} userEmail={user.email} usage={usage} />
-    </div>
+    </PaperPage>
   );
 }

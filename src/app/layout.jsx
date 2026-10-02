@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import "@fontsource/dancing-script/400.css";
 import "./globals.css";
 import PostHogPageview from "../components/PostHogPageview.jsx";
 import { SITE_URL } from "../lib/siteConfig.js";

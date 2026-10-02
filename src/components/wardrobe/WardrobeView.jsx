@@ -44,94 +44,99 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
   const countFor = (c) =>
     c === "All" ? items.length : items.filter((it) => it.category === c).length;
 
+  const meta = "text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45";
+  const favCount = items.filter((i) => i.fav).length;
+
+  // Redesigned 2026-10-02 to match the main interface (src/components/tete/):
+  // paper-white, serif type, hairlines instead of boxes, photos with soft
+  // violet shadows and editorial captions underneath.
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      {/* Header */}
-      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line px-6 py-5 sm:px-8">
-        <div>
-          <h1 className="font-display text-[26px] font-semibold tracking-[-0.03em] leading-tight text-ink">
-            Wardrobe
-          </h1>
-          <p className="mt-1 text-[13.5px] text-muted">
-            {items.length} pieces · {items.filter((i) => i.fav).length} favorites · the
-            closet helloModa styles from
-          </p>
-        </div>
-        <div className="flex items-center gap-2.5">
-          <div className="glass-soft flex h-11 items-center gap-2 rounded-full px-4">
-            <Search size={16} className="text-faint" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search your wardrobe…"
-              className="w-36 bg-transparent text-[14px] text-ink placeholder:text-faint focus:outline-none sm:w-48"
-            />
-          </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex h-11 items-center gap-1.5 rounded-[12px] bg-accent px-4 text-[14px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
-          >
-            <Plus size={17} />
-            Add item
-          </button>
-        </div>
-      </header>
+    <div className="scroll-area flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#fdfcfa] text-[#2b2633]">
+      <div className="mx-auto w-full max-w-[1180px] px-6 pb-32 pt-8 sm:px-10 sm:pt-12">
+        {/* Header */}
+        <p className={meta}>Your wardrobe</p>
+        <h1 className="mt-4 font-script text-[44px] leading-[1.02] sm:text-[60px]">
+          {items.length} {items.length === 1 ? "piece" : "pieces"},{" "}
+          <span className="font-hand text-[#8f78e8]">ready to style.</span>
+        </h1>
+        <p className="mt-4 max-w-lg text-[15px] leading-[1.7] text-[#2b2633]/60">
+          Every look starts here. {favCount ? `${favCount} favourite${favCount === 1 ? "" : "s"} · ` : ""}
+          add a photo and helloModa reads the rest.
+        </p>
 
-      <ClosetStats items={items} />
+        <ClosetStats items={items} />
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-line px-6 py-3.5 sm:px-8">
-        {wardrobeCategories.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
-              category === c
-                ? "bg-accent text-canvas shadow-soft"
-                : "glass-soft text-muted hover:text-accent-deep"
-            }`}
-          >
-            {c}
-            <span className="ml-1.5 opacity-60">{countFor(c)}</span>
-          </button>
-        ))}
-        <button
-          onClick={() => setFavOnly((v) => !v)}
-          className={`ml-auto rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
-            favOnly
-              ? "bg-accent text-canvas shadow-soft"
-              : "glass-soft text-muted hover:text-accent-deep"
-          }`}
-        >
-          Favorites only
-        </button>
-      </div>
-
-      {/* Grid */}
-      <div className="scroll-area min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-        {filtered.length === 0 ? (
-          <div className="grid place-items-center py-24 text-center text-muted">
-            <Hanger size={36} />
-            <p className="mt-3 text-[15px]">Your wardrobe is empty — for now. Add a few pieces and every look starts with them.</p>
+        {/* Controls */}
+        <div className="mt-12 flex flex-wrap items-end justify-between gap-6 border-b border-[#2b2633]/10 pb-4">
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {wardrobeCategories.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={`relative pb-1 text-[14px] transition-colors ${
+                  category === c ? "text-[#2b2633]" : "text-[#2b2633]/45 hover:text-[#2b2633]"
+                }`}
+              >
+                {c}
+                <span className="ml-1 text-[11px] opacity-60">{countFor(c)}</span>
+                {category === c && <span className="absolute inset-x-0 -bottom-[17px] h-px bg-[#8f78e8]" />}
+              </button>
+            ))}
             <button
-              onClick={() => setModalOpen(true)}
-              className="mt-3 text-[14px] font-medium text-accent-deep hover:underline"
+              onClick={() => setFavOnly((v) => !v)}
+              aria-pressed={favOnly}
+              className={`pb-1 text-[14px] transition-colors ${favOnly ? "text-[#e46d92]" : "text-[#2b2633]/45 hover:text-[#2b2633]"}`}
             >
-              Add your first piece
+              ♥ Favourites
             </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
-            {/* Upload tile */}
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 border-b border-[#2b2633]/15 pb-1 focus-within:border-[#8f78e8]">
+              <Search size={15} className="text-[#2b2633]/40" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search"
+                className="w-32 bg-transparent text-[14px] placeholder:text-[#2b2633]/35 focus:outline-none sm:w-44"
+              />
+            </label>
             <button
               onClick={() => setModalOpen(true)}
-              className="group grid aspect-[3/4] place-items-center rounded-xl2 border border-dashed border-accent-soft bg-white/60 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/70 hover:text-accent-deep"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#2b2633] px-5 py-2.5 text-[13.5px] font-medium text-white transition-colors hover:bg-[#8f78e8]"
+            >
+              <Plus size={15} />
+              Add a piece
+            </button>
+          </div>
+        </div>
+
+        {/* Grid */}
+        {filtered.length === 0 ? (
+          <div className="grid place-items-center py-28 text-center">
+            <Hanger size={32} className="text-[#2b2633]/30" />
+            <p className="mt-4 font-script text-[22px] italic text-[#2b2633]/55">
+              {items.length ? "Nothing matches that — try another filter." : "Your wardrobe is empty — for now."}
+            </p>
+            {!items.length && (
+              <button
+                onClick={() => setModalOpen(true)}
+                className="mt-4 text-[14px] text-[#2b2633]/60 underline decoration-[#2b2633]/20 underline-offset-4 hover:text-[#2b2633] hover:decoration-[#8f78e8]"
+              >
+                Add your first piece
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 sm:gap-x-7 lg:grid-cols-4">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="group grid aspect-[4/5] place-items-center rounded-[18px] border border-dashed border-[#8f78e8]/35 bg-white/50 transition-colors hover:border-[#8f78e8] hover:bg-white/80"
             >
               <span className="text-center">
-                <span className="glass-circle mx-auto grid h-12 w-12 place-items-center rounded-full transition-transform group-hover:scale-105">
-                  <Plus size={22} />
+                <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-white text-[#2b2633]/70 shadow-[0_10px_30px_-12px_rgba(90,70,160,0.35)] transition-transform group-hover:scale-105">
+                  <Plus size={18} />
                 </span>
-                <span className="mt-2.5 block text-[13px] font-medium">Add piece</span>
+                <span className="mt-3 block font-hand text-[24px] text-[#8f78e8]">Add a piece</span>
               </span>
             </button>
 

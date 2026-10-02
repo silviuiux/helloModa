@@ -6,6 +6,7 @@ import PresenceLight from "./PresenceLight.jsx";
 import TiltLook from "./TiltLook.jsx";
 import WardrobeView from "../wardrobe/WardrobeView.jsx";
 import BlobGallery from "./BlobGallery.jsx";
+import HandwrittenCycle from "./HandwrittenCycle.jsx";
 import { useOutfitImage } from "../../lib/useOutfitImage.js";
 import { cardToWardrobeItem } from "../../lib/look.js";
 import { occasions } from "../../data/occasions.js";
@@ -105,7 +106,6 @@ function shuffled(arr) {
 }
 
 function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, occasionImages = {} }) {
-  const [line, setLine] = useState(0);
   const [touch, setTouch] = useState(false);
   // Data order on the server, shuffled after mount — no hydration mismatch.
   const [picks, setPicks] = useState(occasions.slice(0, 5));
@@ -117,9 +117,6 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, o
     const rest = shuffled(occasions.filter((o) => !occasionImages[o.slug]));
     setPicks([...mine, ...rest].slice(0, 5));
     setTouch(window.matchMedia("(hover: none)").matches);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setLine((v) => (v + 1) % COVER_LINES.length), 2800);
-    return () => clearInterval(id);
   }, []);
 
   return (
@@ -132,8 +129,8 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, o
         >
           Dressed for
           <br />
-          <span key={line} className="animate-word-in inline-block min-h-[2em] italic text-[#8f78e8] sm:min-h-0 sm:whitespace-nowrap">
-            {COVER_LINES[line]}
+          <span className="inline-block min-h-[2.1em] sm:min-h-0">
+            <HandwrittenCycle lines={COVER_LINES} className="leading-[1.15] text-[#8f78e8] sm:whitespace-nowrap" />
           </span>
         </h1>
         <p
@@ -765,15 +762,17 @@ export default function TeteLayout({ shell }) {
       {menuOpen && <Menu shell={shell} onClose={() => setMenuOpen(false)} />}
 
       {view === "wardrobe" && (
-        <div className="animate-fade-in fixed inset-0 z-40 flex flex-col bg-[#f5f3fa] text-ink">
-          <div className="flex h-16 shrink-0 items-center justify-between px-5">
-            <p className="font-script text-[26px] italic">Your wardrobe</p>
+        <div className="animate-fade-in fixed inset-0 z-40 flex flex-col bg-[#fdfcfa]">
+          <div className="flex h-16 shrink-0 items-center justify-between px-5 sm:px-7">
+            <span className="flex items-center gap-2.5 font-script text-[22px] italic text-[#2b2633]/80">
+              <span className="tete-breathe block h-2 w-2 rounded-full bg-[#8f78e8] shadow-[0_0_14px_4px_rgba(185,164,255,0.5)]" />
+              helloModa
+            </span>
             <button
               onClick={() => setView("chat")}
-              aria-label="Back to the conversation"
-              className="grid h-10 w-10 place-items-center rounded-full bg-black/5 text-muted hover:text-ink"
+              className="rounded-full bg-white/70 px-4 py-2 text-[13px] text-[#2b2633] ring-1 ring-[#2b2633]/10 backdrop-blur-md transition-colors hover:ring-[#8f78e8]/50"
             >
-              <X size={18} />
+              Back to styling
             </button>
           </div>
           <div className="flex min-h-0 flex-1 flex-col">

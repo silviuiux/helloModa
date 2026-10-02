@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import PresenceLight from "@/components/tete/PresenceLight.jsx";
 import BlobGallery from "@/components/tete/BlobGallery.jsx";
+import HandwrittenCycle from "@/components/tete/HandwrittenCycle.jsx";
 import PlaceholderImage from "@/components/PlaceholderImage.jsx";
 import Reveal from "@/components/Reveal.jsx";
 import { occasions } from "@/data/occasions";
@@ -125,7 +126,6 @@ function Nav() {
 // The hero mirrors the app's welcome: the same headline and the same
 // blobs, which here hold real generated looks.
 function Hero({ images }) {
-  const [line, setLine] = useState(0);
   const [touch, setTouch] = useState(false);
   const [picks, setPicks] = useState(() => occasions.slice(0, 5));
 
@@ -134,9 +134,6 @@ function Hero({ images }) {
     const withLook = shuffled(occasions.filter((o) => images[o.slug]));
     const rest = shuffled(occasions.filter((o) => !images[o.slug]));
     setPicks([...withLook, ...rest].slice(0, 5));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setLine((v) => (v + 1) % COVER_LINES.length), 2800);
-    return () => clearInterval(id);
   }, [images]);
 
   return (
@@ -155,8 +152,8 @@ function Hero({ images }) {
         >
           Dressed for
           <br />
-          <span key={line} className="animate-word-in inline-block min-h-[2em] italic text-[#8f78e8] sm:min-h-0 sm:whitespace-nowrap">
-            {COVER_LINES[line]}
+          <span className="inline-block min-h-[2.1em] sm:min-h-0">
+            <HandwrittenCycle lines={COVER_LINES} className="leading-[1.15] text-[#8f78e8] sm:whitespace-nowrap" />
           </span>
         </h1>
         <p
@@ -252,7 +249,7 @@ export default function LandingPage({ showcase = [] }) {
             <h2 className="mt-8 font-script text-[40px] leading-[1.08] sm:text-[60px]">
               Your wardrobe first.
               <br />
-              <span className="italic text-[#8f78e8]">Then, the perfect match.</span>
+              <span className="font-hand text-[#8f78e8]">Then, the perfect match.</span>
             </h2>
             <p className="mx-auto mt-8 max-w-xl text-balance text-[16px] leading-[1.75] text-[#2b2633]/65">
               Most mornings you already own the outfit — you just can’t see it yet. helloModa
@@ -333,7 +330,7 @@ export default function LandingPage({ showcase = [] }) {
           <Reveal>
             <p className={meta}>Private beta</p>
             <h2 className="mt-7 font-script text-[56px] leading-[0.95] sm:text-[88px]">
-              Come get <span className="italic text-[#8f78e8]">dressed.</span>
+              Come get <span className="font-hand text-[#8f78e8]">dressed.</span>
             </h2>
             <p className="mx-auto mt-7 max-w-md text-balance text-[15.5px] leading-[1.7] text-[#2b2633]/60">
               helloModa is invite-only while we refine the styling. Got a code? You’re one step away.

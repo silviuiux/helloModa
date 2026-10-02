@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Home, Plus } from "../Icons.jsx";
+import { Plus } from "../Icons.jsx";
 import { deleteAvatarProfile } from "../../actions/avatars.js";
 import AvatarCard from "./AvatarCard.jsx";
 import AvatarProfileModal from "./AvatarProfileModal.jsx";
@@ -11,14 +10,14 @@ function AddTile({ label, sublabel, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="group grid aspect-[3/4] place-items-center rounded-bubble border border-dashed border-accent-soft bg-white/60 text-muted backdrop-blur-md transition-colors hover:border-accent hover:bg-white/70 hover:text-accent-deep"
+      className="group grid aspect-[3/4] place-items-center rounded-[18px] border border-dashed border-[#8f78e8]/35 bg-white/50 text-[#2b2633]/60 transition-colors hover:border-[#8f78e8] hover:bg-white/80"
     >
       <span className="text-center">
-        <span className="glass-circle mx-auto grid h-12 w-12 place-items-center rounded-full transition-transform group-hover:scale-105">
+        <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-white text-[#2b2633]/70 shadow-[0_10px_30px_-12px_rgba(90,70,160,0.35)] transition-transform group-hover:scale-105">
           <Plus size={22} />
         </span>
-        <span className="mt-2.5 block text-[13px] font-medium">{label}</span>
-        {sublabel && <span className="mt-0.5 block text-[11.5px] text-faint">{sublabel}</span>}
+        <span className="mt-3 block font-hand text-[22px] text-[#8f78e8]">{label}</span>
+        {sublabel && <span className="mt-0.5 block text-[11.5px] text-[#2b2633]/40">{sublabel}</span>}
       </span>
     </button>
   );
@@ -50,25 +49,19 @@ export default function AvatarsView({ profiles, selfDefaults, maxAvatars }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
-      <div className="mb-4 flex items-center gap-3">
-        <Link
-          href="/"
-          aria-label="Back to helloModa"
-          className="glass-circle grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
-        >
-          <Home size={17} />
-        </Link>
-        <h1 className="font-script text-[40px] leading-none text-ink sm:text-[52px]">hello—Avatar</h1>
-      </div>
-      <p className="mb-10 max-w-lg text-[14px] text-muted">
+    <div className="mx-auto w-full max-w-[1100px] px-6 pb-32 pt-28 sm:px-10 sm:pt-36">
+      <p className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">Avatars</p>
+      <h1 className="mt-4 font-script text-[46px] leading-[1.02] text-[#2b2633] sm:text-[60px]">
+        Styled on <span className="font-hand text-[#8f78e8]">you.</span>
+      </h1>
+      <p className="mb-12 mt-5 max-w-lg text-[15px] leading-[1.7] text-[#2b2633]/60">
         Watercolor avatars helloModa styles outfits on in chat — yourself
         {maxFamily > 0 ? `, plus up to ${maxFamily} family members` : ""}, each with their own
         measurements. A reference photo is used once to paint the avatar, then discarded — only
         the finished painting is kept.
       </p>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-7 lg:grid-cols-4">
         {selfProfile ? (
           <AvatarCard profile={selfProfile} onEdit={(p) => setEditing({ profile: p, isSelf: true })} onDelete={handleDeleted} />
         ) : (
@@ -88,10 +81,10 @@ export default function AvatarsView({ profiles, selfDefaults, maxAvatars }) {
         )}
 
         {selfProfile && maxFamily === 0 && (
-          <div className="glass grid aspect-[3/4] place-items-center rounded-bubble p-6 text-center">
+          <div className="grid aspect-[3/4] place-items-center rounded-[18px] border border-[#2b2633]/10 bg-white/50 p-6 text-center">
             <div>
-              <p className="text-[13px] font-medium text-ink">Style the whole family with Pro</p>
-              <p className="mt-1.5 text-[11.5px] text-muted">
+              <p className="font-script text-[22px] leading-tight text-[#2b2633]">Style the whole family with Pro</p>
+              <p className="mt-2 text-[12px] leading-relaxed text-[#2b2633]/50">
                 Add up to 3 more people — partner, kids, parents — each with their own avatar, sizes and measurements.
               </p>
             </div>

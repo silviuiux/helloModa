@@ -8,26 +8,26 @@ import GuideHeroImage from "./GuideHeroImage.jsx";
 export default function GuideShowcase({ guide }) {
   return (
     <section className="mt-24 sm:mt-28">
-      <p className="label text-faint">See it in helloModa</p>
+      <p className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">See it in helloModa</p>
       <div className="mt-5 grid gap-8 sm:grid-cols-2 sm:items-start">
         <GuideHeroImage
           src={`/guides/${guide.slug}-hero.jpg`}
           alt={guide.occasion}
-          className="aspect-[4/5] rounded-xl2"
+          className="aspect-[4/5] rounded-[22px] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.45)]"
         />
         <div className="flex flex-col">
-          <h2 className="font-script text-[44px] leading-[0.9] text-ink sm:text-[52px]">
+          <h2 className="font-script text-[44px] leading-[1] text-[#2b2633] sm:text-[52px]">
             {guide.occasion}
           </h2>
-          <p className="mt-4 text-[16px] leading-relaxed text-ink">{guide.hook}</p>
+          <p className="mt-5 text-[16px] leading-[1.75] text-[#2b2633]/75">{guide.hook}</p>
           <div className="mt-6 flex flex-wrap gap-2">
-            <span className="glass-soft rounded-full px-3.5 py-1.5 text-[13px] text-accent-deep">
-              "{guide.promptExample}"
+            <span className="font-hand text-[24px] leading-snug text-[#8f78e8]">
+              “{guide.promptExample}”
             </span>
           </div>
         </div>
       </div>
-      <p className="mt-5 max-w-2xl text-[13px] leading-relaxed text-faint">
+      <p className="mt-6 max-w-2xl text-[13.5px] leading-[1.7] text-[#2b2633]/45">
         This is what a helloModa answer looks like. Describe your own version of this occasion
         and get one specific look — built from your wardrobe first, painted on you, not a grid
         of generic options.
