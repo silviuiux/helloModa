@@ -11,8 +11,8 @@ import { occasions } from "../../data/occasions.js";
 import { ArrowRight, Heart, X, User } from "../Icons.jsx";
 
 // design-07 — "Tête-à-tête". A personal, intimate one-to-one with the
-// stylist: a dim, warm room where the stylist is a light (PresenceLight),
-// not a chat widget. Minimal chrome, everything interactive:
+// stylist: a bright, airy room with lots of white space, where the
+// stylist is a soft pastel haze (PresenceLight), not a chat widget. Minimal chrome, everything interactive:
 //  - type anywhere: any key focuses the composer; words appear large, in
 //    a handwritten-feeling serif, and the line beneath fills as you write;
 //    every keystroke makes the light lean in. Tab borrows one of the
@@ -25,7 +25,7 @@ import { ArrowRight, Heart, X, User } from "../Icons.jsx";
 // Same `shell` contract as the other /design-0X layouts: identical data,
 // sending, image generation, quotas, history, avatars and wardrobe.
 
-const INK = "#f3ece4";
+const INK = "#2b2633";
 const OPENERS = ["rooftop-birthday", "first-date", "big-interview"]
   .map((slug) => occasions.find((o) => o.slug === slug))
   .filter(Boolean);
@@ -72,7 +72,7 @@ function Streamed({ text, fresh, className }) {
 
 function Whisper({ children, className = "" }) {
   return (
-    <p className={`text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#f3ece4]/40 ${className}`}>{children}</p>
+    <p className={`text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/40 ${className}`}>{children}</p>
   );
 }
 
@@ -91,7 +91,7 @@ function Welcome({ name, lastConversation, onSelectConversation, onSend, styling
   return (
     <section
       data-moment
-      className="tete-moment mx-auto flex min-h-[80svh] max-w-[640px] flex-col justify-center px-6 pb-12 pt-28 text-center"
+      className="tete-moment mx-auto flex min-h-[88svh] max-w-[620px] flex-col justify-center px-6 pb-16 pt-36 text-center"
     >
       <Whisper className="animate-fade-in">{moment.when || " "}</Whisper>
       <h1
@@ -102,7 +102,7 @@ function Welcome({ name, lastConversation, onSelectConversation, onSend, styling
         {name ? `, ${name}` : ""}.
       </h1>
       <p
-        className="animate-fade-up mx-auto mt-5 max-w-md text-[16.5px] leading-[1.7] text-[#f3ece4]/60"
+        className="animate-fade-up mx-auto mt-5 max-w-md text-[16.5px] leading-[1.7] text-[#2b2633]/60"
         style={{ animationDelay: "260ms" }}
       >
         It&apos;s just the two of us. Tell me where you&apos;re going — I&apos;ll start with what&apos;s already in
@@ -112,21 +112,21 @@ function Welcome({ name, lastConversation, onSelectConversation, onSend, styling
       {lastConversation && (
         <button
           onClick={() => onSelectConversation(lastConversation.id)}
-          className="animate-fade-up group mx-auto mt-9 text-[14.5px] text-[#f3ece4]/55 transition-colors hover:text-[#f3ece4]"
+          className="animate-fade-up group mx-auto mt-9 text-[14.5px] text-[#2b2633]/55 transition-colors hover:text-[#2b2633]"
           style={{ animationDelay: "380ms" }}
         >
           {/* Conversation titles are the opening message itself (api/chat),
               so quote it back rather than slot it into a sentence. */}
           Last time, you told me{" "}
-          <em className="font-script text-[19px] text-[#d9ccff]">“{lastConversation.title}”</em>{" "}
-          <span className="whitespace-nowrap underline decoration-[#f3ece4]/20 underline-offset-4 group-hover:decoration-[#c9b8ff]">
+          <em className="font-script text-[19px] text-[#8f78e8]">“{lastConversation.title}”</em>{" "}
+          <span className="whitespace-nowrap underline decoration-[#2b2633]/20 underline-offset-4 group-hover:decoration-[#c9b8ff]">
             Pick it back up →
           </span>
         </button>
       )}
 
       <div
-        className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[14px] text-[#f3ece4]/40"
+        className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[14px] text-[#2b2633]/40"
         style={{ animationDelay: "480ms" }}
       >
         <span className="basis-full sm:basis-auto">Or start with</span>
@@ -134,7 +134,7 @@ function Welcome({ name, lastConversation, onSelectConversation, onSend, styling
           <span key={o.slug} className="flex items-center gap-2">
             <button
               onClick={() => onSend(o.prompt)}
-              className="font-script text-[18px] italic text-[#f3ece4]/75 transition-colors hover:text-[#d9ccff] sm:text-[19px]"
+              className="font-script text-[18px] italic text-[#2b2633]/75 transition-colors hover:text-[#8f78e8] sm:text-[19px]"
             >
               {o.label.toLowerCase()}
             </button>
@@ -142,7 +142,7 @@ function Welcome({ name, lastConversation, onSelectConversation, onSend, styling
           </span>
         ))}
       </div>
-      <p className="animate-fade-in mt-14 hidden text-[12px] text-[#f3ece4]/30 sm:block" style={{ animationDelay: "700ms" }}>
+      <p className="animate-fade-in mt-14 hidden text-[12px] text-[#2b2633]/30 sm:block" style={{ animationDelay: "700ms" }}>
         Just start typing — anywhere.
       </p>
     </section>
@@ -150,14 +150,17 @@ function Welcome({ name, lastConversation, onSelectConversation, onSend, styling
 }
 
 // ── One stylist look ────────────────────────────────────────────────────
-function LookMoment({ message, isLatest, onSend, onToggleSave, savedIds }) {
+function LookMoment({ message, isLatest, onSend, onKeepLook, onToggleSave, savedIds }) {
   const image = useOutfitImage({
     recommendationId: message.recommendationId,
     heroPrompt: message.heroPrompt,
     generatedImageUrl: message.generatedImageUrl,
   });
   const [flipped, setFlipped] = useState(false);
-  const [liked, setLiked] = useState(false);
+  // Kept looks persist (outfit_recommendations.kept_at) and show up in the
+  // style journal's Kept section — AppShell owns the optimistic update.
+  const liked = Boolean(message.kept);
+  const setKept = (value) => onKeepLook?.(message.recommendationId, value);
   const pieces = message.pieces || [];
   const after = message.fresh ? streamTiming(message.narrative).total + 300 : 0;
 
@@ -174,7 +177,7 @@ function LookMoment({ message, isLatest, onSend, onToggleSave, savedIds }) {
   const action = "text-[11px] font-medium uppercase tracking-[0.2em] transition-colors";
 
   return (
-    <section data-moment className="tete-moment mx-auto max-w-[640px] px-6 py-14">
+    <section data-moment className="tete-moment mx-auto max-w-[620px] px-6 py-24">
       <div className="animate-fade-up">
         <TiltLook
           image={image}
@@ -184,16 +187,16 @@ function LookMoment({ message, isLatest, onSend, onToggleSave, savedIds }) {
           flipped={flipped}
           onFlip={() => setFlipped((f) => !f)}
           liked={liked}
-          onKeep={() => setLiked(true)}
+          onKeep={() => !liked && setKept(true)}
           onToggleSave={onToggleSave}
           savedIds={savedIds}
         />
-        <p className="mt-4 text-center text-[11.5px] text-[#f3ece4]/30">
+        <p className="mt-4 text-center text-[11.5px] text-[#2b2633]/30">
           {pieces.length ? "Turn it over for the pieces · double-tap to keep it" : "Double-tap to keep it"}
         </p>
       </div>
 
-      <div className="mt-10 text-center">
+      <div className="mt-14 text-center">
         {message.title && (
           <h2
             className="animate-fade-up font-script text-[42px] leading-[1.02] sm:text-[52px]"
@@ -206,48 +209,48 @@ function LookMoment({ message, isLatest, onSend, onToggleSave, savedIds }) {
           <Streamed
             text={message.narrative}
             fresh={message.fresh}
-            className="mx-auto mt-5 max-w-[34rem] text-left text-[16.5px] leading-[1.8] text-[#f3ece4]/75 sm:text-center"
+            className="mx-auto mt-5 max-w-[34rem] text-left text-[16.5px] leading-[1.8] text-[#2b2633]/75 sm:text-center"
           />
         )}
       </div>
 
       {image.settled && (
         <div
-          className="animate-fade-up mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
+          className="animate-fade-up mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3"
           style={{ animationDelay: `${after}ms` }}
         >
           <button
-            onClick={() => setLiked((v) => !v)}
+            onClick={() => setKept(!liked)}
             aria-pressed={liked}
-            className={`${action} flex items-center gap-1.5 ${liked ? "text-[#ffb3c7]" : "text-[#f3ece4]/45 hover:text-[#f3ece4]"}`}
+            className={`${action} flex items-center gap-1.5 ${liked ? "text-[#e46d92]" : "text-[#2b2633]/45 hover:text-[#2b2633]"}`}
           >
             <Heart size={13} fill={liked ? "currentColor" : "none"} />
             {liked ? "Kept" : "Keep"}
           </button>
           {pieces.length > 0 && (
-            <button onClick={() => setFlipped((f) => !f)} className={`${action} text-[#f3ece4]/45 hover:text-[#f3ece4]`}>
+            <button onClick={() => setFlipped((f) => !f)} className={`${action} text-[#2b2633]/45 hover:text-[#2b2633]`}>
               {flipped ? "The photo" : `The pieces (${pieces.length})`}
             </button>
           )}
           <button
             onClick={() => onSend("Restyle this — show me a different direction for the same occasion.")}
-            className={`${action} text-[#f3ece4]/45 hover:text-[#f3ece4]`}
+            className={`${action} text-[#2b2633]/45 hover:text-[#2b2633]`}
           >
             Restyle
           </button>
-          <button onClick={share} className={`${action} text-[#f3ece4]/45 hover:text-[#f3ece4]`}>
+          <button onClick={share} className={`${action} text-[#2b2633]/45 hover:text-[#2b2633]`}>
             Share
           </button>
         </div>
       )}
 
       {image.settled && message.quickReplies?.length > 0 && (
-        <ul className="mx-auto mt-10 max-w-md space-y-1">
+        <ul className="mx-auto mt-12 max-w-md space-y-1">
           {message.quickReplies.map((q, i) => (
             <li key={q} className="animate-fade-up" style={{ animationDelay: `${after + 150 + i * 90}ms` }}>
               <button
                 onClick={() => onSend(q)}
-                className="group flex w-full items-baseline justify-center gap-3 py-1.5 font-script text-[19px] italic text-[#f3ece4]/40 transition-colors hover:text-[#f3ece4]"
+                className="group flex w-full items-baseline justify-center gap-3 py-1.5 font-script text-[19px] italic text-[#2b2633]/40 transition-colors hover:text-[#2b2633]"
               >
                 <span className="text-[13px] not-italic text-[#c9b8ff]/0 transition-colors group-hover:text-[#c9b8ff]">→</span>
                 {q}
@@ -255,7 +258,7 @@ function LookMoment({ message, isLatest, onSend, onToggleSave, savedIds }) {
             </li>
           ))}
           {isLatest && (
-            <li className="pt-2 text-center text-[11.5px] text-[#f3ece4]/25 [@media(hover:none)]:hidden">
+            <li className="pt-2 text-center text-[11.5px] text-[#2b2633]/25 [@media(hover:none)]:hidden">
               or press Tab to borrow one
             </li>
           )}
@@ -272,9 +275,9 @@ function ThinkingMoment() {
     return () => clearInterval(id);
   }, []);
   return (
-    <section data-moment className="tete-moment mx-auto flex max-w-[640px] flex-col items-center px-6 py-16">
-      <span className="tete-breathe block h-3 w-3 rounded-full bg-[#d9ccff] shadow-[0_0_28px_8px_rgba(185,164,255,0.45)]" />
-      <p key={i} className="animate-word-in mt-6 font-script text-[22px] italic text-[#f3ece4]/60" aria-live="polite">
+    <section data-moment className="tete-moment mx-auto flex max-w-[620px] flex-col items-center px-6 py-24">
+      <span className="tete-breathe block h-3 w-3 rounded-full bg-[#8f78e8] shadow-[0_0_28px_8px_rgba(185,164,255,0.45)]" />
+      <p key={i} className="animate-word-in mt-6 font-script text-[22px] italic text-[#2b2633]/60" aria-live="polite">
         {THINKING_LINES[i]}
       </p>
     </section>
@@ -333,7 +336,7 @@ function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggest
   const fill = hasDraft ? Math.min(100, 6 + value.length * 1.4) : 0;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#0c0a0d] from-50% via-[#0c0a0d]/85 to-transparent pt-24">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#fdfcfa] from-50% via-[#fdfcfa]/85 to-transparent pt-24">
       <div className="pointer-events-auto relative mx-auto max-w-[680px] px-6 pb-6 sm:pb-8">
         {ghost && (
           <p
@@ -356,7 +359,7 @@ function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggest
             // Symmetric room for the send button only once there's a draft,
             // so the placeholder fits one line on a phone and centred text
             // never shifts sideways when the button appears.
-            className={`tete-caret block max-h-[170px] min-h-[44px] w-full resize-none bg-transparent py-1.5 text-center font-script text-[24px] italic leading-snug placeholder:text-[#f3ece4]/25 focus:outline-none sm:text-[28px] ${
+            className={`tete-caret block max-h-[170px] min-h-[44px] w-full resize-none bg-transparent py-1.5 text-center font-script text-[24px] italic leading-snug placeholder:text-[#2b2633]/25 focus:outline-none sm:text-[28px] ${
               hasDraft ? "px-12" : "px-0"
             }`}
             style={{ color: INK }}
@@ -367,20 +370,20 @@ function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggest
             disabled={!hasDraft || thinking}
             className={`absolute bottom-1 right-0 grid h-10 w-10 place-items-center rounded-full transition-all duration-300 ${
               hasDraft && !thinking
-                ? "scale-100 bg-[#f3ece4] text-[#0c0a0d] opacity-100"
+                ? "scale-100 bg-[#2b2633] text-[#fdfcfa] opacity-100"
                 : "pointer-events-none scale-75 bg-transparent text-transparent opacity-0"
             }`}
           >
             <ArrowRight size={16} />
           </button>
         </div>
-        <div className="relative mt-2 h-px bg-[#f3ece4]/12">
+        <div className="relative mt-2 h-px bg-[#2b2633]/[0.08]">
           <div
             className="absolute inset-y-0 left-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#c9b8ff] to-transparent transition-[width] duration-500 ease-out"
             style={{ width: `${thinking ? 100 : fill}%`, opacity: thinking ? 0.5 : 0.9 }}
           />
         </div>
-        <div className="mt-2.5 flex justify-center gap-5 text-[11px] text-[#f3ece4]/25">
+        <div className="mt-2.5 flex justify-center gap-5 text-[11px] text-[#2b2633]/25">
           {hasDraft ? (
             <span>↵ to send · ⇧↵ new line</span>
           ) : (
@@ -425,20 +428,20 @@ function Menu({ shell, onClose }) {
       // cancelled / unavailable
     }
   }
-  const big = "block w-full py-1.5 text-left font-script text-[30px] leading-tight text-[#f3ece4]/80 transition-colors hover:text-[#f3ece4] sm:text-[34px]";
+  const big = "block w-full py-1.5 text-left font-script text-[30px] leading-tight text-[#2b2633]/80 transition-colors hover:text-[#2b2633] sm:text-[34px]";
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Menu"
-      className="animate-fade-in fixed inset-0 z-50 overflow-y-auto bg-[#0c0a0d]/85 backdrop-blur-xl"
+      className="animate-fade-in fixed inset-0 z-50 overflow-y-auto bg-[#fdfcfa]/80 backdrop-blur-2xl"
       onClick={onClose}
     >
       <button
         onClick={onClose}
         aria-label="Close menu"
-        className="fixed right-5 top-5 grid h-10 w-10 place-items-center rounded-full text-[#f3ece4]/60 hover:text-[#f3ece4]"
+        className="fixed right-5 top-5 grid h-10 w-10 place-items-center rounded-full text-[#2b2633]/60 hover:text-[#2b2633]"
       >
         <X size={20} />
       </button>
@@ -447,7 +450,7 @@ function Menu({ shell, onClose }) {
           A new conversation
         </button>
         <button onClick={go(() => setView("wardrobe"))} className={big}>
-          Your wardrobe <span className="text-[18px] text-[#f3ece4]/35">{wardrobe.length}</span>
+          Your wardrobe <span className="text-[18px] text-[#2b2633]/35">{wardrobe.length}</span>
         </button>
         <Link href={journalHref || "/outfits"} className={big}>
           Your style journal
@@ -467,8 +470,8 @@ function Menu({ shell, onClose }) {
                     onClick={() => onSelectAvatar(o.id)}
                     className={`rounded-full px-4 py-1.5 text-[13px] transition-colors ${
                       o.id === (activeAvatarId || null)
-                        ? "bg-[#f3ece4] text-[#0c0a0d]"
-                        : "bg-[#f3ece4]/[0.06] text-[#f3ece4]/60 hover:text-[#f3ece4]"
+                        ? "bg-[#2b2633] text-[#fdfcfa]"
+                        : "bg-[#2b2633]/[0.06] text-[#2b2633]/60 hover:text-[#2b2633]"
                     }`}
                   >
                     {o.label}
@@ -488,7 +491,7 @@ function Menu({ shell, onClose }) {
                   <button
                     onClick={go(() => onSelectConversation(c.id))}
                     className={`block w-full truncate py-1 text-left font-script text-[19px] italic transition-colors ${
-                      c.id === activeConversationId ? "text-[#d9ccff]" : "text-[#f3ece4]/50 hover:text-[#f3ece4]"
+                      c.id === activeConversationId ? "text-[#8f78e8]" : "text-[#2b2633]/50 hover:text-[#2b2633]"
                     }`}
                   >
                     {c.title || "Untitled look"}
@@ -499,16 +502,16 @@ function Menu({ shell, onClose }) {
           </>
         )}
 
-        <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-[#f3ece4]/40">
-          <Link href="/profile" className="hover:text-[#f3ece4]">
+        <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-[#2b2633]/40">
+          <Link href="/profile" className="hover:text-[#2b2633]">
             Profile
           </Link>
-          <Link href="/avatars" className="hover:text-[#f3ece4]">
+          <Link href="/avatars" className="hover:text-[#2b2633]">
             Avatars
           </Link>
           {userEmail && (
             <form action={onSignOut}>
-              <button type="submit" className="hover:text-[#f3ece4]">
+              <button type="submit" className="hover:text-[#2b2633]">
                 Sign out
               </button>
             </form>
@@ -634,24 +637,24 @@ export default function TeteLayout({ shell }) {
   }
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#0c0a0d] font-sans" style={{ color: INK }}>
+    <div className="fixed inset-0 overflow-hidden bg-[#fdfcfa] font-sans" style={{ color: INK }}>
       <PresenceLight energyRef={energyRef} thinking={thinking} />
 
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-20 h-28 bg-gradient-to-b from-[#0c0a0d] from-30% to-transparent"
+        className="pointer-events-none fixed inset-x-0 top-0 z-20 h-28 bg-gradient-to-b from-[#fdfcfa] from-30% to-transparent"
       />
       {/* Top: just a name and a way into everything else. */}
       <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between px-5 pt-5 sm:px-7">
-        <span className="pointer-events-auto flex items-center gap-2.5 font-script text-[22px] italic text-[#f3ece4]/80">
-          <span className="tete-breathe block h-2 w-2 rounded-full bg-[#d9ccff] shadow-[0_0_14px_4px_rgba(185,164,255,0.5)]" />
+        <span className="pointer-events-auto flex items-center gap-2.5 font-script text-[22px] italic text-[#2b2633]/80">
+          <span className="tete-breathe block h-2 w-2 rounded-full bg-[#8f78e8] shadow-[0_0_14px_4px_rgba(185,164,255,0.5)]" />
           helloModa
         </span>
         <button
           onClick={() => setMenuOpen(true)}
-          className="pointer-events-auto flex items-center gap-3 rounded-full py-1 pl-1 pr-4 text-[12.5px] text-[#f3ece4]/55 ring-1 ring-[#f3ece4]/10 transition-colors hover:text-[#f3ece4] hover:ring-[#f3ece4]/25"
+          className="pointer-events-auto flex items-center gap-3 rounded-full py-1 pl-1 pr-4 text-[12.5px] text-[#2b2633]/55 bg-white/60 ring-1 ring-[#2b2633]/[0.07] backdrop-blur-md transition-colors hover:text-[#2b2633] hover:ring-[#2b2633]/20"
         >
-          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-[#f3ece4]/[0.08]">
+          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-[#2b2633]/[0.08]">
             {activeAvatar?.avatar_image_signed_url ? (
               <img src={activeAvatar.avatar_image_signed_url} alt="" className="h-full w-full object-cover" />
             ) : (
@@ -659,7 +662,7 @@ export default function TeteLayout({ shell }) {
             )}
           </span>
           Menu
-          <kbd className="hidden font-sans text-[11px] text-[#f3ece4]/30 sm:inline">⌘K</kbd>
+          <kbd className="hidden font-sans text-[11px] text-[#2b2633]/30 sm:inline">⌘K</kbd>
         </button>
       </header>
 
@@ -674,15 +677,15 @@ export default function TeteLayout({ shell }) {
         />
 
         {isSwitching && messages.length === 0 && (
-          <p className="text-center font-script text-[20px] italic text-[#f3ece4]/40">Finding our conversation…</p>
+          <p className="text-center font-script text-[20px] italic text-[#2b2633]/40">Finding our conversation…</p>
         )}
 
         {messages.map((m) => {
           if (m.role === "user") {
             return (
-              <section key={m.id} data-moment className="tete-moment mx-auto max-w-[640px] px-6 pt-16 text-center">
+              <section key={m.id} data-moment className="tete-moment mx-auto max-w-[620px] px-6 pt-28 text-center">
                 <Whisper>You</Whisper>
-                <p className="animate-fade-up mt-3 font-script text-[26px] italic leading-snug text-[#d9ccff]/85 sm:text-[30px]">
+                <p className="animate-fade-up mt-3 font-script text-[26px] italic leading-snug text-[#8f78e8]/85 sm:text-[30px]">
                   “{m.text}”
                 </p>
               </section>
@@ -691,7 +694,7 @@ export default function TeteLayout({ shell }) {
           if (!m.title && !m.heroPrompt) {
             return (
               <section key={m.id} data-moment className="tete-moment mx-auto max-w-[640px] px-6 py-10 text-center">
-                <p className="animate-fade-up font-script text-[21px] italic leading-snug text-[#ffc9d6]/85">{m.narrative}</p>
+                <p className="animate-fade-up font-script text-[21px] italic leading-snug text-[#c2577a]/85">{m.narrative}</p>
               </section>
             );
           }
@@ -701,6 +704,7 @@ export default function TeteLayout({ shell }) {
               message={m}
               isLatest={m.id === latestLook?.id}
               onSend={onSend}
+              onKeepLook={shell.onKeepLook}
               onToggleSave={handleToggleSave}
               savedIds={savedIds}
             />
@@ -710,7 +714,7 @@ export default function TeteLayout({ shell }) {
         {thinking && <ThinkingMoment />}
       </main>
 
-      {/* Fine grain over everything — the room has texture. */}
+      {/* A whisper of grain, so the white reads as paper, not screen. */}
       <div aria-hidden="true" className="tete-grain pointer-events-none fixed inset-0 z-[15]" />
 
       {view === "chat" && (

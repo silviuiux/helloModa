@@ -92,7 +92,7 @@ export async function getConversationMessages(conversationId) {
 
   const { data: recs, error: recsError } = await supabase
     .from("outfit_recommendations")
-    .select("id, message_id, title, hero_prompt, quick_replies, generated_image_url")
+    .select("id, message_id, title, hero_prompt, quick_replies, generated_image_url, kept_at")
     .in("message_id", assistantIds);
   if (recsError) throw new Error(recsError.message);
 
@@ -126,9 +126,64 @@ export async function getConversationMessages(conversationId) {
       recommendationId: rec?.id || null,
       generatedImageUrl: rec?.generated_image_url ? await signLookImageUrl(supabase, rec.generated_image_url) : null,
       quickReplies: rec?.quick_replies || [],
+      kept: Boolean(rec?.kept_at),
       pieces,
     };
   }));
+}
+
+// "Keep" on a look (/design-07): pins that one recommendation into the
+// style journal's Kept section. RLS on outfit_recommendations (owner via
+// message -> conversation) is what stops anyone keeping someone else's look.
+export async function setLookKept(recommendationId, kept) {
+  if (!recommendationId) throw new Error("Missing recommendation.");
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("outfit_recommendations")
+    .update({ kept_at: kept ? new Date().toISOString() : null })
+    .eq("id", recommendationId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Look not found.");
+}
+
+// The journal's Kept section — every kept look, newest keep first, each
+// linking back into its own conversation. Not limited to the latest look
+// per conversation like listOutfitHistory: keeping an earlier look in a
+// thread is exactly the point.
+export async function listKeptLooks() {
+  const supabase = await createClient();
+  const { data: recs, error } = await supabase
+    .from("outfit_recommendations")
+    .select("id, title, generated_image_url, kept_at, messages(conversation_id, content)")
+    .not("kept_at", "is", null)
+    .order("kept_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  if (!recs?.length) return [];
+
+  const { data: items, error: itemsError } = await supabase
+    .from("outfit_recommendation_items")
+    .select(
+      "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url)"
+    )
+    .in("recommendation_id", recs.map((r) => r.id));
+  if (itemsError) throw new Error(itemsError.message);
+
+  return Promise.all(
+    recs
+      .filter((r) => r.messages?.conversation_id)
+      .map(async (r) => ({
+        id: r.id,
+        conversationId: r.messages.conversation_id,
+        title: r.title || "Untitled look",
+        narrative: r.messages.content,
+        createdAt: r.kept_at,
+        kept: true,
+        coverImageUrl: r.generated_image_url ? await signLookImageUrl(supabase, r.generated_image_url) : null,
+        pieces: (items || []).filter((it) => it.recommendation_id === r.id).map(mapRecommendationItem),
+      }))
+  );
 }
 
 // Powers /outfits — one row per conversation, summarized by its most recent

@@ -1,4 +1,4 @@
-import { listOutfitHistory } from "@/actions/conversations";
+import { listKeptLooks, listOutfitHistory } from "@/actions/conversations";
 import OutfitHistoryList from "@/components/outfits/OutfitHistoryList.jsx";
 import { appHomeFor } from "@/lib/designRoutes";
 
@@ -8,13 +8,13 @@ import { appHomeFor } from "@/lib/designRoutes";
 export default async function OutfitsPage({ searchParams }) {
   const { from } = (await searchParams) || {};
   const home = appHomeFor(typeof from === "string" ? from : null);
-  const rows = await listOutfitHistory();
+  const [rows, kept] = await Promise.all([listOutfitHistory(), listKeptLooks()]);
 
   return (
     <div
       className="min-h-screen w-full"
     >
-      <OutfitHistoryList rows={rows} home={home} />
+      <OutfitHistoryList rows={rows} kept={kept} home={home} />
     </div>
   );
 }

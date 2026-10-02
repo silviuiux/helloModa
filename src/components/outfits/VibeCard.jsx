@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import PlaceholderImage from "../PlaceholderImage.jsx";
-import { Hanger } from "../Icons.jsx";
+import { Hanger, Heart } from "../Icons.jsx";
 
 const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
 
@@ -16,7 +16,7 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "num
 export default function VibeCard({ row, home = "/" }) {
   return (
     <Link
-      href={`${home}?conversation=${row.id}`}
+      href={`${home}?conversation=${row.conversationId || row.id}`}
       className="group relative block aspect-[4/5] overflow-hidden rounded-bubble shadow-soft transition-transform hover:-translate-y-1"
     >
       {row.coverImageUrl ? (
@@ -32,6 +32,11 @@ export default function VibeCard({ row, home = "/" }) {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
         style={{ background: "linear-gradient(to top, rgba(30,26,46,0.72), transparent)" }}
       />
+      {row.kept && (
+        <span className="absolute left-3.5 top-3.5 grid h-7 w-7 place-items-center rounded-full bg-white/85 text-[#e46d92] backdrop-blur-sm">
+          <Heart size={13} fill="currentColor" />
+        </span>
+      )}
       {row.pieces.length > 0 && (
         <span className="label absolute right-3.5 top-3.5 flex items-center gap-1.5 rounded-full bg-black/35 px-2.5 py-1 text-white/90 backdrop-blur-sm">
           <Hanger size={11} />

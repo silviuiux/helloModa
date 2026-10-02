@@ -4,6 +4,53 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — Keep saves to the style journal; /design-07 goes light and airy
+
+Two direct requests.
+
+**1. "Make keep save looks to the style journal."** Keeping a look (the heart, or double-tapping
+the photo) used to be visual only. It's now saved:
+
+- **Database.** Migration `outfit_recommendations_kept_at`, applied directly to Supabase, adds a
+  nullable `kept_at timestamptz` to `outfit_recommendations`, plus a partial index. Existing
+  rows are unaffected. The table's owner-only RLS policy already covered updates, so no policy
+  changes were needed.
+- **Server actions** in `src/actions/conversations.js`:
+  - `setLookKept(recommendationId, kept)` sets or clears `kept_at`.
+  - `listKeptLooks()` returns every kept look, most recently kept first, each linked to its
+    own conversation.
+  - `getConversationMessages()` now returns `kept` on every look, so the heart stays filled
+    when you reopen a conversation.
+- **App state.** `AppShell` gets `handleKeepLook`, passed to the layouts as `shell.onKeepLook`.
+  The heart fills immediately, and goes back if saving fails. Each keep is tracked as
+  `look_kept`.
+- **Style journal (`/outfits`).** A new **Kept** section sits above the monthly groups. It shows
+  any look you kept, including an earlier look in a conversation, not just the latest one. Kept
+  cards carry a small heart, and every card opens its conversation, on `/` or on the design
+  route you came from.
+
+**2. "Light themed, dreamy, airy and plenty of white space."** `/design-07` keeps the same
+interactions on a light background:
+
+- **Background.** Paper-white (`#fdfcfa`), with dark plum-grey type (`#2b2633`). Lilac
+  (`#8f78e8`) is used for your quoted messages and accents, rose (`#e46d92`) for hearts.
+- **Presence light.** It's now a soft pastel haze: a lilac and peach bloom, a pale sky-blue
+  drift that lags behind and sways the other way, and a white core. The edges fade out to
+  white instead of darkening.
+- **Looks develop from mist.** A new image starts soft, washed-out and pale, then resolves to
+  full colour.
+- **Cards.** Both sides of the look card are white, with a soft violet-tinted shadow.
+- **Menu and Menu button.** The menu is a frosted white overlay, and the Menu button is
+  frosted glass.
+- **More white space.** Vertical spacing between messages is roughly 1.5–1.75× larger, and the
+  welcome screen is taller.
+- **Grain.** The paper grain is much fainter.
+
+The changes are limited to the `tete-*` classes in `globals.css` and the three
+`src/components/tete/*` files. `/` and the other design routes are untouched.
+
+---
+
 ## 2026-10-02 — /design-07 "Tête-à-tête": an intimate one-to-one with the stylist
 
 Direct request: one more design at `/design-07`. The brief was "as interactive as possible,

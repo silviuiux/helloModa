@@ -24,7 +24,7 @@ function groupByMonth(rows) {
   return groups;
 }
 
-export default function OutfitHistoryList({ rows, home = "/" }) {
+export default function OutfitHistoryList({ rows, kept = [], home = "/" }) {
   const groups = groupByMonth(rows);
 
   return (
@@ -44,6 +44,19 @@ export default function OutfitHistoryList({ rows, home = "/" }) {
       <p className="mb-14 text-[14px] text-muted">
         Every look you&apos;ve been styled, kept. Open one to restyle it.
       </p>
+
+      {kept.length > 0 && (
+        <section className="mb-14">
+          <p className="label mb-5 text-faint">Kept</p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5">
+            {kept.map((row, i) => (
+              <Reveal key={row.id} delay={(i % 6) * 60}>
+                <VibeCard row={row} home={home} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       {rows.length === 0 ? (
         <p className="text-[14px] text-muted">

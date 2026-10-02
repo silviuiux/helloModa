@@ -7,8 +7,8 @@ import { Heart } from "../Icons.jsx";
 const EUR = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 
 // design-07 "Tête-à-tête": the look as a photograph you can handle.
-// - It *develops*: the painting arrives dark, warm and blurred and slowly
-//   resolves to full colour (globals.css `.tete-develop`).
+// - It *develops*: the painting arrives as soft, over-exposed mist and
+//   slowly resolves to full colour (globals.css `.tete-develop`).
 // - It tilts toward the pointer, with a glint that follows it.
 // - Tap turns it over to the pieces (shop links, save to wardrobe);
 //   double-tap keeps it, with a small heart. Both also exist as plain
@@ -104,7 +104,7 @@ export default function TiltLook({
         onPointerLeave={onPointerLeave}
         onClick={onClick}
         onKeyDown={onKeyDown}
-        className="group relative aspect-[4/5] w-full cursor-pointer select-none outline-none transition-transform duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[#c9b8ff]/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[#0c0a0d] rounded-[22px]"
+        className="group relative aspect-[4/5] w-full cursor-pointer select-none outline-none transition-transform duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[#c9b8ff]/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[#fdfcfa] rounded-[22px]"
         style={{ transformStyle: "preserve-3d" }}
       >
         <div
@@ -113,7 +113,7 @@ export default function TiltLook({
         >
           {/* Front: the photograph */}
           <div
-            className={`tete-face absolute inset-0 overflow-hidden rounded-[22px] bg-[#17131a] shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] ${
+            className={`tete-face absolute inset-0 overflow-hidden rounded-[22px] bg-[#f3eff8] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.35),0_0_0_1px_rgba(43,38,51,0.04)] ${
               flipped ? "pointer-events-none" : ""
             }`}
           >
@@ -130,10 +130,10 @@ export default function TiltLook({
             ) : image?.settled ? (
               <PlaceholderImage seed={seed} width={680} height={850} />
             ) : (
-              <div className="grid h-full w-full place-items-center bg-[radial-gradient(circle_at_50%_45%,rgba(185,164,255,0.18),transparent_60%)]">
+              <div className="grid h-full w-full place-items-center bg-[radial-gradient(circle_at_50%_45%,rgba(185,164,255,0.22),rgba(255,214,196,0.12)_45%,transparent_70%)]">
                 <div className="flex flex-col items-center gap-4">
-                  <span className="tete-breathe block h-3 w-3 rounded-full bg-[#d9ccff] shadow-[0_0_24px_6px_rgba(185,164,255,0.45)]" />
-                  <span className="font-script text-[19px] italic text-[#f3ece4]/60">developing your look…</span>
+                  <span className="tete-breathe block h-3 w-3 rounded-full bg-[#8f78e8] shadow-[0_0_24px_6px_rgba(185,164,255,0.45)]" />
+                  <span className="font-script text-[19px] italic text-[#2b2633]/60">developing your look…</span>
                 </div>
               </div>
             )}
@@ -143,13 +143,13 @@ export default function TiltLook({
               className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               style={{
                 background:
-                  "radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,255,255,0.22), rgba(255,255,255,0) 45%)",
+                  "radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,255,255,0.35), rgba(255,255,255,0) 45%)",
                 mixBlendMode: "soft-light",
               }}
             />
 
             {liked && (
-              <span className="animate-fade-in absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-black/45 text-[#ffb3c7] backdrop-blur-md">
+              <span className="animate-fade-in absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-white/85 text-[#e46d92] backdrop-blur-md">
                 <Heart size={16} fill="currentColor" />
               </span>
             )}
@@ -162,7 +162,7 @@ export default function TiltLook({
 
           {/* Back: the pieces */}
           <div
-            className={`tete-face scroll-area absolute inset-0 overflow-y-auto rounded-[22px] bg-[#f4efe8] p-5 text-[#1e1a2e] shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] ${
+            className={`tete-face scroll-area absolute inset-0 overflow-y-auto rounded-[22px] bg-white p-5 text-[#1e1a2e] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.35),0_0_0_1px_rgba(43,38,51,0.04)] ${
               flipped ? "" : "pointer-events-none"
             }`}
             style={{ transform: "rotateY(180deg)" }}
@@ -175,7 +175,7 @@ export default function TiltLook({
                 const linked = p.matched && p.productUrl;
                 return (
                   <li key={p.id} className="flex items-center gap-3">
-                    <span className="relative h-14 w-11 shrink-0 overflow-hidden rounded-lg bg-[#e7e0d6]">
+                    <span className="relative h-14 w-11 shrink-0 overflow-hidden rounded-lg bg-[#f3eff8]">
                       <PlaceholderImage src={linked ? p.imageUrl : undefined} seed={`${p.type}-${p.name}`} width={88} height={112} />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -207,7 +207,7 @@ export default function TiltLook({
                         aria-label={saved ? "Saved to wardrobe" : "Save to wardrobe"}
                         aria-pressed={saved}
                         className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors ${
-                          saved ? "bg-[#1e1a2e] text-[#ffb3c7]" : "bg-[#1e1a2e]/[0.06] text-[#6b6680] hover:text-[#1e1a2e]"
+                          saved ? "bg-[#1e1a2e] text-[#e46d92]" : "bg-[#f3eff8] text-[#6b6680] hover:text-[#1e1a2e]"
                         }`}
                       >
                         <Heart size={14} fill={saved ? "currentColor" : "none"} />
@@ -224,7 +224,7 @@ export default function TiltLook({
         {bursts.map((b) => (
           <span
             key={b.id}
-            className="tete-heart pointer-events-none absolute text-[#ffb3c7]"
+            className="tete-heart pointer-events-none absolute text-[#e46d92]"
             style={{ left: b.x, top: b.y }}
           >
             <Heart size={44} fill="currentColor" />

@@ -14,7 +14,7 @@ import {
   setWardrobeItemPrice,
   logWardrobeItemWear,
 } from "@/actions/wardrobe";
-import { getConversationMessages } from "@/actions/conversations";
+import { getConversationMessages, setLookKept } from "@/actions/conversations";
 import { signOut } from "@/actions/auth";
 import { identifyUser, track } from "@/lib/analytics";
 
@@ -173,6 +173,22 @@ export default function AppShell({
     }
   }
 
+  // Keep / un-keep one look (design-07's heart): optimistic on the message,
+  // persisted to outfit_recommendations.kept_at, rolled back on failure.
+  async function handleKeepLook(recommendationId, kept) {
+    if (!recommendationId) return;
+    const flip = (value) =>
+      setMessages((prev) => prev.map((m) => (m.recommendationId === recommendationId ? { ...m, kept: value } : m)));
+    flip(kept);
+    try {
+      await setLookKept(recommendationId, kept);
+      if (kept) track("look_kept");
+    } catch (err) {
+      console.error("Failed to keep look:", err);
+      flip(!kept);
+    }
+  }
+
   function handleNewChat() {
     setActiveConversationId(null);
     setMessages([]);
@@ -266,6 +282,7 @@ export default function AppShell({
       composing,
       setComposing,
       onSend: handleSend,
+      onKeepLook: handleKeepLook,
       conversations,
       activeConversationId,
       onSelectConversation: handleSelectConversation,

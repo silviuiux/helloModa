@@ -92,6 +92,10 @@ outfit_recommendations
   occasion                text
   weather_context         jsonb
   followup_question       text   -- superseded by quick_replies; unused going forward, kept for now
+  kept_at                 timestamptz -- null unless the user kept this look (design-07's heart /
+                             double-tap); kept looks fill the style journal's "Kept" section.
+                             Migration `outfit_recommendations_kept_at` (2026-10-02, applied directly
+                             via Supabase), plus a partial index on kept_at where not null.
   avatar_profile_id (fk -> avatar_profiles, nullable, on delete set null)   -- helloAvatar, added
                              2026-09-22: which avatar (if any) this look was generated for. Set
                              from the chat request; POST /api/generate-image reads it back to use
