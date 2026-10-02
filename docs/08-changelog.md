@@ -4,6 +4,43 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — /design-07: back to the clean light welcome, with photos as blobs that reveal on hover
+
+Direct request: drift back toward the first light versions. Minimalist, "just a few blob images
+that would reveal on hover, as clean as possible. Organic, dynamic and interactive."
+
+- **Welcome (`TeteLayout.jsx`):**
+  - **Layout.** Centred and minimal again, with plenty of white space.
+  - **Text.** A date line, then a serif "Dressed for" with an italic lilac line that cycles
+    through occasions, then one sentence ("Name the occasion. Looks start in your own
+    wardrobe."). If you have a recent conversation, a quiet "Continue '…' →" link follows,
+    then a hint line.
+  - **Removed.** The masthead, both carousels and the "Overheard" marquee are gone. So is the
+    "intimate" copy, which stays out.
+- **New `BlobGallery.jsx`:** five occasion photos, chosen at random, float in the margins around
+  the text, three of them on phones.
+  - **At rest.** Each is a faded pastel shape: blurred, desaturated, tinted, with feathered edges
+    that dissolve into the page.
+  - **Reveal on hover.** As the pointer gets close, the photo reveals in proportion to the
+    distance, not as an on/off switch. The blur clears, colour floods back, the edge firms up,
+    the shape swells slightly, and the occasion name with "Style this →" fades in. Clicking
+    starts styling for that occasion.
+  - **Always moving.** The outlines keep reshaping and the shapes float slowly.
+  - **On touch screens.** They reveal one at a time, in turns, and a tap sends.
+  - **Keyboard.** Focusing a blob reveals it fully.
+  - **Layering.** The float transform, the morphing clip and the image filter sit on three
+    separate elements, which avoids the earlier square-clip bug. The feathered edge uses a mask,
+    which is safe on the clipping element.
+- **Background (`PresenceLight.jsx`):** the drifting forms are removed, leaving only the three
+  slow colour washes and the central brightening. The blob photos are now the only "objects" on
+  the page.
+
+Verified with temporary local occasion images (not committed, since the sandbox blocks the
+placeholder photos). I checked the rest and hover states on desktop, and the touch round-robin
+at 390 px.
+
+---
+
 ## 2026-10-02 — /design-07: drifting forms instead of dots; an editorial cover hero
 
 Two direct requests.
