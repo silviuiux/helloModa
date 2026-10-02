@@ -5,14 +5,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PresenceLight from "./PresenceLight.jsx";
 import TiltLook from "./TiltLook.jsx";
 import WardrobeView from "../wardrobe/WardrobeView.jsx";
+import PlaceholderImage from "../PlaceholderImage.jsx";
 import { useOutfitImage } from "../../lib/useOutfitImage.js";
 import { cardToWardrobeItem } from "../../lib/look.js";
 import { occasions } from "../../data/occasions.js";
 import { ArrowRight, Heart, X, User } from "../Icons.jsx";
 
-// design-07 — "Tête-à-tête". A personal, intimate one-to-one with the
-// stylist: a bright, airy room with lots of white space, where the
-// stylist is a soft pastel haze (PresenceLight), not a chat widget. Minimal chrome, everything interactive:
+// design-07 — "Tête-à-tête". A one-to-one with the stylist in a bright,
+// airy room with lots of white space: an editorial cover to start from
+// (Welcome), slow organic forms drifting in the background (PresenceLight),
+// and the conversation set large, without chat-widget chrome. Minimal chrome, everything interactive:
 //  - type anywhere: any key focuses the composer; words appear large, in
 //    a handwritten-feeling serif, and the line beneath fills as you write;
 //    every keystroke makes the light lean in. Tab borrows one of the
@@ -76,74 +78,205 @@ function Whisper({ children, className = "" }) {
   );
 }
 
-// ── The welcome ──────────────────────────────────────────────────────────
+// ── The welcome: an editorial cover ─────────────────────────────────────
+// Direct request 2026-10-02: no "intimate" copy — a magazine-cover hero
+// instead, with the occasion carousels the main app once had. A masthead
+// line, an oversized serif headline whose last line cycles through
+// occasions, a short standfirst, then two image rows: a scroll-snap
+// carousel of every occasion (tap one to start) and a slow marquee of
+// things people actually ask.
+const COVER_LINES = [
+  "the first date.",
+  "the big interview.",
+  "the black-tie gala.",
+  "the rooftop birthday.",
+  "the weekend away.",
+  "the garden party.",
+  "whatever's next.",
+];
+
+const ASKS = [
+  { q: "Black-tie gala on Saturday — but I hate heels", slug: "black-tie-event" },
+  { q: "Beach weekend, carry-on only. What do I pack?", slug: "weekend-trip" },
+  { q: "Presenting to the leadership team on Thursday", slug: "big-interview" },
+  { q: "First date at a wine bar, not too try-hard", slug: "first-date" },
+  { q: "My sister's garden wedding, it might rain", slug: "garden-party" },
+  { q: "Gallery opening, I want to look effortless", slug: "museum-date" },
+];
+
+const EDGE = "max(1.5rem, calc((100vw - 1240px) / 2 + 2.5rem))";
+
+function shuffled(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 function Welcome({ name, lastConversation, onSelectConversation, onSend, stylingFor }) {
-  const [moment, setMoment] = useState({ greeting: "Hello", when: "" });
-  // Time-of-day set after mount so server and client markup match.
+  const [dateLine, setDateLine] = useState("");
+  const [line, setLine] = useState(0);
+  // Data order on the server, shuffled after mount — no hydration mismatch.
+  const [cards, setCards] = useState(occasions);
+  const railRef = useRef(null);
+
   useEffect(() => {
     const d = new Date();
-    const h = d.getHours();
-    const part = h < 5 ? "night" : h < 12 ? "morning" : h < 18 ? "afternoon" : h < 22 ? "evening" : "night";
-    const day = d.toLocaleDateString("en-US", { weekday: "long" });
-    setMoment({ greeting: part === "night" ? "Still up" : `Good ${part}`, when: `${day} ${part}` });
+    setDateLine(d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }));
+    setCards(shuffled(occasions));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setLine((v) => (v + 1) % COVER_LINES.length), 2800);
+    return () => clearInterval(id);
   }, []);
 
+  // Reordering keyed cards makes scroll-snap hold on to the card it had
+  // snapped to (now at the far end) — start from the beginning instead.
+  useEffect(() => {
+    if (railRef.current) railRef.current.scrollLeft = 0;
+  }, [cards]);
+
+  function page(dir) {
+    const rail = railRef.current;
+    if (rail) rail.scrollBy({ left: dir * rail.clientWidth * 0.8, behavior: "smooth" });
+  }
+
+  const meta = "text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45";
+  const asks = [...ASKS, ...ASKS];
+
   return (
-    <section
-      data-moment
-      className="tete-moment mx-auto flex min-h-[88svh] max-w-[620px] flex-col justify-center px-6 pb-16 pt-36 text-center"
-    >
-      <Whisper className="animate-fade-in">{moment.when || " "}</Whisper>
-      <h1
-        className="animate-fade-up mt-5 font-script text-[54px] leading-[1.02] tracking-[-0.01em] sm:text-[72px]"
-        style={{ color: INK, animationDelay: "120ms" }}
-      >
-        {moment.greeting}
-        {name ? `, ${name}` : ""}.
-      </h1>
-      <p
-        className="animate-fade-up mx-auto mt-5 max-w-md text-[16.5px] leading-[1.7] text-[#2b2633]/60"
-        style={{ animationDelay: "260ms" }}
-      >
-        It&apos;s just the two of us. Tell me where you&apos;re going — I&apos;ll start with what&apos;s already in
-        your wardrobe{stylingFor ? `, and dress ${stylingFor} for it` : ""}.
-      </p>
+    <section data-moment className="tete-moment w-full pb-10 pt-24 sm:pt-28">
+      <div className="mx-auto max-w-[1240px] px-6 sm:px-10">
+        {/* Masthead */}
+        <div className={`animate-fade-in flex items-center justify-between border-b border-[#2b2633]/10 pb-3 ${meta}`}>
+          <span>The Edit{name ? ` · for ${name}` : ""}</span>
+          <span className="hidden sm:inline">{dateLine || " "}</span>
+          <span>Nº {String(occasions.length).padStart(2, "0")} occasions</span>
+        </div>
 
-      {lastConversation && (
-        <button
-          onClick={() => onSelectConversation(lastConversation.id)}
-          className="animate-fade-up group mx-auto mt-9 text-[14.5px] text-[#2b2633]/55 transition-colors hover:text-[#2b2633]"
-          style={{ animationDelay: "380ms" }}
+        {/* Full-width cover line; the last line cycles through occasions and
+            never wraps on desktop, so nothing below it jumps. */}
+        <h1
+          className="animate-fade-up mt-10 font-script text-[clamp(52px,8vw,128px)] leading-[0.92] tracking-[-0.02em] text-[#2b2633] sm:mt-14"
+          style={{ animationDelay: "100ms" }}
         >
-          {/* Conversation titles are the opening message itself (api/chat),
-              so quote it back rather than slot it into a sentence. */}
-          Last time, you told me{" "}
-          <em className="font-script text-[19px] text-[#8f78e8]">“{lastConversation.title}”</em>{" "}
-          <span className="whitespace-nowrap underline decoration-[#2b2633]/20 underline-offset-4 group-hover:decoration-[#c9b8ff]">
-            Pick it back up →
+          Dressed for
+          <br />
+          <span key={line} className="animate-word-in inline-block min-h-[1.84em] italic text-[#8f78e8] sm:min-h-0 sm:whitespace-nowrap">
+            {COVER_LINES[line]}
           </span>
-        </button>
-      )}
+        </h1>
 
-      <div
-        className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[14px] text-[#2b2633]/40"
-        style={{ animationDelay: "480ms" }}
-      >
-        <span className="basis-full sm:basis-auto">Or start with</span>
-        {OPENERS.map((o, i) => (
-          <span key={o.slug} className="flex items-center gap-2">
+        <div
+          className="animate-fade-up mt-10 grid gap-8 border-t border-[#2b2633]/10 pt-6 sm:grid-cols-[minmax(0,420px)_1fr] sm:gap-16"
+          style={{ animationDelay: "240ms" }}
+        >
+          <div>
+            <p className={meta}>The brief</p>
+            <p className="mt-3 text-[15.5px] leading-[1.7] text-[#2b2633]/70">
+              Name the occasion, the weather or the mood. Each look starts in your own wardrobe, is
+              painted on you, and only reaches for something new when it&apos;s genuinely missing
+              {stylingFor ? ` — styling ${stylingFor} today` : ""}.
+            </p>
+          </div>
+          {lastConversation && (
             <button
-              onClick={() => onSend(o.prompt)}
-              className="font-script text-[18px] italic text-[#2b2633]/75 transition-colors hover:text-[#8f78e8] sm:text-[19px]"
+              onClick={() => onSelectConversation(lastConversation.id)}
+              className="group block min-w-0 text-left sm:justify-self-end sm:text-right"
             >
-              {o.label.toLowerCase()}
+              <span className={meta}>Continue where you left off</span>
+              <span className="mt-2 block max-w-[440px] truncate font-script text-[22px] italic text-[#2b2633]/80 transition-colors group-hover:text-[#8f78e8]">
+                {lastConversation.title} →
+              </span>
             </button>
-            {i < OPENERS.length - 1 && <span aria-hidden="true">·</span>}
-          </span>
+          )}
+        </div>
+
+        {/* Carousel header */}
+        <div className="mt-16 flex items-end justify-between border-b border-[#2b2633]/10 pb-3 sm:mt-20">
+          <p className={meta}>The occasions<span className="hidden sm:inline"> — tap one to begin</span></p>
+          <div className="flex gap-2">
+            {[
+              [-1, "Previous occasions", "←"],
+              [1, "More occasions", "→"],
+            ].map(([dir, label, glyph]) => (
+              <button
+                key={dir}
+                onClick={() => page(dir)}
+                aria-label={label}
+                className="grid h-9 w-9 place-items-center rounded-full text-[15px] text-[#2b2633]/60 ring-1 ring-[#2b2633]/10 transition-colors hover:bg-white hover:text-[#2b2633]"
+              >
+                {glyph}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Carousel 1: every occasion, full-bleed, scroll-snap. */}
+      <div
+        ref={railRef}
+        className="scroll-area mt-6 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] sm:gap-7"
+        // Lines the first card up with the 1240px column, then runs full-bleed.
+        style={{ paddingInline: EDGE, scrollPaddingInline: EDGE }}
+      >
+        {cards.map((c, i) => (
+          <button
+            key={c.slug}
+            onClick={() => onSend(c.prompt)}
+            className="group w-[62vw] shrink-0 snap-start text-left sm:w-[300px]"
+          >
+            <span className="relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-[#f3eff8] shadow-[0_30px_60px_-40px_rgba(90,70,160,0.45)]">
+              <PlaceholderImage
+                src={`/occasions/${c.slug}-hero.jpg`}
+                seed={c.slug}
+                width={600}
+                height={750}
+                className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              />
+            </span>
+            <span className={`mt-4 flex items-baseline justify-between ${meta}`}>
+              <span>{String(i + 1).padStart(2, "0")}</span>
+              <span className="opacity-0 transition-opacity group-hover:opacity-100">Style this →</span>
+            </span>
+            <span className="mt-1 block font-script text-[24px] leading-tight text-[#2b2633] sm:text-[26px]">{c.label}</span>
+          </button>
         ))}
       </div>
-      <p className="animate-fade-in mt-14 hidden text-[12px] text-[#2b2633]/30 sm:block" style={{ animationDelay: "700ms" }}>
-        Just start typing — anywhere.
+
+      {/* Carousel 2: what people ask — a slow marquee of pull quotes. */}
+      <div className="mx-auto mt-14 max-w-[1240px] px-6 sm:px-10">
+        <p className={`border-b border-[#2b2633]/10 pb-3 ${meta}`}>Overheard — or ask your own</p>
+      </div>
+      <div className="relative mt-6 w-full overflow-hidden">
+        <div className="animate-marquee flex w-max gap-5 hover:[animation-play-state:paused]">
+          {asks.map((a, i) => (
+            <button
+              key={`${a.slug}-${i}`}
+              onClick={() => onSend(a.q)}
+              tabIndex={i >= ASKS.length ? -1 : 0}
+              aria-hidden={i >= ASKS.length ? "true" : undefined}
+              className="group relative aspect-[3/2] w-[300px] shrink-0 overflow-hidden rounded-[16px] text-left"
+            >
+              <PlaceholderImage
+                src={`/occasions/${a.slug}-hero.jpg`}
+                seed={`ask-${a.slug}`}
+                width={600}
+                height={400}
+                className="transition-transform duration-700 group-hover:scale-[1.04]"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-[#2b2633]/70 via-[#2b2633]/15 to-transparent" />
+              <span className="absolute inset-x-4 bottom-3.5 font-script text-[19px] italic leading-snug text-white">
+                “{a.q}”
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="mx-auto mt-12 max-w-[1240px] px-6 text-[12px] text-[#2b2633]/35 sm:px-10">
+        Or just start typing — anywhere.
       </p>
     </section>
   );

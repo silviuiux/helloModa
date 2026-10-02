@@ -4,6 +4,57 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — /design-07: drifting forms instead of dots; an editorial cover hero
+
+Two direct requests.
+
+**1. "Purple animated dots are too in-your-face."** I read the request as big, irregular, faded
+shapes that move and blend into the background. `PresenceLight.jsx` was rewritten:
+
+- **Removed:** the planets, comet trails, moon, orbit rings, dust and the sun's blob heart are
+  all gone.
+- **Six large organic forms**, each 26–56 vmin across, drift slowly around the page. Their
+  outline keeps reshaping, from eight border-radius values moving independently, so they are
+  never round. They're blurred 30px and multiplied into the paper-white page, so they read as
+  soft light and shadow rather than objects.
+- **Kept:** the three wandering colour fields (lilac, peach, sky).
+- **A soft brightening at the centre** replaces the sun. It has no edge.
+- **Still reacts:** typing makes everything swell and stir, and while the stylist is thinking
+  the shapes move faster. There's still no pointer tracking, and reduced motion still shows a
+  single still frame.
+
+**2. "Intimate doesn't mean the copy should say so — make the hero more editorial, with the
+image carousels the main version once had."** `Welcome` in `TeteLayout.jsx` is now a magazine
+cover:
+
+- **Masthead line:** "The Edit · for {name}" · the date · "Nº 20 occasions", over a hairline.
+- **Headline:** oversized serif "Dressed for", with an italic lilac line underneath that cycles
+  every 2.8s through: the first date, the big interview, the black-tie gala, the rooftop
+  birthday, the weekend away, the garden party, whatever's next. On desktop that line never
+  wraps, so nothing below it jumps.
+- **Below the headline:**
+  - "The brief" (what helloModa does, in plain words).
+  - A "Continue where you left off" link to your most recent conversation.
+- **Carousel 1, "The occasions":** all 20 occasions as 4:5 photo cards, numbered 01–20, with
+  serif captions.
+  - Full-bleed, scroll-snap, and lined up with the column.
+  - Previous/next buttons.
+  - Shuffled on each visit, after the page loads.
+  - Tapping a card starts that occasion.
+- **Carousel 2, "Overheard — or ask your own":** a slow marquee of photo tiles carrying
+  real-sounding requests as pull quotes. It pauses on hover, and tapping one sends it.
+- **Removed copy:** "It's just the two of us", the time-of-day greeting and the "Last time,
+  you told me…" sentence.
+
+Bug caught in testing: shuffling the keyed cards made the scroll-snap stay on the card it had
+snapped to, so the carousel opened at its far end. The rail is now reset to the start after
+each shuffle.
+
+Card images use `/occasions/{slug}-hero.jpg` when present, otherwise placeholder photos, as on
+main.
+
+---
+
 ## 2026-10-02 — /design-07: background no longer follows the cursor; softer and more diffuse
 
 Direct request: "don't like how the whole thing follows my cursor … something even more organic
