@@ -30,7 +30,7 @@ const SLOTS = [
 ];
 const TINTS = ["#e6dcff", "#ffe1d6", "#dce8ff", "#f9dbe7", "#efe6ff"];
 
-export default function BlobGallery({ items, images = {}, onPick }) {
+export default function BlobGallery({ items, images = {}, onPick, cta = "Style this →" }) {
   const rootRef = useRef(null);
   const outerRefs = useRef([]);
   const clipRefs = useRef([]);
@@ -203,7 +203,7 @@ export default function BlobGallery({ items, images = {}, onPick }) {
             >
               {item.label}
               <span className="mt-0.5 block font-sans text-[10px] not-italic uppercase tracking-[0.2em] text-[#2b2633]/45">
-                Style this →
+                {cta}
               </span>
             </span>
           </button>

@@ -1,405 +1,366 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "@/components/Icons.jsx";
-import Orb from "@/components/Orb.jsx";
+import PresenceLight from "@/components/tete/PresenceLight.jsx";
+import BlobGallery from "@/components/tete/BlobGallery.jsx";
+import PlaceholderImage from "@/components/PlaceholderImage.jsx";
 import Reveal from "@/components/Reveal.jsx";
-import OrganicField from "@/components/OrganicField.jsx";
-import StickyStage from "@/components/landing/StickyStage.jsx";
-import OccasionMarquee from "@/components/landing/OccasionMarquee.jsx";
-import DetailHighlights from "@/components/landing/DetailHighlights.jsx";
-import LandingChatDemo from "@/components/landing/LandingChatDemo.jsx";
+import { occasions } from "@/data/occasions";
 
-// Public marketing page for signed-out visitors (src/app/page.jsx branches
-// on auth; signed-in users get the real app at this same path).
+// Public page for signed-out visitors (src/app/page.jsx branches on auth;
+// signed-in users get the app at this same path).
 //
-// Design brief, 2026-09-22 redesign: "organic intelligence" — a dark,
-// minimalist, sharply-set page whose one warm, living element is the orb
-// (helloModa's presence, the same component the app uses). Immersive-object
-// hero: a single dramatic visual with annotations radiating off it on
-// hairlines, a massive tight-tracked headline anchored left, exactly one
-// primary action per viewport.
+// Redesigned 2026-10-02 to match the main interface (src/components/tete/):
+// paper-white, lots of air, serif type, the same slow colour washes
+// (PresenceLight) and the same occasion blobs that reveal on hover
+// (BlobGallery) — here filled with real looks helloModa generated
+// (`showcase`, src/lib/showcaseLooks.js), so a visitor sees what the
+// paintings actually look like. Copy is brand-friendly: the wardrobe comes
+// first, and when a look needs one more piece helloModa finds the right
+// match from the brands you'd actually wear.
 //
 // Everything asserted here is true of the shipped product — no invented
 // customer logos, testimonials or metrics.
 
-const FACTS = [
-  { value: "20", label: "occasions ready to style, or type your own" },
-  { value: "1", label: "decisive look per answer, never a product wall" },
-  { value: "0", label: "sponsored picks, made-up prices or fake shops" },
-  { value: "EU", label: "your data is stored in Frankfurt" },
+const INK = "#2b2633";
+
+const COVER_LINES = [
+  "the first date.",
+  "the big interview.",
+  "the vineyard wedding.",
+  "the rooftop birthday.",
+  "the weekend away.",
+  "the festival.",
+  "whatever's next.",
 ];
 
-const ORB_CYCLE = ["idle", "listening", "thinking"];
+const STEPS = [
+  {
+    n: "01",
+    title: "Tell it where you’re going.",
+    body: "A wedding in June, a first date, a Monday that matters — in your own words, or pick an occasion.",
+  },
+  {
+    n: "02",
+    title: "It starts in your wardrobe.",
+    body: "Every look is built from what you already own first, then painted on you so you can see it before you get dressed.",
+  },
+  {
+    n: "03",
+    title: "Then, the perfect match.",
+    body: "When a look needs one more piece, helloModa finds the one that completes it — from brands you’ll love, at a fit and price that make sense.",
+  },
+];
 
-function useScrollPast(threshold = 24) {
-  const [past, setPast] = useState(false);
-  useEffect(() => {
-    function onScroll() {
-      setPast(window.scrollY > threshold);
-    }
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [threshold]);
-  return past;
+function shuffled(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
-function useParallax(factor = 0.06) {
-  const [offset, setOffset] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let frame = 0;
-    function measure() {
-      frame = 0;
-      setOffset(window.scrollY * factor);
-    }
-    function onScroll() {
-      if (!frame) frame = requestAnimationFrame(measure);
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [factor]);
-  return offset;
-}
+const meta = "text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45";
 
-// Cycles the hero orb through its three real states so a visitor sees it
-// breathe, listen and think without doing anything. Paused when the user
-// has asked for reduced motion.
-function useOrbCycle(interval = 3200) {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setI((v) => (v + 1) % ORB_CYCLE.length), interval);
-    return () => clearInterval(id);
-  }, [interval]);
-  return ORB_CYCLE[i];
-}
-
-function Wordmark({ size = 22 }) {
+function Wordmark() {
   return (
-    <span className="flex items-center gap-2.5">
-      <Orb size={size} mini />
-      <span className="text-[16px] font-semibold tracking-[-0.02em] text-ink">helloModa</span>
+    <span className="flex items-center gap-2.5 font-script text-[22px] italic text-[#2b2633]/85">
+      <span className="tete-breathe block h-2 w-2 rounded-full bg-[#8f78e8] shadow-[0_0_14px_4px_rgba(185,164,255,0.5)]" />
+      helloModa
     </span>
   );
 }
 
-function PrimaryCta({ children = "Join with your invite", className = "" }) {
+function JoinButton({ className = "", children = "Join the beta" }) {
   return (
     <Link
       href="/register"
-      className={`inline-flex items-center gap-2 rounded-[10px] bg-accent px-7 py-3.5 text-[15px] font-semibold text-canvas transition-colors hover:bg-accent-deep ${className}`}
+      className={`inline-flex items-center gap-2 rounded-full bg-[#2b2633] px-6 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#8f78e8] ${className}`}
     >
-      {children}
-      <ArrowRight size={16} />
+      {children} <span aria-hidden="true">→</span>
     </Link>
   );
 }
 
 function Nav() {
-  const scrolled = useScrollPast();
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled ? "glass border-x-0 border-t-0" : "border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4">
-        <Wordmark />
-        <nav className="flex items-center gap-6">
-          <Link href="/what-to-wear" className="hidden text-[13.5px] text-muted transition-colors hover:text-ink sm:block">
+    <>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 z-20 h-28 bg-gradient-to-b from-[#fdfcfa] from-45% to-transparent"
+      />
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between px-5 pt-5 sm:px-7">
+        <Link href="/" aria-label="helloModa home">
+          <Wordmark />
+        </Link>
+        <nav className="absolute left-1/2 top-[30px] hidden -translate-x-1/2 items-center gap-8 md:flex">
+          <a href="#looks" className={`${meta} transition-colors hover:text-[#2b2633]`}>
+            The looks
+          </a>
+          <a href="#how" className={`${meta} transition-colors hover:text-[#2b2633]`}>
+            How it works
+          </a>
+          <Link href="/what-to-wear" className={`${meta} transition-colors hover:text-[#2b2633]`}>
             Occasion guides
           </Link>
-          <a href="#try" className="hidden text-[13.5px] text-muted transition-colors hover:text-ink sm:block">
-            See it style
-          </a>
-          <Link href="/login" className="text-[13.5px] text-muted transition-colors hover:text-ink">
+        </nav>
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="text-[13px] text-[#2b2633]/60 transition-colors hover:text-[#2b2633]">
             Sign in
           </Link>
           <Link
             href="/register"
-            className="rounded-[10px] bg-accent px-4 py-2 text-[13px] font-semibold text-canvas transition-colors hover:bg-accent-deep"
+            className="rounded-full bg-white/70 px-4 py-2 text-[13px] text-[#2b2633] ring-1 ring-[#2b2633]/10 backdrop-blur-md transition-colors hover:ring-[#8f78e8]/50"
           >
             Join the beta
           </Link>
-        </nav>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 }
 
-// One annotation off the orb: text, a hairline, and a violet dot sitting on
-// the orb's edge — the NASA-poster callout pattern. `side` decides which way
-// the line runs; `x`/`y` are the dot's position inside the orb box.
-function Callout({ side, x, y, index, title, children }) {
-  const left = side === "left";
+// The hero mirrors the app's welcome: the same headline and the same
+// blobs, which here hold real generated looks.
+function Hero({ images }) {
+  const [line, setLine] = useState(0);
+  const [touch, setTouch] = useState(false);
+  const [picks, setPicks] = useState(() => occasions.slice(0, 5));
+
+  useEffect(() => {
+    setTouch(window.matchMedia("(hover: none)").matches);
+    const withLook = shuffled(occasions.filter((o) => images[o.slug]));
+    const rest = shuffled(occasions.filter((o) => !images[o.slug]));
+    setPicks([...withLook, ...rest].slice(0, 5));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setLine((v) => (v + 1) % COVER_LINES.length), 2800);
+    return () => clearInterval(id);
+  }, [images]);
+
   return (
-    <div
-      className="absolute hidden -translate-y-1/2 items-center gap-3 lg:flex"
-      style={left ? { right: `calc(100% - ${x}px)`, top: y } : { left: x, top: y }}
-    >
-      {!left && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
-      {!left && <span className="h-px w-16 bg-accent-soft" />}
-      <div className={`w-48 ${left ? "text-right" : ""}`}>
-        <p className="label text-faint">{index}</p>
-        <p className="mt-1.5 text-[14px] font-medium leading-snug text-ink">{title}</p>
-        <p className="mt-0.5 text-[12.5px] leading-snug text-muted">{children}</p>
+    <section className="relative min-h-[100svh] w-full">
+      <BlobGallery
+        items={picks}
+        images={images}
+        cta="See the looks ↓"
+        onPick={() => document.getElementById("looks")?.scrollIntoView({ behavior: "smooth" })}
+      />
+      <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[680px] flex-col justify-start px-6 pb-24 pt-28 text-center sm:justify-center sm:pt-32">
+        <p className={`animate-fade-in ${meta}`}>Your AI stylist · private beta</p>
+        <h1
+          className="animate-fade-up mt-6 font-script text-[52px] leading-[1] tracking-[-0.01em] sm:text-[84px]"
+          style={{ color: INK, animationDelay: "120ms" }}
+        >
+          Dressed for
+          <br />
+          <span key={line} className="animate-word-in inline-block whitespace-nowrap italic text-[#8f78e8]">
+            {COVER_LINES[line]}
+          </span>
+        </h1>
+        <p
+          className="animate-fade-up mx-auto mt-7 max-w-lg text-balance text-[16px] leading-[1.7] text-[#2b2633]/65"
+          style={{ animationDelay: "260ms" }}
+        >
+          Tell helloModa where you’re going. It styles you from your own wardrobe, paints the look
+          on you — and finds the perfect match for anything it’s missing.
+        </p>
+        <div
+          className="animate-fade-up pointer-events-auto mt-9 flex flex-wrap items-center justify-center gap-5"
+          style={{ animationDelay: "380ms" }}
+        >
+          <JoinButton />
+          <Link
+            href="/login"
+            className="text-[14px] text-[#2b2633]/55 underline decoration-[#2b2633]/15 underline-offset-4 transition-colors hover:text-[#2b2633] hover:decoration-[#8f78e8]"
+          >
+            I have an account
+          </Link>
+        </div>
+        <p className="animate-fade-in mt-12 text-[12px] text-[#2b2633]/35" style={{ animationDelay: "700ms" }}>
+          {touch ? "Each shape is a look helloModa painted" : "Hover the shapes — each one is a look helloModa painted"}
+        </p>
       </div>
-      {left && <span className="h-px w-16 bg-accent-soft" />}
-      {left && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
-    </div>
+    </section>
   );
 }
 
-// Where a dot at height fraction `f` of the orb box touches the orb's ring
-// (globals.css `.orb__ring`, inset -12% — 12% of the *diameter* on each
-// side, so the ring's radius is 1.24x the body's).
-function edgePoint(size, f, side) {
-  const r = size / 2;
-  const ring = r * 1.24;
-  const y = size * f;
-  const dx = Math.sqrt(Math.max(0, ring * ring - (y - r) * (y - r)));
-  return { x: side === "left" ? r - dx : r + dx, y };
-}
-
-const CALLOUTS = [
-  { side: "left", f: 0.28, index: "01", title: "Your closet first", body: "Every look starts with what you own." },
-  { side: "left", f: 0.72, index: "02", title: "One confident look", body: "Not forty tabs of maybes." },
-  { side: "right", f: 0.3, index: "03", title: "Painted on you", body: "Your face, your build, in watercolour." },
-  { side: "right", f: 0.7, index: "04", title: "One piece, if any", body: "Only when there's a real gap." },
-];
-
-const HERO_ORB = 320;
-
-function HeroObject() {
-  const state = useOrbCycle();
-  const offset = useParallax(0.06);
+// A look card with the app's photograph treatment (TiltLook): it tilts
+// toward the pointer with a soft glint. No flip/keep here — just to look at.
+function LookCard({ look, label }) {
+  const ref = useRef(null);
+  function onMove(e) {
+    if (e.pointerType === "touch" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = ref.current;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `rotateX(${(-py * 8).toFixed(2)}deg) rotateY(${(px * 10).toFixed(2)}deg)`;
+    el.style.setProperty("--gx", `${((px + 0.5) * 100).toFixed(1)}%`);
+    el.style.setProperty("--gy", `${((py + 0.5) * 100).toFixed(1)}%`);
+  }
+  function onLeave() {
+    if (ref.current) ref.current.style.transform = "none";
+  }
   return (
-    <div
-      className="relative mx-auto h-[240px] w-[240px] sm:h-[320px] sm:w-[320px]"
-      style={{ transform: `translateY(${-offset}px)` }}
-    >
-      {/* Absolutely centred with translate+scale composed in one transform:
-          a bare scale() doesn't shrink the layout box, so a 320px orb in a
-          240px grid cell overflowed from the start edge on phones. */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-75 sm:scale-100">
-        <Orb size={HERO_ORB} state={state} />
+    <figure className="w-[68vw] shrink-0 snap-start sm:w-[240px] xl:w-[260px]" style={{ perspective: "1000px" }}>
+      <div
+        ref={ref}
+        onPointerMove={onMove}
+        onPointerLeave={onLeave}
+        className="group relative aspect-[4/5] overflow-hidden rounded-[22px] bg-[#f3eff8] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.4),0_0_0_1px_rgba(43,38,51,0.04)] transition-transform duration-200 ease-out"
+      >
+        <PlaceholderImage src={look.url} seed={look.slug} width={560} height={700} />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,255,255,0.35), rgba(255,255,255,0) 45%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
       </div>
-
-      {CALLOUTS.map((c) => {
-        const { x, y } = edgePoint(HERO_ORB, c.f, c.side);
-        return (
-          <Callout key={c.index} side={c.side} x={x} y={y} index={c.index} title={c.title}>
-            {c.body}
-          </Callout>
-        );
-      })}
-
-      <div className="absolute -bottom-14 left-1/2 flex -translate-x-1/2 items-center gap-2 sm:-bottom-[72px]">
-        <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-accent" />
-        <span className="label whitespace-nowrap text-faint">
-          state: <span key={state} className="animate-word-in inline-block text-accent-deep">{state}</span>
+      <figcaption className="mt-4 text-center">
+        <span className={meta}>{label}</span>
+        <span className="mt-1 block font-script text-[24px] leading-tight" style={{ color: INK }}>
+          {look.title}
         </span>
-      </div>
-    </div>
+      </figcaption>
+    </figure>
   );
 }
 
-export default function LandingPage() {
+export default function LandingPage({ showcase = [] }) {
+  const energyRef = useRef(0);
+  const images = Object.fromEntries(showcase.map((l) => [l.slug, l.url]));
+  const labelFor = (slug) => occasions.find((o) => o.slug === slug)?.label || "";
+
   return (
-    // overflow-x-CLIP, not hidden: `hidden` turns this into a scroll
-    // container, which silently breaks `position: sticky` for the
-    // scrollytelling stage. `clip` contains overhangs without a scroll box.
-    <div className="app-canvas relative isolate min-h-screen w-full overflow-x-clip">
-      <OrganicField className="-z-10" />
+    <div className="relative min-h-screen w-full overflow-x-clip bg-[#fdfcfa] font-sans" style={{ color: INK }}>
+      <PresenceLight energyRef={energyRef} thinking={false} />
+      <div aria-hidden="true" className="tete-grain pointer-events-none fixed inset-0 z-[15]" />
       <Nav />
 
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
-      {/* Vertical composition: the orb and its callouts own the upper
-          band; the massive headline anchors bottom-left, body + the one
-          CTA sit bottom-right. Side-by-side collided the left callouts
-          with a 100px headline. */}
-      <section className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-6 pb-14 pt-28 sm:pb-16">
-        <div className="animate-fade-in flex flex-1 items-center justify-center" style={{ animationDelay: "150ms" }}>
-          <HeroObject />
-        </div>
+      <main className="relative z-10">
+        <Hero images={images} />
 
-        <div className="mt-24 grid items-end gap-10 lg:grid-cols-[1fr_minmax(320px,400px)] lg:gap-16">
-          <div>
-            <p className="label animate-fade-up text-accent">Your AI stylist · private beta</p>
-            <h1
-              className="animate-fade-up mt-6 font-display text-[44px] font-extrabold leading-[0.9] tracking-[-0.045em] text-ink sm:text-[84px] lg:text-[100px]"
-              style={{ animationDelay: "120ms" }}
-            >
-              <span className="mb-2 block font-script text-[0.46em] font-normal italic tracking-[-0.01em] text-muted">
-                hello —
-              </span>
-              you already own <br className="hidden sm:inline" />
-              the outfit<span className="text-accent">.</span>
-            </h1>
-          </div>
-          <div className="animate-fade-up lg:pb-3" style={{ animationDelay: "260ms" }}>
-            <p className="text-[16.5px] leading-[1.65] text-muted">
-              Tell helloModa where you&apos;re going. It builds the look from clothes you already
-              own, paints it on you so you can see it before you get dressed, and only suggests
-              buying something when your wardrobe genuinely can&apos;t cover it.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-6">
-              <PrimaryCta />
-              <p className="text-[13.5px] text-muted">
-                Already a member?{" "}
-                <Link href="/login" className="text-ink underline decoration-line underline-offset-4 hover:decoration-accent">
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Trust band ───────────────────────────────────────────────── */}
-      <section className="border-y border-line">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-2 px-6 sm:grid-cols-4">
-          {FACTS.map((f, i) => (
-            <Reveal
-              key={f.label}
-              delay={i * 80}
-              className={`py-10 sm:py-12 ${i > 0 ? "sm:border-l sm:border-line sm:pl-8" : ""}`}
-            >
-              <p className="font-display text-[40px] font-extrabold leading-none tracking-[-0.04em] text-ink sm:text-[48px]">
-                {f.value}
-              </p>
-              <p className="label mt-4 max-w-[190px] leading-[1.7] text-faint">{f.label}</p>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Positioning statement ────────────────────────────────────── */}
-      <section id="how" className="mx-auto max-w-[1400px] px-6 py-36 sm:py-52">
-        <Reveal>
-          <p className="label text-accent">Why helloModa</p>
-          <h2 className="mt-8 max-w-5xl font-display text-[36px] font-bold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[64px]">
-            Most style apps are shops wearing a stylist&apos;s badge.{" "}
-            <span className="text-faint">
-              helloModa works for your wardrobe, not a retailer — and only sends you shopping when
-              it{" "}
-              <span className="font-script font-normal italic tracking-normal text-muted">has to.</span>
-            </span>
-          </h2>
-        </Reveal>
-      </section>
-
-      {/* ── Scrollytelling stage ─────────────────────────────────────── */}
-      <StickyStage />
-
-      {/* ── Occasion breadth ─────────────────────────────────────────── */}
-      <section className="py-36 sm:py-52">
-        <Reveal className="mx-auto mb-16 grid max-w-[1400px] gap-6 px-6 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-end">
-          <div>
-            <p className="label text-accent">Occasions</p>
-            <h2 className="mt-6 max-w-2xl font-display text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[56px]">
-              Twenty occasions, ready when you are.
-            </h2>
-          </div>
-          <p className="text-[15px] leading-relaxed text-muted">
-            The wedding and the interview, obviously. But also the rooftop birthday, the
-            90s throwback party, the pumpkin-patch date — or anything else, in your own words.
-            If you&apos;d get dressed for it, helloModa can style it.
-          </p>
-        </Reveal>
-        <OccasionMarquee />
-      </section>
-
-      {/* ── Craft details ────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-[1400px] px-6 pb-36 sm:pb-52">
-        <Reveal className="mb-16">
-          <p className="label text-accent">What you get</p>
-          <h2 className="mt-6 max-w-2xl font-display text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[56px]">
-            Everything a great stylist does. None of the pressure.
-          </h2>
-        </Reveal>
-        <DetailHighlights />
-      </section>
-
-      {/* ── Interactive demo ─────────────────────────────────────────── */}
-      <section id="try" className="mx-auto max-w-[1400px] scroll-mt-24 px-6 pb-36 sm:pb-52">
-        <div className="grid gap-12 lg:grid-cols-[minmax(260px,340px)_1fr] lg:gap-20">
+        {/* ── Positioning: wardrobe first, then the perfect match ───── */}
+        <section className="mx-auto max-w-[760px] px-6 py-32 text-center sm:py-44">
           <Reveal>
-            <p className="label text-accent">See it style</p>
-            <h2 className="mt-6 font-display text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[48px]">
-              Watch it style a real occasion.
-            </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-muted">
-              Tap an occasion and see exactly what you&apos;d get: the look, the reasoning, the
-              pieces, and what to ask next. These are real answers from the app, replayed — no
-              sign-up needed.
-            </p>
-          </Reveal>
-          <Reveal delay={120}>
-            <LandingChatDemo />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── Closing CTA ──────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-[1400px] px-6 pb-36 sm:pb-52">
-        <Reveal className="glass grain relative overflow-hidden rounded-xl3 px-8 py-20 sm:px-20 sm:py-28">
-          <div className="pointer-events-none absolute -right-24 top-1/2 hidden -translate-y-1/2 opacity-90 md:block">
-            <Orb size={420} />
-          </div>
-          <div className="relative max-w-xl">
-            <p className="label text-accent">Private beta</p>
-            <h2 className="mt-7 font-display text-[48px] font-extrabold leading-[0.92] tracking-[-0.045em] text-ink sm:text-[80px]">
-              come get
+            <p className={meta}>Why helloModa</p>
+            <h2 className="mt-8 font-script text-[40px] leading-[1.08] sm:text-[60px]">
+              Your wardrobe first.
               <br />
-              <span className="font-script font-normal italic tracking-[-0.01em]">dressed.</span>
+              <span className="italic text-[#8f78e8]">Then, the perfect match.</span>
             </h2>
-            <p className="mt-7 max-w-md text-[15.5px] leading-relaxed text-muted">
-              helloModa is invite-only while we sharpen the styling. Got a code? You&apos;re one
-              step away. No code yet? Ask whoever sent you here — they can pass theirs on.
+            <p className="mx-auto mt-8 max-w-xl text-balance text-[16px] leading-[1.75] text-[#2b2633]/65">
+              Most mornings you already own the outfit — you just can’t see it yet. helloModa
+              styles what’s in your closet, and when a look really needs one more piece, it brings
+              you the brand and the fit that complete it. One considered piece, never a product wall.
             </p>
-            <PrimaryCta className="mt-10" />
-          </div>
-        </Reveal>
-      </section>
+          </Reveal>
+        </section>
 
-      {/* ── Footer ───────────────────────────────────────────────────── */}
-      <footer className="border-t border-line bg-canvas">
-        <div className="mx-auto grid max-w-[1400px] gap-12 px-6 py-16 sm:grid-cols-[1.4fr_1fr_1fr]">
-          <div>
-            <Wordmark />
-            <p className="mt-5 max-w-xs text-[13.5px] leading-relaxed text-muted">
-              The AI stylist that starts in your wardrobe — and paints the look on you. A
-              helloCorp company.
+        {/* ── The looks: real generated paintings ──────────────────── */}
+        {showcase.length > 0 && (
+          <section id="looks" className="scroll-mt-24 pb-32 sm:pb-44">
+            <Reveal className="mx-auto max-w-[760px] px-6 text-center">
+              <p className={meta}>The looks</p>
+              <h2 className="mt-6 font-script text-[36px] leading-[1.1] sm:text-[52px]">
+                Painted for the person asking.
+              </h2>
+              <p className="mx-auto mt-6 max-w-lg text-balance text-[15.5px] leading-[1.7] text-[#2b2633]/60">
+                Every answer comes with a look painted fresh for that occasion. These are real ones
+                helloModa made — with your own avatar, it paints them on you.
+              </p>
+            </Reveal>
+            <div
+              className="scroll-area mt-14 snap-x snap-mandatory overflow-x-auto px-6 pb-6 [scrollbar-width:none]"
+              style={{ scrollPaddingInline: "1.5rem" }}
+            >
+              {/* w-max + mx-auto: centred when the row fits, scrollable
+                  from its first card when it doesn't (justify-center on
+                  an overflowing flex row hides its start). */}
+              <div className="mx-auto flex w-max gap-6 sm:gap-8">
+                {showcase.map((look) => (
+                  <LookCard key={look.slug} look={look} label={labelFor(look.slug)} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── How it works ─────────────────────────────────────────── */}
+        <section id="how" className="mx-auto max-w-[1040px] scroll-mt-24 px-6 pb-32 sm:pb-44">
+          <Reveal className="text-center">
+            <p className={meta}>How it works</p>
+          </Reveal>
+          <div className="mt-12 grid gap-14 sm:grid-cols-3 sm:gap-10">
+            {STEPS.map((s, i) => (
+              <Reveal key={s.n} delay={i * 90} className="border-t border-[#2b2633]/10 pt-6">
+                <p className={meta}>{s.n}</p>
+                <h3 className="mt-3 font-script text-[28px] leading-[1.15]">{s.title}</h3>
+                <p className="mt-3 text-[15px] leading-[1.7] text-[#2b2633]/60">{s.body}</p>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Occasions ────────────────────────────────────────────── */}
+        <section className="mx-auto max-w-[900px] px-6 pb-32 text-center sm:pb-44">
+          <Reveal>
+            <p className={meta}>Twenty occasions, or your own words</p>
+            <p className="mt-8 font-script text-[22px] italic leading-[1.9] text-[#2b2633]/55 sm:text-[26px]">
+              {occasions.map((o, i) => (
+                <span key={o.slug}>
+                  {o.label.toLowerCase()}
+                  {i < occasions.length - 1 && <span className="mx-2 not-italic text-[#8f78e8]/50">·</span>}
+                </span>
+              ))}
             </p>
+            <Link
+              href="/what-to-wear"
+              className="mt-10 inline-block text-[14px] text-[#2b2633]/55 underline decoration-[#2b2633]/15 underline-offset-4 transition-colors hover:text-[#2b2633] hover:decoration-[#8f78e8]"
+            >
+              Browse the occasion guides →
+            </Link>
+          </Reveal>
+        </section>
+
+        {/* ── Closing ──────────────────────────────────────────────── */}
+        <section className="mx-auto max-w-[760px] px-6 pb-36 text-center sm:pb-48">
+          <Reveal>
+            <p className={meta}>Private beta</p>
+            <h2 className="mt-7 font-script text-[56px] leading-[0.95] sm:text-[88px]">
+              Come get <span className="italic text-[#8f78e8]">dressed.</span>
+            </h2>
+            <p className="mx-auto mt-7 max-w-md text-balance text-[15.5px] leading-[1.7] text-[#2b2633]/60">
+              helloModa is invite-only while we refine the styling. Got a code? You’re one step away.
+              No code yet? Ask whoever sent you here — they can pass theirs on.
+            </p>
+            <JoinButton className="mt-10" />
+          </Reveal>
+        </section>
+
+        <footer className="border-t border-[#2b2633]/10">
+          <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row">
+            <Wordmark />
+            <nav className="flex flex-wrap items-center justify-center gap-6 text-[13px] text-[#2b2633]/55">
+              <Link href="/what-to-wear" className="hover:text-[#2b2633]">
+                Occasion guides
+              </Link>
+              <Link href="/login" className="hover:text-[#2b2633]">
+                Sign in
+              </Link>
+              <Link href="/register" className="hover:text-[#2b2633]">
+                Join with an invite
+              </Link>
+            </nav>
+            <p className={meta}>© helloModa · data stored in the EU</p>
           </div>
-          <div>
-            <p className="label text-faint">Product</p>
-            <ul className="mt-5 space-y-3 text-[13.5px]">
-              <li><Link href="/what-to-wear" className="text-muted hover:text-ink">Occasion guides</Link></li>
-              <li><a href="#try" className="text-muted hover:text-ink">See it style</a></li>
-            </ul>
-          </div>
-          <div>
-            <p className="label text-faint">Account</p>
-            <ul className="mt-5 space-y-3 text-[13.5px]">
-              <li><Link href="/login" className="text-muted hover:text-ink">Sign in</Link></li>
-              <li><Link href="/register" className="text-muted hover:text-ink">Join with an invite</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-line">
-          <p className="label mx-auto max-w-[1400px] px-6 py-6 text-faint">
-            © helloModa · private beta · data stored in the EU
-          </p>
-        </div>
-      </footer>
+        </footer>
+      </main>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { loadAppShellData } from "@/lib/appShellData";
 import AppShell from "./AppShell.jsx";
 import LandingPage from "./LandingPage.jsx";
+import { createClient } from "@/lib/supabase/server";
+import { loadShowcaseLooks } from "@/lib/showcaseLooks";
 
 // "/" is public now (src/lib/supabase/middleware.js, 2026-09-21) — a
 // signed-out visit renders the marketing LandingPage instead of being
@@ -12,6 +14,10 @@ import LandingPage from "./LandingPage.jsx";
 // shared with the /design-0X comparison routes.
 export default async function HomePage() {
   const { user, props } = await loadAppShellData();
-  if (!user) return <LandingPage />;
+  if (!user) {
+    // Signed out: the landing page shows the public showcase looks.
+    const showcase = await loadShowcaseLooks(await createClient()).catch(() => []);
+    return <LandingPage showcase={showcase} />;
+  }
   return <AppShell {...props} layout="tete" />;
 }

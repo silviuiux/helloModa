@@ -101,6 +101,18 @@ outfit_recommendations
                              from the chat request; POST /api/generate-image reads it back to use
                              that avatar's image as an img2img reference (src/lib/imageGen.js).
 
+showcase_looks                     -- added 2026-10-02 (migration `showcase_looks`, applied directly)
+  path      text pk               -- object name in the private `generated-looks` bucket
+  slug      text                  -- occasion slug (src/data/occasions.js)
+  title     text
+  position  int                   -- display order
+  -- A hand-picked whitelist of generated looks shown publicly (landing page;
+  -- fallback for the signed-in welcome blobs). RLS: select for anon +
+  -- authenticated. A storage policy ("generated looks: showcase public read")
+  -- makes exactly these objects readable by anyone; every other generated look
+  -- stays owner-only. Only looks generated WITHOUT an avatar go here, and only
+  -- the image + title are public — never the conversation text.
+
 outfit_recommendation_items
   id (uuid, pk)
   recommendation_id (fk -> outfit_recommendations)

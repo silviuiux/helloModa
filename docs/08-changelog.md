@@ -4,6 +4,63 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — Public showcase looks; landing page redesigned to match the app; brand-friendly copy
+
+Three direct requests: make a few generated looks public so everyone can see what they look
+like; redesign the signed-out home page to match the new interface; and make the copy friendlier
+to brands ("finding the perfect match for your wardrobe").
+
+**Public showcase looks**
+
+- **What's public.** Migration `showcase_looks` adds a whitelist table, readable by everyone,
+  plus a storage policy that makes exactly the listed objects in the private `generated-looks`
+  bucket readable by anon and authenticated users. Every other generated look stays owner-only.
+- **The five looks**, all generated **without an avatar**, so none shows anyone's likeness:
+
+  | Occasion | Title |
+  |---|---|
+  | Wedding guest | Featherweight layer |
+  | Summer festival | Festival Haze |
+  | City weekend getaway | City drift |
+  | Big interview | Sharper footing |
+  | First date | Wet-Weather Moto |
+
+- **Only the image and title are public.** The conversation text stays private: one narrative
+  names a person, and several of the requests were follow-ups that make no sense out of
+  context.
+- **Loader.** New `src/lib/showcaseLooks.js` signs them in a single batch, with a 6-hour TTL.
+- **Why not static files.** The sandbox can't reach Supabase Storage to download them, and the
+  table means adding or removing a public look is one row, with no deploy.
+- **Signed-in welcome.** The blobs now use: your own look for an occasion, then the showcase
+  look, then the stock photo.
+
+**Landing page (`src/app/LandingPage.jsx`), rebuilt in the app's style.** It uses the same
+paper-white page, slow colour washes (`PresenceLight`), grain and serif type:
+
+- **Nav:** the helloModa wordmark on the left; The looks · How it works · Occasion guides
+  centred; Sign in and a frosted "Join the beta" on the right.
+- **Hero:** the app's welcome — "Dressed for *the …*" cycling, with the occasion blobs around
+  it holding the real showcase looks. They reveal on hover with "See the looks ↓", and
+  clicking scrolls to the gallery.
+- **Positioning:** "Your wardrobe first. *Then, the perfect match.*" This replaces "Most style
+  apps are shops wearing a stylist's badge…", which read as hostile to retailers and brands.
+- **The looks:** the five generated looks as tilting photo cards with their titles, under
+  "Painted for the person asking."
+- **How it works:** three steps, the last being "Then, the perfect match" — from brands you'll
+  love, at a fit and price that make sense.
+- **Occasions:** all twenty as a quiet serif line, plus a link to the occasion guides.
+- **Closing:** "Come get *dressed.*" with Join the beta, then a minimal footer.
+- **Removed copy:** the old fact "0 sponsored picks, made-up prices or fake shops" is gone.
+- **Removed components:** the old landing parts are deleted (StickyStage, StageVisuals,
+  DetailHighlights, EditorialPlate, OccasionMarquee, LandingChatDemo, and
+  `src/lib/useScrollProgress.js`).
+
+**Fix:** the looks row was centred with `justify-center`, which hides an overflowing row's start
+at 1440 px. It's now `mx-auto w-max` inside the scroller: centred when it fits, scrollable from
+the first card when it doesn't.
+
+---
+
 ## 2026-10-02 — Welcome blobs show your own generated looks instead of stock photos
 
 Direct request: use the looks we've already generated for the hero's occasion prompts instead

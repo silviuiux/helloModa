@@ -4,6 +4,7 @@ import { listAvatarProfiles } from "@/actions/avatars";
 import { signWardrobeItems } from "@/lib/wardrobeImages";
 import { signAvatarProfiles } from "@/lib/avatarImages";
 import { loadOccasionLooks } from "@/lib/occasionLooks";
+import { loadShowcaseLooks } from "@/lib/showcaseLooks";
 
 // Everything the signed-in app needs on first render, loaded once on the
 // server. Shared by "/" and the /design-0X comparison routes so every
@@ -43,10 +44,19 @@ export async function loadAppShellData() {
   });
   const avatarProfiles = await signAvatarProfiles(supabase, avatarRows);
 
-  const occasionImages = await loadOccasionLooks(supabase).catch((err) => {
-    console.error("Failed to load occasion looks:", err.message);
-    return {};
-  });
+  // The user's own looks win; the public showcase looks fill in the
+  // occasions they haven't asked about yet; stock photos after that.
+  const [ownLooks, showcase] = await Promise.all([
+    loadOccasionLooks(supabase).catch((err) => {
+      console.error("Failed to load occasion looks:", err.message);
+      return {};
+    }),
+    loadShowcaseLooks(supabase).catch((err) => {
+      console.error("Failed to load showcase looks:", err.message);
+      return [];
+    }),
+  ]);
+  const occasionImages = { ...Object.fromEntries(showcase.map((l) => [l.slug, l.url])), ...ownLooks };
 
   // Always land on the welcome screen (docs/09-conversation-design.md) —
   // past conversations are reachable from history, not auto-resumed.
