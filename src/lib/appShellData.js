@@ -3,6 +3,7 @@ import { listConversations } from "@/actions/conversations";
 import { listAvatarProfiles } from "@/actions/avatars";
 import { signWardrobeItems } from "@/lib/wardrobeImages";
 import { signAvatarProfiles } from "@/lib/avatarImages";
+import { loadOccasionLooks } from "@/lib/occasionLooks";
 
 // Everything the signed-in app needs on first render, loaded once on the
 // server. Shared by "/" and the /design-0X comparison routes so every
@@ -42,6 +43,11 @@ export async function loadAppShellData() {
   });
   const avatarProfiles = await signAvatarProfiles(supabase, avatarRows);
 
+  const occasionImages = await loadOccasionLooks(supabase).catch((err) => {
+    console.error("Failed to load occasion looks:", err.message);
+    return {};
+  });
+
   // Always land on the welcome screen (docs/09-conversation-design.md) —
   // past conversations are reachable from history, not auto-resumed.
   return {
@@ -55,6 +61,7 @@ export async function loadAppShellData() {
       initialActiveConversationId: null,
       initialMessages: [],
       initialAvatarProfiles: avatarProfiles,
+      occasionImages,
     },
   };
 }

@@ -104,14 +104,18 @@ function shuffled(arr) {
   return copy;
 }
 
-function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor }) {
+function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, occasionImages = {} }) {
   const [line, setLine] = useState(0);
   const [touch, setTouch] = useState(false);
   // Data order on the server, shuffled after mount — no hydration mismatch.
   const [picks, setPicks] = useState(occasions.slice(0, 5));
 
   useEffect(() => {
-    setPicks(shuffled(occasions).slice(0, 5));
+    // Occasions the user already has a generated look for come first, so
+    // the blobs show their own looks wherever possible.
+    const mine = shuffled(occasions.filter((o) => occasionImages[o.slug]));
+    const rest = shuffled(occasions.filter((o) => !occasionImages[o.slug]));
+    setPicks([...mine, ...rest].slice(0, 5));
     setTouch(window.matchMedia("(hover: none)").matches);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => setLine((v) => (v + 1) % COVER_LINES.length), 2800);
@@ -120,7 +124,7 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor })
 
   return (
     <section data-moment className="tete-moment relative min-h-[100svh] w-full">
-      <BlobGallery items={picks} onPick={(o) => onSend(o.prompt)} />
+      <BlobGallery items={picks} images={occasionImages} onPick={(o) => onSend(o.prompt)} />
       <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-[620px] flex-col justify-start px-6 pb-24 pt-28 text-center sm:justify-center sm:pt-32">
         <h1
           className="animate-fade-up font-script text-[52px] leading-[1] tracking-[-0.01em] text-[#2b2633] sm:text-[76px]"
@@ -702,6 +706,7 @@ export default function TeteLayout({ shell }) {
           onSelectConversation={onSelectConversation}
           onSend={onSend}
           stylingFor={stylingFor}
+          occasionImages={shell.occasionImages}
         />
 
         {isSwitching && messages.length === 0 && (

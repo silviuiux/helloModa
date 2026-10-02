@@ -4,6 +4,29 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — Welcome blobs show your own generated looks instead of stock photos
+
+Direct request: use the looks we've already generated for the hero's occasion prompts instead
+of the stock images.
+
+- **New `src/lib/occasionLooks.js`.** `loadOccasionLooks()` finds this user's conversations that
+  opened with an occasion's exact prompt (from `src/data/occasions.js`). It takes the newest
+  generated look from each and returns `{ slug: signedUrl }` for the private `generated-looks`
+  bucket, using the same 1-hour signed URLs as elsewhere.
+- **Loading.** It's loaded in `loadAppShellData()` and passed through AppShell as
+  `occasionImages`, down to the welcome's `BlobGallery`.
+- **Which blobs show.** Occasions with one of your own looks are picked first, and each blob
+  shows that look. Any remaining slots fall back to `/occasions/{slug}-hero.jpg` or the
+  placeholder photo, as before.
+- **Per user, never shared.** Queries are RLS-scoped. The looks sit in a private bucket and
+  some were generated with an avatar (someone's likeness), so they are never used as global
+  hero images or shown to other users. Another user sees their own looks, or stock photos.
+- **Current data.** The account that tested the occasion prompts has looks for 14 of the 20
+  occasions. Missing: black-tie event, concert night, cozy fall date, garden party, holiday
+  office party, New Year's Eve and weekend trip, so all five blobs will show real looks.
+
+---
+
 ## 2026-10-02 — Tête-à-tête becomes the main interface; a self-review polish round
 
 Direct requests: run a round of self-feedback on the interface, then make this design the main

@@ -30,7 +30,7 @@ const SLOTS = [
 ];
 const TINTS = ["#e6dcff", "#ffe1d6", "#dce8ff", "#f9dbe7", "#efe6ff"];
 
-export default function BlobGallery({ items, onPick }) {
+export default function BlobGallery({ items, images = {}, onPick }) {
   const rootRef = useRef(null);
   const outerRefs = useRef([]);
   const clipRefs = useRef([]);
@@ -182,7 +182,14 @@ export default function BlobGallery({ items, onPick }) {
               }}
             >
               <span ref={(el) => (imgRefs.current[i] = el)} className="absolute inset-[-8%] block">
-                <PlaceholderImage src={`/occasions/${item.slug}-hero.jpg`} seed={item.slug} width={460} height={575} />
+                {/* The user's own generated look for this occasion when they have
+                    one (src/lib/occasionLooks.js), else the stock photo. */}
+                <PlaceholderImage
+                  src={images[item.slug] || `/occasions/${item.slug}-hero.jpg`}
+                  seed={item.slug}
+                  width={460}
+                  height={575}
+                />
               </span>
               <span
                 ref={(el) => (washRefs.current[i] = el)}
