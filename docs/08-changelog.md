@@ -4,6 +4,42 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — /design-07: the presence light becomes a small solar system
+
+Direct request: make the organic background animation more detailed and more visible, with a
+few particles orbiting the main one in a random loop, "like planets orbiting the sun".
+
+`src/components/tete/PresenceLight.jsx` now draws:
+
+- **The sun.** A brighter pearl-to-lilac core with a white glow and a lilac corona, inside the
+  existing lilac/peach bloom. The bloom is a little stronger, and the sky-blue haze still
+  trails behind.
+- **Seven planets.** Each one is a small glowing sphere in pearl, peach, sky, rose, violet or
+  champagne.
+  - **Orbits.** Each planet travels a tilted ellipse, as if the system were seen at an angle.
+    Inner planets move faster, roughly following Kepler's law, and a few orbit the other way.
+  - **Depth.** On the far side of an orbit a planet shrinks, dims, blurs slightly and passes
+    behind the sun. On the near side it grows, brightens and swings in front.
+  - **The random loop.** Each orbit's size, flattening and tilt drift slowly. The drift comes
+    from summed sines with seeded random frequencies, so no path ever exactly repeats.
+  - **A moon.** One planet has a small moon circling it.
+- **Orbit rings.** Faint lilac hairlines trace each orbit, some dashed. The rings follow the
+  wobble live, so they always match where the planets are.
+- **Dust.** 26 tiny lilac and peach motes drift in a wide, slowly turning halo, twinkling as
+  they go.
+- **Reacts to you.**
+  - The whole system still leans toward your pointer.
+  - Typing makes the orbits widen and spin faster, then settle back.
+  - While the stylist is thinking, the planets speed up and the system pulses gently.
+- **On phones.** The orbits are allowed to run wider than the screen, and the planets are
+  drawn a little smaller, so the system doesn't look cramped.
+
+It's still a single requestAnimationFrame loop writing transforms straight to the DOM, with
+no React re-renders per frame. The layout is seeded, so every visit shows the same sky. With
+reduced motion turned on, it renders a single still frame.
+
+---
+
 ## 2026-10-02 — Keep saves to the style journal; /design-07 goes light and airy
 
 Two direct requests.
