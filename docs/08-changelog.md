@@ -4,6 +4,45 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-02 — Tête-à-tête becomes the main interface; a self-review polish round
+
+Direct requests: run a round of self-feedback on the interface, then make this design the main
+helloModa interface.
+
+**Main interface.**
+
+- **`/` uses the new layout.** Signed-in users at `/` now get the Tête-à-tête layout
+  (`src/app/page.jsx` passes `layout="tete"` to AppShell). It uses the same data, chat, image
+  generation, quotas, history, avatars, wardrobe, Keep and style journal as before.
+- **Signed-out visitors** still see the marketing LandingPage.
+- **Old URL.** `/design-07` now redirects to `/`, and it's been removed from `DESIGN_ROUTES`.
+- **Easy rollback.** The previous layout (ChatView + BottomBar) is still AppShell's default
+  branch. Removing `layout="tete"` from `page.jsx` brings it back.
+- **Other designs.** `/design-01..03` still exist, unlinked.
+- **Bundle.** `/` is still 360 kB first-load, because the layout is loaded with `next/dynamic`.
+
+**Self-review round.** Issues I spotted in the live screenshots, and what changed:
+
+- **Blobs were nearly invisible at rest**, and nothing invited interaction.
+  - At rest, each blob now shows a faint hint of its photo (a reveal floor of 0.14).
+  - After five seconds without pointer movement, one blob at a time gently half-reveals with
+    its caption, then fades.
+- **The welcome line left "wardrobe." on its own line.** The block is wider and uses
+  `text-balance`.
+- **The continue link showed the database's literal "..."** That's now replaced with a proper
+  ellipsis.
+- **Long reasoning was centred over 8+ lines**, which is tiring to read. It's now
+  left-aligned in a narrower column with `text-pretty`. The title stays centred.
+- **The look photo was small on desktop**, and it no longer needs to fit on screen alongside
+  the text. The card grew from `min(340px, 36svh)` to `min(400px, 44svh)`.
+- **Scrolled text collided with the centred date** in the header. The top fade is now taller
+  and fully opaque for its top half.
+- **The "⌘K" hint was wrong on Windows and Linux.** It now shows "Ctrl K" off Apple devices,
+  in both the Menu button and the composer hint.
+- **Suggested replies were too faint.** They went from 40% to 55% opacity.
+
+---
+
 ## 2026-10-02 — /design-07: date in the header, words before the photo; version switcher removed
 
 Direct requests:

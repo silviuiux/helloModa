@@ -133,7 +133,7 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor })
           </span>
         </h1>
         <p
-          className="animate-fade-up mx-auto mt-6 max-w-sm text-[15.5px] leading-[1.7] text-[#2b2633]/60"
+          className="animate-fade-up mx-auto mt-6 max-w-md text-balance text-[15.5px] leading-[1.7] text-[#2b2633]/60"
           style={{ animationDelay: "260ms" }}
         >
           Name the occasion. Looks start in your own wardrobe
@@ -145,7 +145,7 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor })
             className="animate-fade-up pointer-events-auto mx-auto mt-8 max-w-full truncate text-[14px] text-[#2b2633]/50 underline decoration-[#2b2633]/15 underline-offset-4 transition-colors hover:text-[#2b2633] hover:decoration-[#8f78e8]"
             style={{ animationDelay: "380ms" }}
           >
-            Continue “{lastConversation.title}” →
+            Continue “{lastConversation.title.replace(/\.{3}$/, "…")}” →
           </button>
         )}
         <p className="animate-fade-in mt-10 text-[12px] text-[#2b2633]/35 sm:mt-12" style={{ animationDelay: "700ms" }}>
@@ -198,7 +198,7 @@ function LookMoment({ message, isLatest, onSend, onKeepLook, onToggleSave, saved
           <Streamed
             text={message.narrative}
             fresh={message.fresh}
-            className="mx-auto mt-5 max-w-[34rem] text-left text-[16.5px] leading-[1.8] text-[#2b2633]/75 sm:text-center"
+            className="mx-auto mt-6 max-w-[32rem] text-pretty text-left text-[16.5px] leading-[1.8] text-[#2b2633]/75"
           />
         )}
       </div>
@@ -262,7 +262,7 @@ function LookMoment({ message, isLatest, onSend, onKeepLook, onToggleSave, saved
             <li key={q} className="animate-fade-up" style={{ animationDelay: `${after + 150 + i * 90}ms` }}>
               <button
                 onClick={() => onSend(q)}
-                className="group flex w-full items-baseline justify-center gap-3 py-1.5 font-script text-[19px] italic text-[#2b2633]/40 transition-colors hover:text-[#2b2633]"
+                className="group flex w-full items-baseline justify-center gap-3 py-1.5 font-script text-[19px] italic text-[#2b2633]/55 transition-colors hover:text-[#2b2633]"
               >
                 <span className="text-[13px] not-italic text-[#c9b8ff]/0 transition-colors group-hover:text-[#c9b8ff]">→</span>
                 {q}
@@ -297,7 +297,7 @@ function ThinkingMoment() {
 }
 
 // ── The composer ────────────────────────────────────────────────────────
-function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggestions }) {
+function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggestions, modKey }) {
   const [value, setValue] = useState("");
   const [ghost, setGhost] = useState(null);
   const suggestionIndex = useRef(-1);
@@ -401,7 +401,7 @@ function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggest
           ) : (
             <>
               {suggestions.length > 0 && <span className="[@media(hover:none)]:hidden">⇥ for a suggestion</span>}
-              <span className="hidden sm:inline">⌘K for everything else</span>
+              <span className="hidden sm:inline">{modKey} for everything else</span>
             </>
           )}
         </div>
@@ -561,7 +561,9 @@ export default function TeteLayout({ shell }) {
   // Day and date, centred in the header. Set after mount so server and
   // client markup match; short form on phones so it clears the wordmark.
   const [today, setToday] = useState({ long: "", short: "" });
+  const [modKey, setModKey] = useState("⌘K");
   useEffect(() => {
+    if (!/Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent)) setModKey("Ctrl K");
     const d = new Date();
     setToday({
       long: d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }),
@@ -664,7 +666,7 @@ export default function TeteLayout({ shell }) {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-20 h-28 bg-gradient-to-b from-[#fdfcfa] from-30% to-transparent"
+        className="pointer-events-none fixed inset-x-0 top-0 z-20 h-32 bg-gradient-to-b from-[#fdfcfa] from-50% to-transparent"
       />
       {/* Top: just a name and a way into everything else. */}
       <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between px-5 pt-5 sm:px-7">
@@ -688,7 +690,7 @@ export default function TeteLayout({ shell }) {
             )}
           </span>
           Menu
-          <kbd className="hidden font-sans text-[11px] text-[#2b2633]/30 sm:inline">⌘K</kbd>
+          <kbd className="hidden font-sans text-[11px] text-[#2b2633]/30 sm:inline">{modKey}</kbd>
         </button>
       </header>
 
@@ -751,6 +753,7 @@ export default function TeteLayout({ shell }) {
           setComposing={setComposing}
           energyRef={energyRef}
           suggestions={suggestions}
+          modKey={modKey}
         />
       )}
 

@@ -57,6 +57,7 @@ export default function BlobGallery({ items, onPick }) {
     let raf = 0;
     let px = -9999;
     let py = -9999;
+    let lastMove = performance.now();
     const reveal = SLOTS.map(() => 0);
     const focused = SLOTS.map(() => false);
     const start = performance.now();
@@ -64,6 +65,7 @@ export default function BlobGallery({ items, onPick }) {
     function onMove(e) {
       px = e.clientX;
       py = e.clientY;
+      lastMove = performance.now();
     }
     function onLeave() {
       px = py = -9999;
@@ -96,10 +98,17 @@ export default function BlobGallery({ items, onPick }) {
           const cy = r.top + r.height / 2;
           const d = Math.hypot(px - cx, py - cy) - r.width * 0.45;
           target = Math.max(0, Math.min(1, 1 - d / 220));
+          // Idle invitation: after a few still seconds, one blob at a time
+          // half-reveals, hinting that they're there to be explored.
+          if (now - lastMove > 5000) {
+            const turn = Math.floor(t / 5) % SLOTS.length;
+            if (turn === i) target = Math.max(target, 0.55 * Math.sin(((t % 5) / 5) * Math.PI));
+          }
         }
         if (focused[i]) target = 1;
         reveal[i] += (target - reveal[i]) * (target > reveal[i] ? 0.09 : 0.04);
-        const v = reveal[i];
+        // A floor of 0.14 so at rest you can just make out a photograph.
+        const v = 0.14 + reveal[i] * 0.86;
 
         const fx = Math.sin(t * 0.21 + ph) * 10 + Math.sin(t * 0.13 + ph * 2) * 6;
         const fy = Math.cos(t * 0.17 + ph) * 12;

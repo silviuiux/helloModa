@@ -64,8 +64,9 @@ export default function AppShell({
   initialActiveConversationId,
   initialMessages,
   initialAvatarProfiles,
-  // Design-comparison routes (/design-0X) pass a layout name; "/"
-  // passes nothing and renders the shipped layout below, unchanged.
+  // "/" passes "tete" (the main interface since 2026-10-02); the
+  // /design-0X comparison routes pass their own. With no layout, the
+  // previous ChatView + BottomBar layout below renders.
   layout = null,
   basePath = "/",
 }) {

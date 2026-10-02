@@ -5,7 +5,6 @@ export const DESIGN_ROUTES = [
   { slug: "design-01", layout: "studio", name: "Studio" },
   { slug: "design-02", layout: "fitting", name: "Fitting Room" },
   { slug: "design-03", layout: "feed", name: "Feed" },
-  { slug: "design-07", layout: "tete", name: "Tête-à-tête" },
 ];
 
 export function appHomeFor(from) {

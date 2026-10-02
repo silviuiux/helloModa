@@ -1,7 +1,6 @@
-import DesignPage, { designMetadata } from "../_design/DesignPage.jsx";
+import { redirect } from "next/navigation";
 
-export const metadata = designMetadata;
-
+// design-07 became the main interface on 2026-10-02 — it lives at "/" now.
 export default function Page() {
-  return <DesignPage slug="design-07" />;
+  redirect("/");
 }

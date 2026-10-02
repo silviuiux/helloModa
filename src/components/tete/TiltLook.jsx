@@ -94,7 +94,7 @@ export default function TiltLook({
   }
 
   return (
-    <div className="mx-auto w-full max-w-[min(340px,36svh)]" style={{ perspective: "1100px" }}>
+    <div className="mx-auto w-full max-w-[min(400px,44svh)]" style={{ perspective: "1100px" }}>
       <div
         ref={tiltRef}
         role="button"
