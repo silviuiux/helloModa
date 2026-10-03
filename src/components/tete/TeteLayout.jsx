@@ -7,6 +7,8 @@ import TiltLook from "./TiltLook.jsx";
 import WardrobeView from "../wardrobe/WardrobeView.jsx";
 import BlobGallery from "./BlobGallery.jsx";
 import HandwrittenCycle from "./HandwrittenCycle.jsx";
+import CursorThumb from "./CursorThumb.jsx";
+import AboutSections from "./AboutSections.jsx";
 import { useOutfitImage } from "../../lib/useOutfitImage.js";
 import { cardToWardrobeItem } from "../../lib/look.js";
 import { occasions } from "../../data/occasions.js";
@@ -105,7 +107,53 @@ function shuffled(arr) {
   return copy;
 }
 
-function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, occasionImages = {} }) {
+// "today", "tomorrow", "Saturday", or "9 Oct" for further out.
+function bookedWhen(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const day = new Date(y, m - 1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = Math.round((day - today) / 86400000);
+  if (diff <= 0) return "today";
+  if (diff === 1) return "tomorrow";
+  if (diff < 7) return day.toLocaleDateString("en-GB", { weekday: "long" });
+  return day.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+// The landing page's explanations, under the welcome. Open when you
+// arrive; once a conversation starts they fold away under a toggle title
+// so the thread stays the focus (direct request 2026-10-02).
+function AboutPanel({ showcase, folded }) {
+  const [open, setOpen] = useState(!folded);
+  useEffect(() => setOpen(!folded), [folded]);
+  return (
+    <section id="about" data-moment className="tete-moment scroll-mt-20">
+      <div className="mx-auto max-w-[620px] px-6 text-center">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          className="group inline-flex items-center gap-3 py-6 text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45 transition-colors hover:text-[#8f78e8]"
+        >
+          <span className="h-px w-8 bg-[#2b2633]/15 transition-all group-hover:w-12 group-hover:bg-[#8f78e8]/50" />
+          {open ? "About helloModa" : "How helloModa works"}
+          <span className={`inline-block transition-transform duration-300 ${open ? "rotate-180" : ""}`}>⌄</span>
+          <span className="h-px w-8 bg-[#2b2633]/15 transition-all group-hover:w-12 group-hover:bg-[#8f78e8]/50" />
+        </button>
+      </div>
+      <div
+        className={`grid transition-[grid-template-rows,opacity] duration-700 ease-[cubic-bezier(0.2,0.7,0.2,1)] ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <AboutSections showcase={showcase} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, occasionImages = {}, covers = {}, nextBooked = null }) {
   const [touch, setTouch] = useState(false);
   // Data order on the server, shuffled after mount — no hydration mismatch.
   const [picks, setPicks] = useState(occasions.slice(0, 5));
@@ -140,19 +188,44 @@ function Welcome({ lastConversation, onSelectConversation, onSend, stylingFor, o
           Name the occasion. Looks start in your own wardrobe
           {stylingFor ? ` — styling ${stylingFor} today` : ""}.
         </p>
-        {lastConversation && (
-          <button
-            onClick={() => onSelectConversation(lastConversation.id)}
-            className="animate-fade-up pointer-events-auto mx-auto mt-8 max-w-full truncate text-[14px] text-[#2b2633]/50 underline decoration-[#2b2633]/15 underline-offset-4 transition-colors hover:text-[#2b2633] hover:decoration-[#8f78e8]"
-            style={{ animationDelay: "380ms" }}
-          >
-            Continue “{lastConversation.title.replace(/\.{3}$/, "…")}” →
-          </button>
+        {(lastConversation || nextBooked) && (
+          <div className="animate-fade-up pointer-events-auto mx-auto mt-8 flex max-w-full flex-col items-center gap-2.5" style={{ animationDelay: "380ms" }}>
+            {/* The next look you've booked in the style journal, if any —
+                hover shows it beside the cursor. */}
+            {nextBooked && (
+              <CursorThumb
+                src={nextBooked.imageUrl}
+                onClick={() => nextBooked.conversationId && onSelectConversation(nextBooked.conversationId)}
+                className="tete-link max-w-full truncate text-[14px] text-[#2b2633]/60"
+              >
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#8f78e8]">Coming up · {bookedWhen(nextBooked.eventDate)}</span>{" "}
+                <span className="font-script text-[17px] italic text-[#2b2633]/80">{nextBooked.title}</span>
+              </CursorThumb>
+            )}
+            {lastConversation && (
+              <CursorThumb
+                src={covers[lastConversation.id]}
+                onClick={() => onSelectConversation(lastConversation.id)}
+                className="tete-link max-w-full truncate text-[14px] text-[#2b2633]/50 hover:text-[#2b2633]"
+              >
+                Continue “{lastConversation.title.replace(/\.{3}$/, "…")}” →
+              </CursorThumb>
+            )}
+          </div>
         )}
         <p className="animate-fade-in mt-10 text-[12px] text-[#2b2633]/35 sm:mt-12" style={{ animationDelay: "700ms" }}>
           {touch ? "Tap a shape for an idea" : "Hover the shapes for ideas"} — or just start typing.
         </p>
       </div>
+      {/* Scroll cue to the explanations below. */}
+      <a
+        href="#about"
+        className="animate-fade-in absolute bottom-[22vh] left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/35 transition-colors hover:text-[#8f78e8] sm:flex"
+        style={{ animationDelay: "1200ms" }}
+      >
+        What is helloModa
+        <span className="tete-nudge text-[14px]">↓</span>
+      </a>
     </section>
   );
 }
@@ -281,7 +354,7 @@ function LookMoment({ message, isLatest, onSend, onKeepLook, onToggleSave, saved
   );
 }
 
-function ThinkingMoment() {
+function ThinkingMoment({ pieces = 0 }) {
   const [i, setI] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setI((v) => (v + 1) % THINKING_LINES.length), 2300);
@@ -291,7 +364,8 @@ function ThinkingMoment() {
     <section data-moment className="tete-moment mx-auto flex max-w-[620px] flex-col items-center px-6 py-24">
       <span className="tete-breathe block h-3 w-3 rounded-full bg-[#8f78e8] shadow-[0_0_28px_8px_rgba(185,164,255,0.45)]" />
       <p key={i} className="animate-word-in mt-6 font-script text-[22px] italic text-[#2b2633]/60" aria-live="polite">
-        {THINKING_LINES[i]}
+        {/* First line names the real wardrobe size — it's looking at *your* clothes. */}
+        {i === 0 && pieces > 1 ? `Looking through your ${pieces} pieces…` : THINKING_LINES[i]}
       </p>
     </section>
   );
@@ -360,7 +434,19 @@ function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggest
             {ghost.text}
           </p>
         )}
-        <div className="relative">
+        {/* The field: a soft paper card so it reads as the place to write
+            (direct request 2026-10-02 — "make the input more evident"),
+            glowing violet while focused (globals.css .tete-field). The
+            breathing dot is the stylist, listening; the bar along the
+            bottom fills as you write and runs while it thinks. */}
+        <div
+          onClick={() => inputRef.current?.focus()}
+          className="tete-field relative flex cursor-text items-end gap-3 rounded-[28px] bg-white/85 py-2.5 pl-5 pr-2.5 shadow-[0_22px_50px_-30px_rgba(90,70,160,0.5),0_0_0_1px_rgba(43,38,51,0.08)] backdrop-blur-xl"
+        >
+          <span
+            aria-hidden="true"
+            className={`mb-[17px] block h-2 w-2 shrink-0 rounded-full bg-[#8f78e8] shadow-[0_0_12px_3px_rgba(185,164,255,0.55)] ${thinking || hasDraft ? "" : "tete-breathe"}`}
+          />
           <textarea
             ref={inputRef}
             rows={1}
@@ -368,35 +454,33 @@ function Composer({ inputRef, onSend, thinking, setComposing, energyRef, suggest
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={onKeyDown}
             aria-label="Tell the stylist where you're going"
-            placeholder={thinking ? "…" : "Tell me where you're going…"}
-            // Symmetric room for the send button only once there's a draft,
-            // so the placeholder fits one line on a phone and centred text
-            // never shifts sideways when the button appears.
-            className={`tete-caret block max-h-[170px] min-h-[44px] w-full resize-none bg-transparent py-1.5 text-center font-script text-[24px] italic leading-snug placeholder:text-[#2b2633]/25 focus:outline-none sm:text-[28px] ${
-              hasDraft ? "px-12" : "px-0"
-            }`}
+            placeholder={thinking ? "Styling…" : "Tell me where you're going…"}
+            className="tete-caret block max-h-[170px] min-h-[44px] w-full resize-none bg-transparent py-2 font-script text-[20px] italic leading-snug placeholder:text-[#2b2633]/40 focus:outline-none sm:text-[24px]"
             style={{ color: INK }}
           />
           <button
-            onClick={send}
+            onClick={(e) => {
+              e.stopPropagation();
+              send();
+            }}
             aria-label="Send"
             disabled={!hasDraft || thinking}
-            className={`absolute bottom-1 right-0 grid h-10 w-10 place-items-center rounded-full transition-all duration-300 ${
+            className={`mb-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full transition-all duration-300 ${
               hasDraft && !thinking
-                ? "scale-100 bg-[#2b2633] text-[#fdfcfa] opacity-100"
-                : "pointer-events-none scale-75 bg-transparent text-transparent opacity-0"
+                ? "bg-[#2b2633] text-[#fdfcfa] hover:bg-[#8f78e8]"
+                : "bg-[#2b2633]/[0.06] text-[#2b2633]/30"
             }`}
           >
             <ArrowRight size={16} />
           </button>
+          <div className="pointer-events-none absolute inset-x-8 bottom-0 h-px overflow-hidden">
+            <div
+              className="absolute inset-y-0 left-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#8f78e8] to-transparent transition-[width] duration-500 ease-out"
+              style={{ width: `${thinking ? 100 : fill}%`, opacity: thinking ? 0.6 : 0.85 }}
+            />
+          </div>
         </div>
-        <div className="relative mt-2 h-px bg-[#2b2633]/[0.08]">
-          <div
-            className="absolute inset-y-0 left-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#c9b8ff] to-transparent transition-[width] duration-500 ease-out"
-            style={{ width: `${thinking ? 100 : fill}%`, opacity: thinking ? 0.5 : 0.9 }}
-          />
-        </div>
-        <div className="mt-2.5 flex justify-center gap-5 text-[11px] text-[#2b2633]/25">
+        <div className="mt-3 flex justify-center gap-5 text-[11px] text-[#2b2633]/35">
           {hasDraft ? (
             <span>↵ to send · ⇧↵ new line</span>
           ) : (
@@ -441,7 +525,8 @@ function Menu({ shell, onClose }) {
       // cancelled / unavailable
     }
   }
-  const big = "block w-full py-1.5 text-left font-script text-[30px] leading-tight text-[#2b2633]/80 transition-colors hover:text-[#2b2633] sm:text-[34px]";
+  const big =
+    "tete-menu-item block w-full py-1.5 text-left font-script text-[30px] leading-tight text-[#2b2633]/80 transition-colors hover:text-[#2b2633] sm:text-[34px]";
 
   return (
     <div
@@ -501,14 +586,16 @@ function Menu({ shell, onClose }) {
             <ul className="mt-2">
               {conversations.slice(0, 6).map((c) => (
                 <li key={c.id}>
-                  <button
+                  {/* Hover: that conversation's last look follows the cursor. */}
+                  <CursorThumb
+                    src={shell.conversationCovers?.[c.id]}
                     onClick={go(() => onSelectConversation(c.id))}
-                    className={`block w-full truncate py-1 text-left font-script text-[19px] italic transition-colors ${
+                    className={`block w-full truncate py-1 text-left font-script text-[19px] italic transition-[color,transform] duration-300 hover:translate-x-1.5 ${
                       c.id === activeConversationId ? "text-[#8f78e8]" : "text-[#2b2633]/50 hover:text-[#2b2633]"
                     }`}
                   >
-                    {c.title || "Untitled look"}
-                  </button>
+                    {(c.title || "Untitled look").replace(/\.{3}$/, "…")}
+                  </CursorThumb>
                 </li>
               ))}
             </ul>
@@ -580,6 +667,15 @@ export default function TeteLayout({ shell }) {
   const looks = useMemo(() => messages.filter((m) => m.role === "ai" && (m.title || m.heroPrompt)), [messages]);
   const latestLook = looks[looks.length - 1];
   const suggestions = latestLook?.quickReplies?.length ? latestLook.quickReplies : OPENERS.map((o) => o.prompt);
+
+  // The browser tab tells you what's happening while you're elsewhere:
+  // "Styling…" while it works, then the look's title once it lands.
+  useEffect(() => {
+    const base = "helloModa";
+    if (thinking) document.title = `Styling… · ${base}`;
+    else if (latestLook?.title && latestLook.fresh) document.title = `${latestLook.title} · ${base}`;
+    else document.title = base;
+  }, [thinking, latestLook]);
 
   // Type anywhere → the composer. ⌘K/Ctrl+K → menu. Esc closes things.
   useEffect(() => {
@@ -704,7 +800,11 @@ export default function TeteLayout({ shell }) {
           onSend={onSend}
           stylingFor={stylingFor}
           occasionImages={shell.occasionImages}
+          covers={shell.conversationCovers}
+          nextBooked={shell.nextBooked}
         />
+
+        <AboutPanel showcase={shell.showcase || []} folded={messages.length > 0 || isSwitching} />
 
         {isSwitching && messages.length === 0 && (
           <p className="text-center font-script text-[20px] italic text-[#2b2633]/40">Finding our conversation…</p>
@@ -741,7 +841,7 @@ export default function TeteLayout({ shell }) {
           );
         })}
 
-        {thinking && <ThinkingMoment />}
+        {thinking && <ThinkingMoment pieces={wardrobe.length} />}
       </main>
 
       {/* A whisper of grain, so the white reads as paper, not screen. */}

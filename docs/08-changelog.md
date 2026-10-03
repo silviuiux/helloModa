@@ -4,6 +4,68 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-03 — A clearer message box, hover thumbnails, the explanations inside the app, small refinements
+
+Direct requests: make the input field more evident; add hover interaction to text links, with
+"pick up where we left off" in the welcome and the menu showing that conversation's last
+generated image as a thumbnail that follows the cursor; propose refinements; and put the landing
+explanations under the app's hero, folding away under a toggle once a conversation starts.
+
+**Message box (`Composer` in `TeteLayout.jsx`)**
+
+- **More visible.** It's now a soft white card, rounded, with a hairline ring and a violet-tinted
+  shadow, instead of a bare line.
+- **Live state.** A breathing violet dot on the left stands for the stylist listening. The send
+  button is always visible: faint when empty, dark when there's a draft, violet on hover.
+- **Focus.** On focus the card glows violet (`.tete-field`), and clicking anywhere on it
+  focuses it.
+- **Layout.** Text is left-aligned, as in a normal field. The progress line runs along the
+  card's bottom edge, and the placeholder reads "Styling…" while it's thinking.
+
+**Hover thumbnails (`src/components/tete/CursorThumb.jsx`)**
+
+- **Where.** On the welcome's "Continue '…'" link and on every conversation in the menu's
+  "Pick up where we left off".
+- **What.** Hovering shows a 150 px thumbnail of that conversation's latest generated look,
+  floating above and to the right of the cursor.
+  - It eases after the pointer, tilts slightly in the direction of travel, and blooms in from a
+    blur.
+  - Nothing appears on touch screens or for conversations without an image.
+- **Portal.** It's rendered into `<body>`: the links sit inside animated and depth-of-field
+  filtered blocks, which made `position: fixed` resolve against the wrong box. This was caught
+  in testing, when the welcome thumbnail didn't appear.
+- **Data.** New `src/lib/conversationCovers.js` `loadConversationCovers()` signs the latest look
+  of the 8 most recent conversations, loaded in `loadAppShellData()` as `conversationCovers`.
+
+**Landing explanations inside the app**
+
+- **Shared component.** The landing page's sections are now `src/components/tete/AboutSections.jsx`,
+  shared by `LandingPage` and the app: positioning, the showcase looks, how it works, and
+  occasions.
+- **On arrival.** They sit open under the welcome hero, with a "What is helloModa ↓" scroll cue
+  at the hero's foot.
+- **Once a conversation starts.** They fold under a "— How helloModa works ⌄ —" toggle with a
+  smooth height animation, so the thread stays the focus. One click reopens them.
+
+**Refinements, implemented**
+
+- **"Coming up" on the welcome.** Your next booked look from the style journal, e.g. "COMING
+  UP · TOMORROW *Rooftop after dark*", with the hover thumbnail. Clicking opens its
+  conversation. Loaded via `loadNextBooked()`.
+- **Drawn underlines.** Text links draw their violet underline from the left on hover
+  (`.tete-link`).
+- **Menu items.** Items shift slightly on hover and a handwritten "→" slides in
+  (`.tete-menu-item`). Conversation entries slide too.
+- **Personal thinking line.** The first thinking line uses your real wardrobe size: "Looking
+  through your 23 pieces…".
+- **Browser tab title.** It reads "Styling… · helloModa" while working and switches to the
+  look's title when it lands, so you can tab away and see when it's ready.
+
+**Other wiring.** `showcase`, `conversationCovers` and `nextBooked` are passed through `AppShell`
+into the shell.
+
+---
+
 ## 2026-10-02 — A handwritten accent font, a written-out hero line, and the remaining pages redesigned
 
 Direct requests: find a readable, elegant handwritten font for the purple title words; make the

@@ -67,6 +67,11 @@ export default function AppShell({
   // { [occasionSlug]: signedUrl } — this user's own generated looks for the
   // welcome's occasion blobs (src/lib/occasionLooks.js).
   occasionImages = {},
+  // Public showcase looks (landing sections inside the app), latest image
+  // per recent conversation (hover thumbnails), next booked look.
+  showcase = [],
+  conversationCovers = {},
+  nextBooked = null,
   // "/" passes "tete" (the main interface since 2026-10-02); the
   // /design-0X comparison routes pass their own. With no layout, the
   // previous ChatView + BottomBar layout below renders.
@@ -299,6 +304,9 @@ export default function AppShell({
       activeAvatarId,
       onSelectAvatar: setActiveAvatarId,
       occasionImages,
+      showcase,
+      conversationCovers,
+      nextBooked,
       // The style journal links back into *this* route, not "/".
       journalHref: `/outfits?from=${encodeURIComponent(basePath.replace(/^\//, ""))}`,
       wardrobeActions: {

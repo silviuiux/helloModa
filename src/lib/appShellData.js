@@ -5,6 +5,7 @@ import { signWardrobeItems } from "@/lib/wardrobeImages";
 import { signAvatarProfiles } from "@/lib/avatarImages";
 import { loadOccasionLooks } from "@/lib/occasionLooks";
 import { loadShowcaseLooks } from "@/lib/showcaseLooks";
+import { loadConversationCovers, loadNextBooked } from "@/lib/conversationCovers";
 
 // Everything the signed-in app needs on first render, loaded once on the
 // server. Shared by "/" and the /design-0X comparison routes so every
@@ -58,6 +59,16 @@ export async function loadAppShellData() {
   ]);
   const occasionImages = { ...Object.fromEntries(showcase.map((l) => [l.slug, l.url])), ...ownLooks };
 
+  // Hover thumbnails for the conversations the welcome + menu link to, and
+  // the next booked look for the welcome's "coming up" line.
+  const [conversationCovers, nextBooked] = await Promise.all([
+    loadConversationCovers(
+      supabase,
+      conversations.slice(0, 8).map((c) => c.id)
+    ).catch(() => ({})),
+    loadNextBooked(supabase).catch(() => null),
+  ]);
+
   // Always land on the welcome screen (docs/09-conversation-design.md) —
   // past conversations are reachable from history, not auto-resumed.
   return {
@@ -72,6 +83,9 @@ export async function loadAppShellData() {
       initialMessages: [],
       initialAvatarProfiles: avatarProfiles,
       occasionImages,
+      showcase,
+      conversationCovers,
+      nextBooked,
     },
   };
 }

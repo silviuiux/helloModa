@@ -631,3 +631,46 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .tete-write { animation: none; -webkit-mask-image: none; mask-image: none; }
 }
+
+/* Text links that draw their underline from the left on hover. */
+.tete-link {
+  background-image: linear-gradient(#8f78e8, #8f78e8), linear-gradient(rgba(43, 38, 51, 0.15), rgba(43, 38, 51, 0.15));
+  background-size: 0% 1px, 100% 1px;
+  background-position: 0 100%, 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.25s ease;
+}
+.tete-link:hover,
+.tete-link:focus-visible { background-size: 100% 1px, 100% 1px; }
+
+/* Menu items: a handwritten arrow slides in on hover. */
+.tete-menu-item { position: relative; transition: color 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.tete-menu-item::after {
+  content: "→";
+  font-family: "Dancing Script", cursive;
+  color: #8f78e8;
+  margin-left: 0.35em;
+  opacity: 0;
+  display: inline-block;
+  transform: translateX(-8px);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.tete-menu-item:hover { transform: translateX(6px); }
+.tete-menu-item:hover::after { opacity: 1; transform: none; }
+
+/* A small arrow that nudges downward, inviting a scroll. */
+@keyframes tete-nudge { 0%, 100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(5px); opacity: 1; } }
+.tete-nudge { animation: tete-nudge 2.2s ease-in-out infinite; }
+
+/* The composer card glows softly when it has focus. */
+.tete-field { transition: box-shadow 0.4s ease, background-color 0.4s ease; }
+.tete-field:focus-within {
+  box-shadow: 0 0 0 1px rgba(143, 120, 232, 0.45), 0 26px 60px -28px rgba(143, 120, 232, 0.55), 0 0 0 6px rgba(201, 184, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tete-nudge { animation: none; }
+  .tete-menu-item, .tete-menu-item::after { transition: none; }
+}
