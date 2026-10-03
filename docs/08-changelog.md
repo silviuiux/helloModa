@@ -4,6 +4,60 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-03 — Image generation can switch between Replicate and fal.ai
+
+Direct request: set up a switch to fal.ai, which researched as cheaper and faster than Replicate
+for the same Flux models. Rough published figures:
+
+| | Replicate | fal.ai |
+|---|---|---|
+| Cold start (idle model) | ~8–60 s | ~1–3 s, models are kept warm |
+| Warm generation | ~3–10 s | similar or a bit faster, plus an optional `acceleration` speed-up |
+| Flux Dev, per image | ~$0.030 | ~$0.025 |
+
+Replicate's idle stalls hit Flux Kontext (avatar looks) hardest, since it's a less-used model.
+
+**How the switch works (`src/lib/imageGen.js`)**
+
+- **`IMAGE_PROVIDER=replicate | fal`.** Defaults to `replicate`, so production behaves exactly
+  as before until it's flipped.
+- **Same models on both providers:** flux-dev for text-to-image, Flux Kontext dev for avatar
+  likeness, and flux-dev img2img as Kontext's fallback.
+  - fal: `fal-ai/flux/dev`, `fal-ai/flux-kontext/dev`, `fal-ai/flux/dev/image-to-image`, via
+    `@fal-ai/client` (reads `FAL_KEY`).
+  - Input fields were checked against the client's bundled endpoint types. Kontext takes
+    `resolution_mode: "4:5"` directly, and flux-dev gets an explicit pixel size of 928×1152.
+  - fal calls use `acceleration: "regular"`, fal's quality-preserving speed-up.
+- **Unchanged:** the house watercolour `STYLE_DIRECTIVE`, every prompt, and the Kontext → img2img
+  fallback inside each provider.
+- **Cross-provider fallback.** If the chosen provider fails and the other one has a key set,
+  the request is retried there once instead of failing the look. If the chosen provider has no
+  key at all, the other one is used.
+- **Timing logs.** Every call logs `[imageGen] provider=… step=text2img|kontext|img2img|avatar
+  ms=…`, so real latency can be compared in the Vercel logs.
+- **Avatar portraits** (`generateAvatarPortrait`) go through the same switch.
+
+**New `scripts/compare-image-providers.mjs`**
+
+- Runs the same look prompt on both providers twice each: the first run can include a cold
+  start, the second shows warm speed.
+- Prints a timing table and saves the four images side by side to compare the watercolour look.
+- Pass an avatar image URL as an argument to test the Kontext likeness path instead.
+- Needs both keys.
+
+**To switch:**
+
+1. Add `FAL_KEY` in Vercel.
+2. Optionally run the comparison script locally.
+3. Set `IMAGE_PROVIDER=fal`.
+4. Redeploy.
+
+`.env.local.example` and `docs/02-tech-stack.md` are updated. Neither provider is reachable from
+the sandbox this was built in, so the fal path hasn't been run against a real key yet. The
+cross-provider fallback is the safety net for that.
+
+---
+
 ## 2026-10-03 — A clearer message box, hover thumbnails, the explanations inside the app, small refinements
 
 Direct requests: make the input field more evident; add hover interaction to text links, with

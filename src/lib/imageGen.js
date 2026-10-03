@@ -1,21 +1,153 @@
 import Replicate from "replicate";
+import { fal } from "@fal-ai/client";
 
 // Phase 2 "Magic Mirror" — see docs/03-roadmap.md. Generates an outfit-in-scene
-// image from the stylist's heroPrompt. Swappable later (fal.ai/Magnific are
-// documented alternatives in docs/02-tech-stack.md) since this is the one
-// place that calls out to a generation provider.
-const MODEL = "black-forest-labs/flux-dev";
+// image from the stylist's heroPrompt. The one place that calls out to an
+// image provider.
+//
+// Provider switch (2026-10-03): IMAGE_PROVIDER=fal | replicate (default
+// replicate, so nothing changes until it's flipped). Both run the same Flux
+// models — flux-dev for text-to-image, Flux Kontext dev for keeping an
+// avatar's likeness, flux-dev img2img as Kontext's fallback — so the look
+// should match; fal is cheaper and mostly faster (pre-warmed, ~1–3 s cold
+// starts vs Replicate's 8–60 s on idle models). If the chosen provider
+// fails and the other one is configured too (its key is set), the request
+// falls back to it rather than failing the look. Every call logs
+// `[imageGen] provider=… step=… ms=…` so real latency can be compared in the
+// Vercel logs; scripts/compare-image-providers.mjs runs the same prompt on
+// both side by side.
+const PROVIDER = (process.env.IMAGE_PROVIDER || "replicate").toLowerCase() === "fal" ? "fal" : "replicate";
 
+const REPLICATE_MODEL = "black-forest-labs/flux-dev";
 // Used only when an avatar is selected (helloAvatar, docs/03-roadmap.md
 // Phase 3) — an image-EDITING model, not plain img2img: given a reference
 // photo and an instruction, it's built to keep the same subject (face,
 // hair, body) while changing context/clothing, which is a much closer
 // match to "same face/hair/body type" than flux-dev's generic img2img
-// (`prompt_strength`) below ever could be — that one just nudges the
-// output toward the reference's rough structure/coloring, nothing more.
-// Kept as a separate model constant so a bad call here can fail closed
-// into the existing img2img path rather than the whole feature.
-const KONTEXT_MODEL = "black-forest-labs/flux-kontext-dev";
+// below ever could be — that one just nudges the output toward the
+// reference's rough structure/coloring, nothing more. A failure here
+// falls back to that img2img path rather than failing the whole feature.
+const REPLICATE_KONTEXT_MODEL = "black-forest-labs/flux-kontext-dev";
+
+const FAL_MODEL = "fal-ai/flux/dev";
+const FAL_KONTEXT_MODEL = "fal-ai/flux-kontext/dev";
+const FAL_IMG2IMG_MODEL = "fal-ai/flux/dev/image-to-image";
+
+function configured(provider) {
+  return provider === "fal" ? Boolean(process.env.FAL_KEY) : Boolean(process.env.REPLICATE_API_TOKEN);
+}
+
+// "4:5" -> pixel size for fal's flux-dev (multiples of 16, long side ~1152).
+function falImageSize(aspectRatio) {
+  const [w, h] = aspectRatio.split(":").map(Number);
+  const scale = 1152 / Math.max(w, h);
+  const round16 = (n) => Math.max(256, Math.round((n * scale) / 16) * 16);
+  return { width: round16(w), height: round16(h) };
+}
+
+async function bufferFromUrl(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Couldn't download generated image (${res.status}).`);
+  return Buffer.from(await res.arrayBuffer());
+}
+
+async function replicateBuffer(output) {
+  if (!output) throw new Error("Replicate returned no output.");
+  return Buffer.from(await output.blob().then((b) => b.arrayBuffer()));
+}
+
+async function falBuffer(result) {
+  const url = result?.data?.images?.[0]?.url;
+  if (!url) throw new Error("fal returned no image.");
+  return bufferFromUrl(url);
+}
+
+// The three operations this app needs, per provider. Each returns a jpeg
+// Buffer or throws.
+const PROVIDERS = {
+  replicate: {
+    async textToImage({ prompt, aspectRatio }) {
+      const [output] = await new Replicate().run(REPLICATE_MODEL, {
+        input: { prompt, aspect_ratio: aspectRatio, output_format: "jpg", num_outputs: 1 },
+      });
+      return replicateBuffer(output);
+    },
+    async edit({ prompt, imageUrl, aspectRatio }) {
+      const [output] = await new Replicate().run(REPLICATE_KONTEXT_MODEL, {
+        input: { prompt, input_image: imageUrl, aspect_ratio: aspectRatio, output_format: "jpg" },
+      });
+      return replicateBuffer(output);
+    },
+    async img2img({ prompt, imageUrl, strength }) {
+      const [output] = await new Replicate().run(REPLICATE_MODEL, {
+        input: { prompt, image: imageUrl, prompt_strength: strength, output_format: "jpg", num_outputs: 1 },
+      });
+      return replicateBuffer(output);
+    },
+  },
+  fal: {
+    // fal's client reads FAL_KEY from the environment. "regular"
+    // acceleration is fal's quality-preserving speed-up.
+    async textToImage({ prompt, aspectRatio }) {
+      const result = await fal.subscribe(FAL_MODEL, {
+        input: {
+          prompt,
+          image_size: falImageSize(aspectRatio),
+          num_images: 1,
+          output_format: "jpeg",
+          acceleration: "regular",
+        },
+      });
+      return falBuffer(result);
+    },
+    async edit({ prompt, imageUrl, aspectRatio }) {
+      const result = await fal.subscribe(FAL_KONTEXT_MODEL, {
+        input: {
+          prompt,
+          image_url: imageUrl,
+          resolution_mode: aspectRatio,
+          num_images: 1,
+          output_format: "jpeg",
+          acceleration: "regular",
+        },
+      });
+      return falBuffer(result);
+    },
+    async img2img({ prompt, imageUrl, strength }) {
+      const result = await fal.subscribe(FAL_IMG2IMG_MODEL, {
+        input: { prompt, image_url: imageUrl, strength, num_images: 1, output_format: "jpeg", acceleration: "regular" },
+      });
+      return falBuffer(result);
+    },
+  },
+};
+
+async function timed(provider, step, fn) {
+  const t0 = Date.now();
+  try {
+    const out = await fn();
+    console.log(`[imageGen] provider=${provider} step=${step} ms=${Date.now() - t0}`);
+    return out;
+  } catch (err) {
+    console.error(`[imageGen] provider=${provider} step=${step} failed after ms=${Date.now() - t0}:`, err?.message || err);
+    throw err;
+  }
+}
+
+// Runs `task(providerName)` on the chosen provider; if that throws and the
+// other provider has a key configured, tries it once before giving up.
+// `prefer` overrides IMAGE_PROVIDER (used by the comparison script).
+async function withFallback(task, prefer = PROVIDER) {
+  const primary = configured(prefer) ? prefer : prefer === "fal" ? "replicate" : "fal";
+  const secondary = primary === "fal" ? "replicate" : "fal";
+  try {
+    return await task(primary);
+  } catch (err) {
+    if (!configured(secondary)) throw err;
+    console.error(`[imageGen] ${primary} failed — falling back to ${secondary}.`);
+    return task(secondary);
+  }
+}
 
 // The house visual style, prepended to every heroPrompt — this is the one
 // place to tune "what a generated look actually looks like." Currently:
@@ -64,53 +196,33 @@ const STYLE_DIRECTIVE =
 // Kontext problem degrades to today's looser-but-working reference instead
 // of failing the whole generation. Omit referenceImageUrl entirely for the
 // plain text-to-image path (no avatar selected — unchanged).
-export async function generateOutfitImage(prompt, aspectRatio, referenceImageUrl) {
+export async function generateOutfitImage(prompt, aspectRatio, referenceImageUrl, { provider } = {}) {
   if (!aspectRatio) {
     throw new Error("generateOutfitImage requires an aspectRatio matching the display crop.");
   }
-  const replicate = new Replicate(); // reads REPLICATE_API_TOKEN from env
+  const scenePrompt = `${STYLE_DIRECTIVE} Scene: ${prompt}`;
 
-  if (referenceImageUrl) {
-    try {
-      const [output] = await replicate.run(KONTEXT_MODEL, {
-        input: {
-          prompt:
-            `${STYLE_DIRECTIVE} Scene: ${prompt}. Keep this exact same person — same face, same ` +
-            `hairstyle and hair color, same body type and skin tone as the reference image. Only ` +
-            `their outfit and the surrounding scene should change.`,
-          input_image: referenceImageUrl,
-          aspect_ratio: aspectRatio,
-          output_format: "jpg",
-        },
-      });
-      if (output) {
-        return Buffer.from(await output.blob().then((b) => b.arrayBuffer()));
+  return withFallback(async (name) => {
+    const p = PROVIDERS[name];
+    if (referenceImageUrl) {
+      try {
+        return await timed(name, "kontext", () =>
+          p.edit({
+            prompt:
+              `${scenePrompt}. Keep this exact same person — same face, same hairstyle and hair ` +
+              `color, same body type and skin tone as the reference image. Only their outfit and ` +
+              `the surrounding scene should change.`,
+            imageUrl: referenceImageUrl,
+            aspectRatio,
+          })
+        );
+      } catch {
+        console.error(`[imageGen] ${name} Kontext failed — falling back to flux-dev img2img.`);
       }
-      console.error("Flux Kontext returned no output — falling back to flux-dev img2img.");
-    } catch (err) {
-      console.error("Flux Kontext generation failed — falling back to flux-dev img2img:", err);
+      return timed(name, "img2img", () => p.img2img({ prompt: scenePrompt, imageUrl: referenceImageUrl, strength: 0.82 }));
     }
-  }
-
-  const input = {
-    prompt: `${STYLE_DIRECTIVE} Scene: ${prompt}`,
-    output_format: "jpg",
-    num_outputs: 1,
-  };
-  if (referenceImageUrl) {
-    input.image = referenceImageUrl;
-    input.prompt_strength = 0.82;
-  } else {
-    input.aspect_ratio = aspectRatio;
-  }
-
-  const [output] = await replicate.run(MODEL, { input });
-
-  if (!output) {
-    throw new Error("Replicate returned no output.");
-  }
-
-  return Buffer.from(await output.blob().then((b) => b.arrayBuffer()));
+    return timed(name, "text2img", () => p.textToImage({ prompt: scenePrompt, aspectRatio }));
+  }, provider);
 }
 
 // helloAvatar's own generation step: a full-body watercolor figure from the
@@ -143,7 +255,6 @@ const SEX_WORD = { man: "male", boy: "male", woman: "female", girl: "female" };
 // even starts, and restating it plainly at the end — the same primacy +
 // recency pairing already proven for the style/build instructions.
 export async function generateAvatarPortrait({ appearance, subjectPhrase, buildPhrase }) {
-  const replicate = new Replicate();
   const sexWord = SEX_WORD[subjectPhrase];
   const subjectClause = sexWord ? `a ${sexWord} ${subjectPhrase}` : `a ${subjectPhrase}`;
 
@@ -156,18 +267,5 @@ export async function generateAvatarPortrait({ appearance, subjectPhrase, buildP
     `Reminder, both required: this figure is ${subjectClause}${sexWord ? ` (${sexWord}, not the opposite sex)` : ""}, ` +
     `with a ${buildPhrase} — painted realistically, not slimmer or more toned than described.`;
 
-  const [output] = await replicate.run(MODEL, {
-    input: {
-      prompt,
-      aspect_ratio: "3:4",
-      output_format: "jpg",
-      num_outputs: 1,
-    },
-  });
-
-  if (!output) {
-    throw new Error("Replicate returned no output.");
-  }
-
-  return Buffer.from(await output.blob().then((b) => b.arrayBuffer()));
+  return withFallback((name) => timed(name, "avatar", () => PROVIDERS[name].textToImage({ prompt, aspectRatio: "3:4" })));
 }
