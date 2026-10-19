@@ -1,4 +1,5 @@
 import GuideHeroImage from "./GuideHeroImage.jsx";
+import { guideHeroPublicPath } from "@/lib/guideHero";
 
 // A literal, honest "here's how helloModa helps" block — styled with the
 // exact same visual grammar as a real chat turn (MessageBubble.jsx: script
@@ -11,7 +12,8 @@ export default function GuideShowcase({ guide }) {
       <p className="text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#2b2633]/45">See it in helloModa</p>
       <div className="mt-5 grid gap-8 sm:grid-cols-2 sm:items-start">
         <GuideHeroImage
-          src={`/guides/${guide.slug}-hero.jpg`}
+          src={guideHeroPublicPath(guide.slug)}
+          palette={guide.palette}
           alt={guide.occasion}
           className="aspect-[4/5] rounded-[22px] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.45)]"
         />
