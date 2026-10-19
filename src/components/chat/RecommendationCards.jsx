@@ -1,7 +1,7 @@
 import PlaceholderImage from "../PlaceholderImage.jsx";
 import { Heart, Hanger } from "../Icons.jsx";
-
-const EUR = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 2 });
+import { formatPrice } from "@/lib/format";
+import { retailerLabel } from "@/lib/awinRetailers";
 
 function RetailerTag({ retailer, source }) {
   if (source === "closet") {
@@ -22,7 +22,7 @@ function RetailerTag({ retailer, source }) {
           borderLeft: "6px solid #ff6900",
         }}
       />
-      {retailer}
+      {retailerLabel(retailer)}
     </span>
   );
 }
@@ -70,7 +70,9 @@ function ProductCard({ card, onToggleSave, saved }) {
         <div className="mt-1 flex items-center justify-between gap-2">
           <RetailerTag retailer={card.retailer} source={card.source} />
           {card.price != null && (
-            <span className="shrink-0 text-[12.5px] font-medium text-ink">{EUR.format(card.price)}</span>
+            <span className="shrink-0 text-[12.5px] font-medium text-ink">
+              {formatPrice(card.price, card.currency)}
+            </span>
           )}
         </div>
       </div>
