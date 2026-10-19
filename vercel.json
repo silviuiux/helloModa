@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/sync-products-zalando",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/check-product-links",
+      "schedule": "15 4 * * *"
     }
   ]
 }

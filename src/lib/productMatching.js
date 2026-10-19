@@ -3,8 +3,10 @@ import { embedText } from "./embeddings.js";
 // Finds real catalog products (from onboarded affiliate retailers, e.g.
 // Italist via Awin — see scripts/sync-products-italist.mjs) closest in
 // meaning to a described piece, via the match_products Postgres function
-// (pgvector cosine distance, docs/04-data-model.md). `products` RLS is
-// public-read, so any Supabase client works here, no auth required.
+// (pgvector cosine distance, docs/04-data-model.md). Rows whose affiliate
+// link landed on a 404, 410, or soft-404 are excluded in that function
+// (link_status dead / soft_404). `products` RLS is public-read, so any
+// Supabase client works here, no auth required.
 export async function matchProducts(
   supabase,
   description,

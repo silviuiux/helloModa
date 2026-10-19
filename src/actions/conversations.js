@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { signLookImageUrl } from "@/lib/lookImages";
+import { isDeadProductLink } from "@/lib/productLinkHealth";
 
 const CATEGORY_TO_TYPE = {
   Tops: "top",
@@ -33,6 +34,7 @@ function mapRecommendationItem(it) {
     };
   }
   if (it.products) {
+    const linkable = !isDeadProductLink(it.products.link_status);
     return {
       id: it.id,
       brand: it.products.brand,
@@ -42,9 +44,9 @@ function mapRecommendationItem(it) {
       currency: it.products.currency || "EUR",
       retailer: it.products.retailer,
       source: "shop",
-      productUrl: it.products.product_url,
-      imageUrl: it.products.image_url,
-      matched: true,
+      ...(linkable
+        ? { productUrl: it.products.product_url, imageUrl: it.products.image_url, matched: true }
+        : {}),
     };
   }
   return {
@@ -102,7 +104,7 @@ export async function getConversationMessages(conversationId) {
     const { data, error: itemsError } = await supabase
       .from("outfit_recommendation_items")
       .select(
-        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url)"
+        "id, recommendation_id, suggested_brand, suggested_name, suggested_category, wardrobe_items(id, name, brand, category), products(id, brand, name, retailer, price_cents, currency, product_url, image_url, link_status)"
       )
       .in("recommendation_id", recIds);
     if (itemsError) throw new Error(itemsError.message);
