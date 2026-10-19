@@ -4,6 +4,12 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-19 — A retailer homepage is a soft-404
+
+Italist answers a missing SKU with HTTP 200 on the store root (`https://italist.com/?source=aw…`, title "Italist | Designer Fashion from Italy") instead of a 404. `classifyProductPage` now treats a final path of `/` or `/search` as `soft_404`, so those products stay out of chat the same way a real 404 does. HTTP 404 and 410 remain `dead`.
+
+---
+
 ## 2026-10-19 — Guide heroes no longer 404; dead affiliate links are hidden
 
 `/what-to-wear` was requesting `public/guides/{slug}-hero.jpg`, which was never generated. Those pages now paint `GuideHeroArt` (an inline SVG tinted with each guide's palette) and only request the jpg when `guideHeroPublicPath()` sees the file on disk. Generating the jpgs still waits on Replicate credit.

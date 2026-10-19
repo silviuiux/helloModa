@@ -42,7 +42,10 @@ function looksMissing(text) {
 
 function pathLooksMissing(finalUrl) {
   try {
-    const path = new URL(finalUrl).pathname.toLowerCase();
+    const path = new URL(finalUrl).pathname.toLowerCase().replace(/\/+$/, "");
+    // Italist answers a gone SKU with HTTP 200 on the store root
+    // (title "Italist | Designer Fashion from Italy"), not a 404.
+    if (path === "" || path === "/search" || path.startsWith("/search/")) return true;
     return path === "/404" || path.endsWith("/404") || path.includes("/not-found");
   } catch {
     return false;

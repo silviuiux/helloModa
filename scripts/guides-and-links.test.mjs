@@ -47,6 +47,14 @@ test("product pages are dead only on 404, 410, or a missing-page title", async (
     }),
     "ok"
   );
+  assert.equal(
+    classifyProductPage({
+      httpStatus: 200,
+      finalUrl: "https://italist.com/?source=aw&awc=127855_1",
+      html: "<title>Italist | Designer Fashion from Italy</title>",
+    }),
+    "soft_404"
+  );
   assert.equal(classifyProductPage({ httpStatus: 429, finalUrl: "https://italist.com/p", html: "" }), "error");
   assert.equal(classifyProductPage({ httpStatus: 503, finalUrl: "https://italist.com/p", html: "" }), "error");
   assert.equal(classifyProductPage({ httpStatus: null, finalUrl: null, html: "" }), "error");
