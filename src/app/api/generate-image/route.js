@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
-import { generateOutfitImage } from "@/lib/imageGen";
+import { generateOutfitImage, ImageProviderConfigError } from "@/lib/imageGen";
 import { signLookImageUrl } from "@/lib/lookImages";
 import { signAvatarRenderUrl } from "@/lib/avatarImages";
 import { assertUnderQuota, recordUsage } from "@/lib/usage";
@@ -91,6 +91,9 @@ export async function POST(request) {
     }
   } catch (err) {
     console.error("Outfit image generation failed:", err);
+    if (err instanceof ImageProviderConfigError || err?.name === "ImageProviderConfigError") {
+      return NextResponse.json({ error: err.message }, { status: err.status || 503 });
+    }
     Sentry.captureException(err);
     return NextResponse.json({ error: "Couldn't generate an image for this look." }, { status: 502 });
   }
