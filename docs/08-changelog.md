@@ -4,6 +4,37 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-19 — Phase 1 loose ends: image-key errors, Zalando's real blocker, link tracking
+
+**Image generation.** `FAL_KEY` is not set in this environment and is not a Vercel env var.
+`REPLICATE_API_TOKEN` is set on Vercel (production, preview, development) but was not in the
+agent shell, so no live generation was run. `generateOutfitImage` now throws
+`ImageProviderConfigError` (HTTP 503, the message names `FAL_KEY` and `REPLICATE_API_TOKEN`)
+when neither key is set, instead of calling a provider and returning a generic 502.
+`/api/generate-image` and `/api/avatar/generate` pass that sentence through.
+
+fal's flux-dev price is $0.025 per megapixel, rounded up (fal.ai model page). The old 4:5
+size was 928×1152 (1.07MP), which bills as $0.05. `falImageSize` now stays at or under 1
+megapixel so a future fal switch matches Replicate's flat $0.025/image
+(https://replicate.com/pricing). Default provider stays `replicate` until `FAL_KEY` exists
+and `scripts/compare-image-providers.mjs` has been run.
+
+**Zalando.** The pipeline was already staged and waiting on `AWIN_ZALANDO_FEED_URL`, which
+is still unset, so nothing has synced (0 Zalando rows). The Awin programme to join is
+**Lounge by Zalando DE, advertiser 13789** — the outlet, not zalando.com. The nightly cron
+now returns 200 `{ skipped: true }` with those steps instead of a 500. Bare merchant URLs
+in a feed are wrapped with publisher id `3100896` (from live Italist links) or dropped.
+
+**Italist links.** A live `awin1.com/pclick.php?a=3100896&m=127855` click redirects with an
+`awc=` token onto italist.com. Some synced SKUs 404 (gone from the shop, still in the feed);
+others return 200, for example a Dolce & Gabbana sneaker and a Dsquared2 sneaker. Chat still
+rarely attaches one: 27 of 29,313 products have embeddings, because the Replicate account is
+under $5 and the CLIP cron is capped at 6 requests/minute with a burst of 1. Those 429s are
+now waited out and retried. Product cards format the row's currency (Italist is USD) instead
+of always showing euros. Wardrobe search no longer throws when a piece has no brand.
+
+---
+
 ## 2026-10-03 — Image generation can switch between Replicate and fal.ai
 
 Direct request: set up a switch to fal.ai, which researched as cheaper and faster than Replicate
