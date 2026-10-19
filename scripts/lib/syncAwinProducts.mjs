@@ -8,6 +8,7 @@
 import { gunzipSync } from "node:zlib";
 import { createClient } from "@supabase/supabase-js";
 import { embedImageUrl, embedText } from "../../src/lib/embeddings.js";
+import { ensureAwinTrackingUrl } from "../../src/lib/awinRetailers.js";
 
 // Awin lets publishers name their own feed columns in "Create-a-Feed," so we
 // accept a few common aliases per field rather than assuming one exact set.
@@ -109,6 +110,10 @@ function toProductRecord(row, retailer) {
 
   const priceRaw = pick(row, FIELD_ALIASES.price);
   const priceCents = priceRaw != null ? Math.round(parseFloat(priceRaw) * 100) : null;
+  // aw_deep_link is already tracked. A bare merchant URL is wrapped with
+  // this publisher's Awin id. Anything we can't track is dropped.
+  const trackedUrl = ensureAwinTrackingUrl(productUrl, retailer);
+  if (!trackedUrl) return null;
 
   return {
     retailer,
@@ -119,7 +124,7 @@ function toProductRecord(row, retailer) {
     category: pick(row, FIELD_ALIASES.category),
     price_cents: Number.isFinite(priceCents) ? priceCents : null,
     currency: pick(row, FIELD_ALIASES.currency) || "EUR",
-    product_url: productUrl,
+    product_url: trackedUrl,
     image_url: pick(row, FIELD_ALIASES.imageUrl),
     last_synced_at: new Date().toISOString(),
   };

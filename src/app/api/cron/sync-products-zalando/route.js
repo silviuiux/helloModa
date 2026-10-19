@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { syncAwinProducts } from "../../../../../scripts/lib/syncAwinProducts.mjs";
+import { zalandoFeedBlockedMessage } from "@/lib/awinRetailers";
 
 export const maxDuration = 300;
 
@@ -20,8 +21,11 @@ export async function GET(request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
+  // Not an error until the programme is joined. A 500 here fired every night
+  // (vercel.json cron) with no feed to sync. The body says exactly which
+  // Awin action is still outstanding.
   if (!process.env.AWIN_ZALANDO_FEED_URL) {
-    return NextResponse.json({ error: "AWIN_ZALANDO_FEED_URL is not set." }, { status: 500 });
+    return NextResponse.json({ ok: true, skipped: true, reason: zalandoFeedBlockedMessage() });
   }
 
   try {
