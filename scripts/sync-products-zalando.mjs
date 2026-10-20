@@ -32,6 +32,7 @@
 // here, so a single long-running manual pass can clear the whole backlog.
 
 import { readFileSync, existsSync } from "node:fs";
+import { zalandoFeedBlockedMessage } from "../src/lib/awinRetailers.js";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -47,7 +48,7 @@ if (existsSync(envPath)) {
 }
 
 if (!process.env.AWIN_ZALANDO_FEED_URL) {
-  console.error("AWIN_ZALANDO_FEED_URL is not set (checked env and .env.local). Aborting.");
+  console.error(zalandoFeedBlockedMessage());
   process.exit(1);
 }
 

@@ -4,6 +4,51 @@ Living log, append-only — never rewrite past entries, add new ones at the top.
 
 ---
 
+## 2026-10-19 — A retailer homepage is a soft-404
+
+Italist answers a missing SKU with HTTP 200 on the store root (`https://italist.com/?source=aw…`, title "Italist | Designer Fashion from Italy") instead of a 404. `classifyProductPage` now treats a final path of `/` or `/search` as `soft_404`, so those products stay out of chat the same way a real 404 does. HTTP 404 and 410 remain `dead`.
+
+---
+
+## 2026-10-19 — Guide heroes no longer 404; dead affiliate links are hidden
+
+`/what-to-wear` was requesting `public/guides/{slug}-hero.jpg`, which was never generated. Those pages now paint `GuideHeroArt` (an inline SVG tinted with each guide's palette) and only request the jpg when `guideHeroPublicPath()` sees the file on disk. Generating the jpgs still waits on Replicate credit.
+
+Affiliate clicks that land on a 404, 410, or a page whose title says the product is gone are stored on `products.link_status` (`dead` or `soft_404`) and left out of `match_products`. Saved looks drop the outbound link too. The checker is `scripts/check-product-links.mjs` and `GET /api/cron/check-product-links` (04:15 UTC), one request every 1.5s, embedded rows first. Transient errors stay linkable and are retried the next day. Migration `20261019080340_product_link_status` is additive.
+
+---
+
+## 2026-10-19 — Phase 1 loose ends: image-key errors, Zalando's real blocker, link tracking
+
+**Image generation.** `FAL_KEY` is not set in this environment and is not a Vercel env var.
+`REPLICATE_API_TOKEN` is set on Vercel (production, preview, development) but was not in the
+agent shell, so no live generation was run. `generateOutfitImage` now throws
+`ImageProviderConfigError` (HTTP 503, the message names `FAL_KEY` and `REPLICATE_API_TOKEN`)
+when neither key is set, instead of calling a provider and returning a generic 502.
+`/api/generate-image` and `/api/avatar/generate` pass that sentence through.
+
+fal's flux-dev price is $0.025 per megapixel, rounded up (fal.ai model page). The old 4:5
+size was 928×1152 (1.07MP), which bills as $0.05. `falImageSize` now stays at or under 1
+megapixel so a future fal switch matches Replicate's flat $0.025/image
+(https://replicate.com/pricing). Default provider stays `replicate` until `FAL_KEY` exists
+and `scripts/compare-image-providers.mjs` has been run.
+
+**Zalando.** The pipeline was already staged and waiting on `AWIN_ZALANDO_FEED_URL`, which
+is still unset, so nothing has synced (0 Zalando rows). The Awin programme to join is
+**Lounge by Zalando DE, advertiser 13789** — the outlet, not zalando.com. The nightly cron
+now returns 200 `{ skipped: true }` with those steps instead of a 500. Bare merchant URLs
+in a feed are wrapped with publisher id `3100896` (from live Italist links) or dropped.
+
+**Italist links.** A live `awin1.com/pclick.php?a=3100896&m=127855` click redirects with an
+`awc=` token onto italist.com. Some synced SKUs 404 (gone from the shop, still in the feed);
+others return 200, for example a Dolce & Gabbana sneaker and a Dsquared2 sneaker. Chat still
+rarely attaches one: 27 of 29,313 products have embeddings, because the Replicate account is
+under $5 and the CLIP cron is capped at 6 requests/minute with a burst of 1. Those 429s are
+now waited out and retried. Product cards format the row's currency (Italist is USD) instead
+of always showing euros. Wardrobe search no longer throws when a piece has no brand.
+
+---
+
 ## 2026-10-03 — Image generation can switch between Replicate and fal.ai
 
 Direct request: set up a switch to fal.ai, which researched as cheaper and faster than Replicate

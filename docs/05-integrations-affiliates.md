@@ -39,7 +39,7 @@ generalists above; verify directly rather than assuming Awin/Rakuten coverage.
    doesn't carry.
 4. Leave 2Performant/eMAG alone until the conflict-of-interest review is done.
 
-## Zalando — next retailer, staged 2026-09-23
+## Zalando — next retailer, staged 2026-09-23, still blocked on the account 2026-10-19
 
 Direct request: get Zalando products showing up, "even if they're not affiliate links."
 Correction worth recording: there is no non-affiliate Zalando catalog to pull from — the only
@@ -50,20 +50,43 @@ fine, "not an affiliate relationship" isn't accurate, so the product copy should
 Scraping their storefront instead is explicitly the one thing `06-risks-legal.md` says to avoid,
 regardless of monetization — not an option here.
 
-The code is staged and ready, mirroring the Italist pipeline exactly (it's retailer-agnostic by
-design — `scripts/lib/syncAwinProducts.mjs` doesn't know or care which advertiser it's syncing):
+**What Awin actually lists.** Public merchant profiles are **Lounge by Zalando** (the outlet
+club), one programme per country. The one to join first is **Lounge by Zalando DE, advertiser
+id `13789`**, https://ui.awin.com/merchant-profile/13789 (12% new / 4% returning, €0.50 per
+lead, 30-day cookie, affiliate@zalando.de). Other public profiles include AT `11350`, CH
+`11518`, BE `8383`, SE `24435`, CZ `18741`, FI `24438`. No public Awin profile for the main
+zalando.com / zalando.de full-price shop turned up; that assortment is the direct Partner
+Program, not this feed.
 
-- `scripts/sync-products-zalando.mjs` — manual/backfill entry point
+The sync code is retailer-agnostic (`scripts/lib/syncAwinProducts.mjs`). Zalando-specific
+wiring:
+
+- `scripts/sync-products-zalando.mjs` — manual/backfill entry point. Exits with the account
+  steps below when `AWIN_ZALANDO_FEED_URL` is missing.
 - `src/app/api/cron/sync-products-zalando/route.js` — nightly trigger, offset 30 minutes from
-  Italist's in `vercel.json` so they don't overlap
-- Both need `AWIN_ZALANDO_FEED_URL` once Zalando is an approved Awin advertiser (or an
-  equivalent env var + a one-line tweak if the Partner Program's feed format differs)
+  Italist's in `vercel.json`. While the feed URL is unset it returns **200 `{ skipped: true }`**
+  with the same steps, so the cron is not a nightly 500.
+- `src/lib/awinRetailers.js` — advertiser ids, and a check that every stored `product_url` is
+  an `awin1.com` tracking link. A bare merchant URL is wrapped as
+  `cread.php?awinmid=…&awinaffid=3100896&ued=…` (publisher id taken from live Italist links).
+  A row that can't be tracked is dropped.
 
-**Not done yet, blocked on you:** applying for Zalando on Awin (or direct), and — if you're on
-Vercel's Hobby plan — checking its cron-job limits before this second nightly job is live; Hobby
-plans have historically capped both job count and how often a job can fire. Once
-`AWIN_ZALANDO_FEED_URL` exists, `node scripts/sync-products-zalando.mjs --embed-limit 30000` is
-the same one-command backfill Italist got.
+**Still blocked on an account action, not on code:**
+
+1. In Awin: Advertisers → Join programmes → Lounge by Zalando DE (advertiser **13789**).
+   Accept the programme terms. Status stays Pending until Zalando or their Awin manager
+   approves it (can take days; track it under Advertisers → My programmes → Pending).
+2. After approval (up to 24h before it shows as Joined): Create-a-Feed, **Compression Type
+   gzip** (zip is rejected by the sync), and set `AWIN_ZALANDO_FEED_URL` in Vercel production.
+   The URL embeds the publisher token — don't commit it.
+3. Optional, in parallel, for the main shop: apply at https://partner.zalando.com. That feed
+   is not Awin-shaped; don't point `AWIN_ZALANDO_FEED_URL` at it without checking columns.
+4. Embeddings use the same Replicate CLIP path as Italist. The account is under $5 credit, so
+   Replicate throttles to 6 requests/minute. Top the balance up or the Zalando backlog will
+   stall the same way Italist's has (27 of 29,313 embedded as of 2026-10-19).
+
+Once `AWIN_ZALANDO_FEED_URL` exists, `node scripts/sync-products-zalando.mjs --embed-limit 30000`
+is the same one-command backfill Italist got.
 
 ## Ingestion pipeline — live for Italist, 2026-09-21
 

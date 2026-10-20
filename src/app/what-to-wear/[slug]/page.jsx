@@ -7,6 +7,7 @@ import GuideHeroImage from "@/components/guides/GuideHeroImage.jsx";
 import GuideShowcase from "@/components/guides/GuideShowcase.jsx";
 import PlaceholderImage from "@/components/PlaceholderImage.jsx";
 import { ArrowRight } from "@/components/Icons.jsx";
+import { guideHeroPublicPath } from "@/lib/guideHero";
 
 export function generateStaticParams() {
   return guides.map((g) => ({ slug: g.slug }));
@@ -16,7 +17,8 @@ export function generateMetadata({ params }) {
   const guide = getGuideBySlug(params.slug);
   if (!guide) return {};
   const url = `${SITE_URL}/what-to-wear/${guide.slug}`;
-  const imageUrl = `${SITE_URL}/guides/${guide.slug}-hero.jpg`;
+  const heroPath = guideHeroPublicPath(guide.slug);
+  const imageUrl = heroPath ? `${SITE_URL}${heroPath}` : null;
   return {
     title: `${guide.title} | helloModa`,
     description: guide.metaDescription,
@@ -26,7 +28,7 @@ export function generateMetadata({ params }) {
       description: guide.metaDescription,
       url,
       type: "article",
-      images: [{ url: imageUrl }],
+      ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
     },
   };
 }
@@ -35,12 +37,13 @@ export default function GuidePage({ params }) {
   const guide = getGuideBySlug(params.slug);
   if (!guide) notFound();
 
+  const heroPath = guideHeroPublicPath(guide.slug);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: guide.title,
     description: guide.metaDescription,
-    image: `${SITE_URL}/guides/${guide.slug}-hero.jpg`,
+    ...(heroPath ? { image: `${SITE_URL}${heroPath}` } : {}),
     author: { "@type": "Organization", name: "helloModa" },
     publisher: { "@type": "Organization", name: "helloModa" },
     mainEntityOfPage: `${SITE_URL}/what-to-wear/${guide.slug}`,
@@ -71,7 +74,8 @@ export default function GuidePage({ params }) {
           </p>
         </div>
         <GuideHeroImage
-          src={`/guides/${guide.slug}-hero.jpg`}
+          src={heroPath}
+          palette={guide.palette}
           alt={guide.title}
           className="aspect-[4/5] rounded-[22px] shadow-[0_50px_90px_-45px_rgba(90,70,160,0.45)]"
         />

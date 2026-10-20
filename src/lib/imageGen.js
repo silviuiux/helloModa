@@ -37,12 +37,36 @@ function configured(provider) {
   return provider === "fal" ? Boolean(process.env.FAL_KEY) : Boolean(process.env.REPLICATE_API_TOKEN);
 }
 
-// "4:5" -> pixel size for fal's flux-dev (multiples of 16, long side ~1152).
-function falImageSize(aspectRatio) {
-  const [w, h] = aspectRatio.split(":").map(Number);
-  const scale = 1152 / Math.max(w, h);
-  const round16 = (n) => Math.max(256, Math.round((n * scale) / 16) * 16);
-  return { width: round16(w), height: round16(h) };
+const KEY_FOR = { fal: "FAL_KEY", replicate: "REPLICATE_API_TOKEN" };
+
+// Thrown before any provider call when neither key is set, so the API can
+// show this sentence instead of a cryptic client error or a generic 502.
+export class ImageProviderConfigError extends Error {
+  constructor() {
+    super(
+      "Image generation isn't configured. Set FAL_KEY for fal.ai (and IMAGE_PROVIDER=fal to prefer it) or REPLICATE_API_TOKEN for Replicate."
+    );
+    this.name = "ImageProviderConfigError";
+    this.status = 503;
+  }
+}
+
+// "4:5" -> pixel size for fal's flux-dev (multiples of 16).
+// fal-ai/flux/dev bills $0.025 per megapixel, rounded up. A long side of
+// 1152 at 4:5 is 928×1152 (1.07MP) and would bill as 2MP / $0.05, twice
+// Replicate's flat $0.025. Stay at or under 1_000_000 pixels.
+export function falImageSize(aspectRatio) {
+  const [w, h] = String(aspectRatio).split(":").map(Number);
+  if (!w || !h) throw new Error(`Bad aspect ratio: ${aspectRatio}`);
+  const round16 = (n) => Math.max(256, Math.round(n / 16) * 16);
+  const MAX_AREA = 1_000_000;
+  for (let longSide = 1152; longSide >= 256; longSide -= 16) {
+    const scale = longSide / Math.max(w, h);
+    const width = round16(w * scale);
+    const height = round16(h * scale);
+    if (width * height <= MAX_AREA) return { width, height };
+  }
+  return { width: 256, height: 256 };
 }
 
 async function bufferFromUrl(url) {
@@ -138,8 +162,16 @@ async function timed(provider, step, fn) {
 // other provider has a key configured, tries it once before giving up.
 // `prefer` overrides IMAGE_PROVIDER (used by the comparison script).
 async function withFallback(task, prefer = PROVIDER) {
+  if (!configured("fal") && !configured("replicate")) {
+    throw new ImageProviderConfigError();
+  }
   const primary = configured(prefer) ? prefer : prefer === "fal" ? "replicate" : "fal";
   const secondary = primary === "fal" ? "replicate" : "fal";
+  if (primary !== prefer) {
+    console.error(
+      `[imageGen] ${prefer} is not configured (${KEY_FOR[prefer]} is missing) — using ${primary}.`
+    );
+  }
   try {
     return await task(primary);
   } catch (err) {

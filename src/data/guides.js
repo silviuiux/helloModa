@@ -13,8 +13,9 @@
 // `heroImagePrompt` feeds scripts/generate-guide-images.mjs — a real
 // generated hero image (house watercolor style, src/lib/imageGen.js), saved
 // as a static file at public/guides/{slug}-hero.jpg. Run that script after
-// adding a guide (needs REPLICATE_API_TOKEN); pages degrade gracefully to
-// an illustrated placeholder until the file exists (GuideHeroImage.jsx).
+// adding a guide (needs REPLICATE_API_TOKEN). Until that file is committed,
+// src/lib/guideHero.js returns null and the page paints GuideHeroArt from
+// `palette` — it does not request the missing jpg.
 // `palette` is a handful of hex swatches matching the guide's described
 // color story — rendered as literal color chips, not an image.
 export const guides = [

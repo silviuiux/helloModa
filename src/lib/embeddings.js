@@ -39,14 +39,76 @@ function resolveModelRef(replicate) {
   return versionPromise;
 }
 
+// Replicate drops accounts under $5 of credit to 6 predictions/minute with
+// a burst of 1 (seen on the Italist cron since 2026-09-24). The message
+// includes retry_after. Parse it so a 429 waits and retries instead of
+// failing the product and leaving the embedding backlog stuck.
+export function retryDelaySeconds(err) {
+  const msg = String(err?.message || err || "");
+  const fromJson = msg.match(/retry_after"\s*:\s*(\d+)/);
+  if (fromJson) return Number(fromJson[1]);
+  const fromText = msg.match(/resets in ~(\d+)s/);
+  if (fromText) return Number(fromText[1]);
+  return 8;
+}
+
+function isThrottle(err) {
+  const status = err?.response?.status ?? err?.status;
+  if (status === 429) return true;
+  return /429|Too Many Requests|throttled/i.test(String(err?.message || ""));
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// After the first 429, later CLIP calls in this process wait out the
+// window so a concurrency-8 cron doesn't spend the whole invocation on
+// rejected bursts. Calls that aren't throttled still run together.
+let clipGate = Promise.resolve();
+let spacedUntil = 0;
+
+async function withClipSlot(fn) {
+  const ticket = clipGate.then(async () => {
+    const wait = spacedUntil - Date.now();
+    if (wait > 0) await sleep(wait);
+  });
+  clipGate = ticket.then(
+    () => {},
+    () => {}
+  );
+  await ticket;
+  try {
+    return await fn();
+  } catch (err) {
+    if (isThrottle(err)) {
+      const delayMs = Math.min(30, Math.max(1, retryDelaySeconds(err))) * 1000;
+      spacedUntil = Math.max(spacedUntil, Date.now() + delayMs);
+    }
+    throw err;
+  }
+}
+
 async function runClip(input) {
   const replicate = new Replicate();
   const ref = await resolveModelRef(replicate);
-  const output = await replicate.run(ref, { input });
-  if (!Array.isArray(output?.embedding)) {
-    throw new Error(`Unexpected CLIP output from ${ref}: ${JSON.stringify(output).slice(0, 200)}`);
+  const maxAttempts = 4;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const output = await withClipSlot(() => replicate.run(ref, { input }));
+      if (!Array.isArray(output?.embedding)) {
+        throw new Error(`Unexpected CLIP output from ${ref}: ${JSON.stringify(output).slice(0, 200)}`);
+      }
+      return output.embedding;
+    } catch (err) {
+      if (!isThrottle(err) || attempt === maxAttempts) throw err;
+      console.warn(
+        `[embeddings] Replicate rate-limited (attempt ${attempt}/${maxAttempts}). ` +
+          `Accounts under $5 credit are capped at 6 requests/minute. ` +
+          `Waiting ${retryDelaySeconds(err)}s before retry.`
+      );
+    }
   }
-  return output.embedding;
 }
 
 export async function embedText(text) {

@@ -3,6 +3,7 @@ import { guides } from "@/data/guides.js";
 import { SITE_URL } from "@/lib/siteConfig.js";
 import GuideLayout from "@/components/guides/GuideLayout.jsx";
 import GuideHeroImage from "@/components/guides/GuideHeroImage.jsx";
+import { guideHeroPublicPath } from "@/lib/guideHero";
 
 export const metadata = {
   title: "Style Guides — What to Wear | helloModa",
@@ -43,7 +44,8 @@ export default function GuidesIndexPage() {
                 <Link key={g.slug} href={`/what-to-wear/${g.slug}`} className="group">
                   <div className="aspect-[4/5] overflow-hidden rounded-[20px] shadow-[0_40px_80px_-45px_rgba(90,70,160,0.45),0_0_0_1px_rgba(43,38,51,0.04)] transition-transform duration-500 group-hover:-translate-y-1">
                     <GuideHeroImage
-                      src={`/guides/${g.slug}-hero.jpg`}
+                      src={guideHeroPublicPath(g.slug)}
+                      palette={g.palette}
                       alt={g.occasion}
                       className="h-full w-full"
                     />

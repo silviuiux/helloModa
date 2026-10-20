@@ -33,10 +33,8 @@ export default function WardrobeView({ items, onAdd, onToggleFav, onRemove, onSe
     return itemsWithStats.filter((it) => {
       const inCat = category === "All" || it.category === category;
       const inFav = !favOnly || it.fav;
-      const inQuery =
-        !query ||
-        it.name.toLowerCase().includes(query.toLowerCase()) ||
-        it.brand.toLowerCase().includes(query.toLowerCase());
+      const haystack = `${it.name || ""} ${it.brand || ""}`.toLowerCase();
+      const inQuery = !query || haystack.includes(query.toLowerCase());
       return inCat && inFav && inQuery;
     });
   }, [itemsWithStats, category, favOnly, query]);

@@ -1,14 +1,17 @@
-"use client";
+import GuideHeroArt from "./GuideHeroArt.jsx";
 
-import PlaceholderImage from "../PlaceholderImage.jsx";
-
-// Real generated image (scripts/generate-guide-images.mjs) when it exists,
-// falling back to a placeholder photo seeded on the path — never a broken
-// image, and upgrades automatically once the script has run.
-export default function GuideHeroImage({ src, alt, className = "" }) {
+// `src` is set only by guideHeroPublicPath(), which checks that the
+// generated jpg is on disk. When it is null this renders the committed
+// SVG and does not request /guides/{slug}-hero.jpg.
+export default function GuideHeroImage({ src, alt, palette, className = "" }) {
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <PlaceholderImage src={src} seed={src} alt={alt} width={1000} height={1250} />
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={alt || ""} className="h-full w-full object-cover" />
+      ) : (
+        <GuideHeroArt palette={palette} title={alt} />
+      )}
     </div>
   );
 }

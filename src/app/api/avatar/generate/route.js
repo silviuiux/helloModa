@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AvatarAppearanceSchema, AVATAR_DESCRIBER_SYSTEM_PROMPT } from "@/lib/avatarDescriber";
 import { AVATAR_CONSENT_TEXT_VERSION } from "@/lib/avatarConsent";
 import { suggestBuildFromBMI, buildPromptPhrase } from "@/lib/avatarBuild";
-import { generateAvatarPortrait } from "@/lib/imageGen";
+import { generateAvatarPortrait, ImageProviderConfigError } from "@/lib/imageGen";
 import { signAvatarRenderUrl } from "@/lib/avatarImages";
 import { assertUnderQuota, recordUsage } from "@/lib/usage";
 
@@ -145,6 +145,9 @@ export async function POST(request) {
     }
   } catch (err) {
     console.error("Avatar portrait generation failed:", err);
+    if (err instanceof ImageProviderConfigError || err?.name === "ImageProviderConfigError") {
+      return NextResponse.json({ error: err.message }, { status: err.status || 503 });
+    }
     Sentry.captureException(err);
     return NextResponse.json({ error: "Couldn't paint an avatar right now." }, { status: 502 });
   }
