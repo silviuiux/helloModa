@@ -14,7 +14,7 @@ Italist answers a missing SKU with HTTP 200 on the store root (`https://italist.
 
 `/what-to-wear` was requesting `public/guides/{slug}-hero.jpg`, which was never generated. Those pages now paint `GuideHeroArt` (an inline SVG tinted with each guide's palette) and only request the jpg when `guideHeroPublicPath()` sees the file on disk. Generating the jpgs still waits on Replicate credit.
 
-Affiliate clicks that land on a 404, 410, or a page whose title says the product is gone are stored on `products.link_status` (`dead` or `soft_404`) and left out of `match_products`. Saved looks drop the outbound link too. The checker is `scripts/check-product-links.mjs` and `GET /api/cron/check-product-links` (04:15 UTC), one request every 1.5s, embedded rows first. Transient errors stay linkable and are retried the next day. Migration `20261019080108_product_link_status` is additive.
+Affiliate clicks that land on a 404, 410, or a page whose title says the product is gone are stored on `products.link_status` (`dead` or `soft_404`) and left out of `match_products`. Saved looks drop the outbound link too. The checker is `scripts/check-product-links.mjs` and `GET /api/cron/check-product-links` (04:15 UTC), one request every 1.5s, embedded rows first. Transient errors stay linkable and are retried the next day. Migration `20261019080340_product_link_status` is additive.
 
 ---
 
